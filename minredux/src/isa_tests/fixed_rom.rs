@@ -1,10 +1,12 @@
-//! Explicitly selected, separately saved fixed ROMs. The default/original ROM
-//! tests and their known-erratum assertions remain unchanged.
+//! The corrected `roms/redux-1.4-isa-fixes-v1` bundle is the default execution
+//! target. These tests pin its fixed behavior (no semantic exceptions, exact
+//! XOR writeback, corrected WIN wakeup) and diff it against the read-only
+//! upstream images kept in `minimal64`.
 use super::*;
 
 #[test]
 fn fixed_rom_passes_all_255_opcodes_without_semantic_exceptions() {
-    let mut h = Harness::with_fixed_rom();
+    let mut h = Harness::new();
     arithmetic::check(&mut h);
     data::check(&mut h);
     control::check(&mut h);
@@ -19,8 +21,8 @@ fn fixed_rom_passes_all_255_opcodes_without_semantic_exceptions() {
 
 #[test]
 fn fixed_rom_only_changes_reviewed_words_and_preserves_program_flash() {
-    let original = images();
-    let fixed = fixed_images();
+    let original = super::original_images();
+    let fixed = super::images();
     assert_eq!(fixed.flash, original.flash);
     let before = ControlRom::from_images(&original).unwrap();
     let after = ControlRom::from_images(&fixed).unwrap();
@@ -54,7 +56,7 @@ fn fixed_rom_only_changes_reviewed_words_and_preserves_program_flash() {
 
 #[test]
 fn fixed_xor_writeback_is_exhaustive_and_preserves_scratch() {
-    let images = fixed_images();
+    let images = super::images();
     let mut m = Machine::new(
         ControlRom::from_images(&images).unwrap(),
         vec![0xff; 0x80000],
@@ -107,7 +109,7 @@ fn fixed_xor_writeback_is_exhaustive_and_preserves_scratch() {
 
 #[test]
 fn fixed_win_wakes_at_the_correct_pc_for_each_input_arrival_phase() {
-    let images = fixed_images();
+    let images = super::images();
     let mut m = Machine::new(
         ControlRom::from_images(&images).unwrap(),
         vec![0xff; 0x80000],
@@ -182,7 +184,7 @@ fn fixed_win_wakes_at_the_correct_pc_for_each_input_arrival_phase() {
 
 #[test]
 fn fixed_rom_boots_unmodified_minos() {
-    let images = fixed_images();
+    let images = super::images();
     let mut m = Machine::new(ControlRom::from_images(&images).unwrap(), images.flash);
     m.run_cycles(400_000);
     assert!(m.text_screen().contains("READY."));

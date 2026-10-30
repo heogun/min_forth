@@ -103,7 +103,7 @@ v2 원본 ROM의 측정 예 (숫자는 준비 구간/정의 규모에 대한 값
 
 ## 실행
 
-워크스페이스 루트에서 실행한다. Python 3 표준 라이브러리, Rust/Cargo, 네이티브 `minforth/tools/asm`이 필요하다. 실행기는 release observer와 현재 소스의 커널을 자동 빌드하며 기존 `minforth/build/` 및 원본 ROM은 변경하지 않는다.
+워크스페이스 루트에서 실행한다. Python 3 표준 라이브러리, Rust/Cargo, 네이티브 `minforth/tools/asm`이 필요하다. 실행기는 release observer와 현재 소스의 커널을 자동 빌드하며 기존 `minforth/build/` 및 ROM 번들은 변경하지 않는다.
 
 ```sh
 # 단계별 실행: 4종 → 6종 → 7종 (empty는 매번 추가)

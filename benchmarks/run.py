@@ -14,7 +14,7 @@ from cases import basic_cases, diagnostic_cases, extended_cases, mandelbrot_case
 from compare import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "minimal64/Revision 1.4 Redux/FLASH Images"
+REFERENCE = ROOT / "roms/redux-1.4-isa-fixes-v1"
 
 
 def load_tool(name):
@@ -143,7 +143,7 @@ def main():
     base.mkdir(exist_ok=True)
     if args.out:
         out = args.out.resolve()
-        protected = [REFERENCE.parent.resolve(), (ROOT / "minforth/build").resolve(),
+        protected = [(ROOT / "minimal64/Revision 1.4 Redux").resolve(), (ROOT / "minforth/build").resolve(),
                      (ROOT / "minforth/build-isa-fixes-v1").resolve(), (ROOT / "roms").resolve()]
         if any(out == path or path in out.parents for path in protected):
             p.error("output must not be inside reference ROMs or existing Forth/ROM bundles")

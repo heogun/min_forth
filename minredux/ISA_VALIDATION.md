@@ -30,7 +30,7 @@ cargo test
 
 아래는 수정 전 upstream ROM에서 확인한 결함 기록이다. 당시에는 독립 기대값과의 차이를 명시적으로 검출한 뒤 **원본 ROM의 정확한 관찰 결과**를 검사했고, opcode별 Rust 보정은 하지 않았다.
 
-세 결함의 수정본은 별도 디렉터리로 두지 않고 `../minimal64/Revision 1.4 Redux/FLASH Images/`의 제어 ROM에 직접 반영했다. 아래는 수정 전 upstream ROM에서 확인한 결함 기록이며, 수정본에서도 255개 전체 ISA 행렬, XOR 전수 검사 및 다양한 입력 도착 시각의 WIN 검사를 적용했다.
+세 결함의 수정본은 `../roms/redux-1.4-isa-fixes-v1/`에 별도 번들로 두며, 2026-10-30부터 에뮬레이터·벤치마크·커널 빌드의 기본 ROM이다. `../minimal64/Revision 1.4 Redux/FLASH Images/`의 원본 이미지는 diff/provenance 용도로만 보존하고 명시 요청 없이 실행하지 않는다. 수정본에는 255개 전체 ISA 행렬, XOR 전수 검사, WIN 4,608개 조합 및 MinOS 부팅 검사를 적용한다.
 
 ### 0x52 BXR (`XR.B`): 목적지 writeback 누락
 
@@ -43,24 +43,24 @@ cargo test
 - RAM[4500..4501]=0x1200, A=1, RAM[1200]=0에서 `XR.R 0x4500`의 의도된 결과는 RAM[1200]=1이다.
 - 원본은 RAM[1200]을 변경하지 않고 최종 XOR 값 1을 RAM[00ff]에 쓴다. BXR과 달리 scratch에 AND가 아닌 XOR 값이 남는다.
 - 근거: `XR_R`은 최종 `RI`가 있지만 MAR은 여전히 scratch 00ff를 가리킨다.
-- 전체 행렬에서 두 opcode 각각 **7개**의 실제 의미 불일치를 검사한다. 허용 예외는 이 두 opcode의 목적지 유지뿐이며, A·플래그·클록·다른 RAM 위치는 일반 검사와 똑같이 비교한다.
+- 전체 행렬에서 두 opcode 각각 **7개**의 실제 의미 불일치가 수정 전 원본에서 나타났다. 수정본의 기본 ISA 행렬은 두 opcode 모두 불일치가 0임을 요구하며, A·플래그·클록·다른 RAM 위치도 일반 검사와 똑같이 비교한다.
 
 ### 0x04 WIN: ffff 대기 중 입력 도착 시 잘못된 주소로 wakeup
 
 - ffff의 WIN에서 입력 없이 세 번 대기한 뒤 UART 또는 PS/2 바이트를 넣는다.
 - 의도된 다음 PC는 0000이지만 원본 ROM에서는 **ff00**이 된다. 입력 latch는 소비되지 않는다.
 - 원인: 실행 중 FI가 ready-input 제어 행으로 전환하면 low-byte 감소 단계는 건너뛰지만 carry=0인 high-byte 감소 단계는 실행된다.
-- `win_waits_then_wakes_and_exposes_ffff_wakeup_rom_erratum`은 이 차이를 명시적으로 검사한다. 같은 검사에서 일반 주소 8000 및 page 끝 80ff의 정상 wakeup도 확인한다.
+- `win_waits_then_wakes_at_the_expected_pc`는 일반 주소 8000, page 끝 80ff, 경계 ffff에서 입력 도착 후 다음 PC가 `start+1`(ffff는 0000)인지 확인한다. `fixed_win_wakes_at_the_correct_pc_for_each_input_arrival_phase`는 UART/PS2와 4,608개 주소·A/B·도착 시점 조합을 전수 검사한다.
 
 ## 기타 ISA 주의점
 
 - word/long 결과의 FR은 마지막으로 FI가 실행된 **바이트**의 플래그이지 전체 폭의 aggregate Z/N이 아니다. long add/sub의 네 번째 바이트 쓰기에는 FI가 없고, LR6/LR7도 최종 A와 다른 중간 연산의 플래그를 남긴다.
 - ZP word의 두 번째 바이트는 0100으로 넘어갈 수 있다. 반면 일부 stack slot 주소는 low byte만 조합하고, RTS는 MAR 전체 증가를 사용하므로 오버플로한 프레임에서 0000/0001·00ff에 접근할 수 있다. 이상적인 추상 원형 스택으로 바꾸지 않는다.
-- 명령 구현의 scratch RAM 00ff 변경도 observable한 부수효과로 검사한다. 특히 XOR·일부 logical right shift·JAS·WDB/WDR의 scratch 사용을 보존한다.
+- 명령 구현의 scratch RAM 00ff 변경도 observable한 부수효과로 검사한다. 특히 일부 logical right shift·JAS·WDB/WDR의 scratch 사용을 보존한다. 수정된 XR.B/XR.R은 목적지가 00ff가 아닌 한 scratch를 변경하지 않는다.
 
 ## 검증한 제어 ROM 식별
 
-경로: `../minimal64/Revision 1.4 Redux/FLASH Images/`. 각 파일은 524,288 bytes이다. SHA-256:
+실행 대상: `../roms/redux-1.4-isa-fixes-v1/`. 각 파일은 524,288 bytes이다. SHA-256:
 
 ```text
 ctrl_lsb.bin a3e8c3b2d84ce2bc07ac545450ff930c24a4064e7da61f048ab590b885d4abbd
@@ -68,4 +68,12 @@ ctrl_msb.bin 3b04671b89b859f84e9043e0fd6e5af015102241bad7318119154030e8db0f40
 ctrl_hsb.bin 94e6179d5c378260c34abd424f9328de438fe94025267cc73fd26e428bf679ca
 ```
 
-ROM를 갱신하면 위 알려진 결함 검사가 실패할 수 있다. 새 ROM의 수정 내용을 검토한 후 해당 예외와 문서를 함께 갱신한다. 검사를 통과시키기 위해 새 관찰값을 자동으로 기대값에 복사하지 않는다.
+Provenance/diff 용도로만 보존하는 원본: `../minimal64/Revision 1.4 Redux/FLASH Images/`. SHA-256:
+
+```text
+ctrl_lsb.bin d056f45db6da4c67d5b843cd49ec19879ac286204d036e34dd4ac68e6928ec34
+ctrl_msb.bin 3b04671b89b859f84e9043e0fd6e5af015102241bad7318119154030e8db0f40
+ctrl_hsb.bin d10100d6d9c7bb87c599fce032d4d39f7f75e5d4a4adefdc425b978c33864ad1
+```
+
+번들 재현성은 `python3 roms/build_redux_isa_fixes.py --check`로 확인하며 원본 이미지는 읽기만 한다. 원본 ROM은 명시 요청 없이 실행하지 않는다.

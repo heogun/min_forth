@@ -1,5 +1,6 @@
 //! Opt-in validation of each independently submitted upstream PR's ROMs.
-//! No default ROM selection or original-ROM erratum assertions are changed.
+//! This reads only the explicit PR fixture directory; the default corrected
+//! bundle and its assertions are untouched.
 use super::*;
 
 #[test]

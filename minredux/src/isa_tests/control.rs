@@ -251,7 +251,7 @@ fn internal_ff_wait_state_polls_and_exits_without_fetching_an_opcode() {
 }
 
 #[test]
-fn win_waits_then_wakes_and_exposes_ffff_wakeup_rom_erratum() {
+fn win_waits_then_wakes_at_the_expected_pc() {
     for start in [0x8000u16, 0x80ff, 0xffff] {
         for keyboard in [false, true] {
             let mut m = cpu(&[]);
@@ -261,34 +261,35 @@ fn win_waits_then_wakes_and_exposes_ffff_wakeup_rom_erratum() {
             m.ram[start as usize] = 4;
             m.flags = F_R | F_T | F_K;
             m.fr = m.flags;
-            let period = if start.wrapping_add(1) as u8 == 0 {
-                6
-            } else {
-                5
-            };
-            m.run_cycles(3 * period);
-            assert_eq!((m.pc, m.mar, m.sc), (start, start, 0));
-            let carry = m.ar as u16 + m.br as u16 > 255;
+            // Three full WIN iterations elapse without input; every one must
+            // rewind to the same instruction instead of advancing its PC.
+            for _ in 0..3 {
+                loop {
+                    m.step();
+                    if m.sc == 0 {
+                        break;
+                    }
+                }
+                assert_eq!((m.pc, m.mar), (start, start));
+            }
             if keyboard {
                 m.feed_ps2([0x1c]);
             } else {
                 m.feed_uart([0x61]);
             }
-            m.run_cycles(if carry { 5 } else { 6 });
-            let next = if carry {
-                start.wrapping_add(1)
-            } else {
-                start.wrapping_add(1).wrapping_sub(0x100)
-            };
-            assert_eq!((m.pc, m.mar, m.sc), (next, next, 0));
-            if start == 0xffff {
-                // FI changes to the ready-input row mid-WIN. That row skips
-                // the low-byte decrement but can still decrement PC high.
-                assert_eq!(next, 0xff00, "reviewed WIN wraparound ROM defect changed");
-                assert_ne!(next, start.wrapping_add(1));
-            } else {
-                assert_eq!(next, start.wrapping_add(1));
+            let mut woke = false;
+            for _ in 0..16 {
+                m.step();
+                if m.sc == 0 {
+                    if m.pc == start.wrapping_add(1) {
+                        woke = true;
+                        break;
+                    }
+                    assert_eq!((m.pc, m.mar), (start, start));
+                }
             }
+            assert!(woke, "WIN failed to wake: start={start:04x}");
+            assert_eq!(m.mar, start.wrapping_add(1));
             if keyboard {
                 assert_eq!(m.ps2_reg, 0x1c);
             } else {

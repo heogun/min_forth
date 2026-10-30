@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 use minredux::pacing::RealtimePacer;
 use minredux::{ControlRom, Images, InputMode, Machine};
 
-const DEFAULT_ROM_DIR: &str = "../minimal64/Revision 1.4 Redux/FLASH Images";
+const DEFAULT_ROM_DIR: &str = "../roms/redux-1.4-isa-fixes-v1";
 
 fn usage() {
     eprintln!(

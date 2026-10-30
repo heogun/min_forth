@@ -57,7 +57,7 @@
 
 ### 수정 ROM 제작과 참조 ROM 반영
 
-- [x] 수정 제어 ROM 3종을 `minimal64/Revision 1.4 Redux/FLASH Images/`에 반영했다. 원본과 분리해 두었던 별도 디렉터리는 참조 이미지에 덮어쓴 뒤 제거했다.
+- [x] 수정 제어 ROM 3종을 `roms/redux-1.4-isa-fixes-v1/`에 원본과 분리해 저장했다. 2026-10-30부터 에뮬레이터·벤치마크·커널 빌드의 기본 ROM이며, `minimal64/Revision 1.4 Redux/FLASH Images/`의 원본 이미지는 provenance/diff fixture로만 유지한다.
 - [x] 재현 가능한 생성 도구에 원본 hash 확인·원본 경로 쓰기 금지·기존 다른 내용 덮어쓰기 방지 추가.
 - [x] XR.B/XR.R의 MAR을 목적지에 유지하여 in-place AND/OR/XOR writeback 구현. 기존 10/13클록 유지.
 - [x] WIN 대기 경로의 FI를 low-byte 감소 시점으로 늦춰 중간 ready-row 전환 시 잘못된 high-byte 감소 방지.

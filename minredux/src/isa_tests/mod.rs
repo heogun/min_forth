@@ -252,15 +252,8 @@ impl Harness {
             errata: [0; 256],
             lengths,
             expected_flash: vec![0xff; 0x80000],
-            fixed_rom: false,
+            fixed_rom: true,
         }
-    }
-
-    fn with_fixed_rom() -> Self {
-        let mut h = Self::new();
-        h.m.ctrl = ControlRom::from_images(&fixed_images()).unwrap();
-        h.fixed_rom = true;
-        h
     }
 
     fn check(&mut self, mut c: Case, expected: impl FnOnce(&mut Case)) {
@@ -396,14 +389,6 @@ impl Harness {
     }
 }
 
-fn fixed_images() -> Images {
-    Images::load(concat!(
-        env!("CARGO_MANIFEST_DIR"),
-        "/../roms/redux-1.4-isa-fixes-v1"
-    ))
-    .unwrap()
-}
-
 #[test]
 fn all_public_opcodes_have_independent_semantic_and_clock_checks() {
     let mut h = Harness::new();
@@ -419,13 +404,9 @@ fn all_public_opcodes_have_independent_semantic_and_clock_checks() {
         "ISA semantic coverage: 255/255 public opcodes, {} cases",
         h.cases
     );
-    eprintln!(
-        "shipped XOR writeback errata: BXR={} RXR={} divergent cases",
-        h.errata[0x52], h.errata[0x54]
-    );
     assert!(
-        h.errata[0x52] > 0 && h.errata[0x54] > 0,
-        "known ROM errata were not exercised"
+        h.errata.iter().all(|&n| n == 0),
+        "corrected ROM diverged from the semantic oracle"
     );
     if std::env::var_os("MINREDUX_ISA_REPORT").is_some() {
         eprintln!("opcode\tmnemonic\tcases\tsemantic_divergences");

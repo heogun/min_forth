@@ -21,7 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 REPO = os.path.dirname(ROOT)
 ASM = os.path.join(ROOT, "tools", "asm")
-ROM = os.path.join(REPO, "minimal64", "Revision 1.4 Redux", "FLASH Images")
+ROM = os.path.join(REPO, "roms", "redux-1.4-isa-fixes-v1")
 
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import hex2bin  # noqa: E402

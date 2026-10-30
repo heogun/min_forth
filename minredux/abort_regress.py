@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parent
-ROM_DIR = ROOT / "../minforth/build-p1"
+ROM_DIR = ROOT / "../minforth/build"
 
 
 def run(lines):

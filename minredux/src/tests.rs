@@ -6,6 +6,16 @@ mod isa;
 fn images() -> Images {
     Images::load(concat!(
         env!("CARGO_MANIFEST_DIR"),
+        "/../roms/redux-1.4-isa-fixes-v1"
+    ))
+    .unwrap()
+}
+
+/// Read-only provenance copy of the upstream images. Only diffs and
+/// bundle-provenance checks may load it; it must not be executed routinely.
+fn original_images() -> Images {
+    Images::load(concat!(
+        env!("CARGO_MANIFEST_DIR"),
         "/../minimal64/Revision 1.4 Redux/FLASH Images"
     ))
     .unwrap()
@@ -292,6 +302,7 @@ fn shipped_control_rom_matches_all_csv_entries() {
     let ctrl = ControlRom::from_images(&images()).unwrap();
     let mapping = include_str!("../../minimal64/Revision 1.4 Redux/microcode_rom.csv");
     let mut checked = 0;
+    let mut changed = 0;
     for (fr, line) in mapping.lines().enumerate() {
         let (_, row) = line.split_once("*/").unwrap();
         let row: Vec<_> = row
@@ -302,16 +313,43 @@ fn shipped_control_rom_matches_all_csv_entries() {
         assert_eq!(row.len(), 256);
         for (ir, name) in row.iter().enumerate() {
             for (sc, &expected) in words[name].iter().enumerate() {
-                assert_eq!(
-                    ctrl.words[(fr << 12) | (ir << 4) | sc],
-                    expected,
-                    "FR={fr:02x} IR={ir:02x} SC={sc} {name}"
-                );
+                let index = (fr << 12) | (ir << 4) | sc;
+                let actual = ctrl.words[index];
+                if actual != expected {
+                    // The executed ROM is the corrected bundle; the CSV is the
+                    // upstream (original) microcode. Only the three reviewed
+                    // fixes may differ, and only in the reviewed control words.
+                    assert!(
+                        reviewed_control_rom_fix(index, expected, actual),
+                        "unreviewed ROM change: FR={fr:02x} IR={ir:02x} SC={sc} {name}"
+                    );
+                    changed += 1;
+                }
                 checked += 1;
             }
         }
     }
     assert_eq!(checked, CTRL_ENTRIES);
+    assert_eq!(changed, 208, "reviewed control-word changes");
+}
+
+/// The 208 control words the corrected bundle changes relative to the upstream
+/// microcode. `old` is the upstream (CSV) word, `new` the corrected bundle's.
+fn reviewed_control_rom_fix(index: usize, old: u32, new: u32) -> bool {
+    let flags = index >> 12;
+    let opcode = (index >> 4) & 0xff;
+    let step = index & 15;
+    if flags & F_R as usize == 0 {
+        return false;
+    }
+    match (opcode, step) {
+        (0x52, 5) | (0x54, 8) => old == MIL | MZ | MIH && new == 0,
+        (0x52, 9) => new == old | RI,
+        (4, 1) => {
+            flags & (F_T | F_K) as usize == (F_T | F_K) as usize && old == BI | FI && new == BI
+        }
+        _ => false,
+    }
 }
 
 #[test]
