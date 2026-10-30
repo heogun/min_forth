@@ -1,0 +1,2961 @@
+{
+  "status": "SCHEMATIC DRAFT - PCB UNROUTED",
+  "parts": [
+    {
+      "ref": "U64",
+      "symbol": "HC30",
+      "value": "74HC30",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "A15",
+        "2": "A14",
+        "3": "A13",
+        "4": "A12",
+        "5": "A11",
+        "6": "A10",
+        "11": "A9",
+        "12": "CS_A8_N",
+        "8": "CS_FE_N",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U65",
+      "symbol": "HC04",
+      "value": "74HC04",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "A8",
+        "2": "CS_A8_N",
+        "3": "CS_FE_N",
+        "4": "CS_FE",
+        "5": "A4",
+        "6": "CS_A4_N",
+        "9": "CS_SN_WRITE",
+        "8": "CS_SN_WRITE_N",
+        "11": "CS_AUDIO_EN",
+        "10": "CS_AUDIO_MUTE",
+        "13": "~{RESET}",
+        "12": "CS_RESET",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U66",
+      "symbol": "HC138",
+      "value": "74HC138",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "A0",
+        "2": "A1",
+        "3": "A2",
+        "4": "CS_FE_N",
+        "5": "A4",
+        "6": "CS_LO",
+        "15": "CS_Y0_N",
+        "14": "CS_Y1_N",
+        "13": "CS_Y2_N",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U67",
+      "symbol": "HC11",
+      "value": "74HC11",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "A7",
+        "2": "A6",
+        "13": "A5",
+        "12": "CS_LO",
+        "3": "CS_FE",
+        "4": "CS_LO",
+        "5": "CS_A4_N",
+        "6": "CS_IO_HIT",
+        "9": "GND",
+        "10": "GND",
+        "11": "GND",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U68",
+      "symbol": "HC11",
+      "value": "74HC11",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "CS_ATTR_MODE",
+        "2": "A14",
+        "13": "CS_A15_N",
+        "12": "CS_ATTR_CPU",
+        "3": "GND",
+        "4": "GND",
+        "5": "GND",
+        "9": "GND",
+        "10": "GND",
+        "11": "GND",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U69",
+      "symbol": "HC173",
+      "value": "74HC173",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "GND",
+        "2": "GND",
+        "3": "CS_COLOR_EN",
+        "4": "CS_SN_WRITE",
+        "5": "CS_ATTR_MODE",
+        "6": "CS_AUDIO_EN",
+        "7": "CLK_MAR",
+        "9": "CS_Y2_N",
+        "10": "~{RI}",
+        "11": "BUS3",
+        "12": "BUS2",
+        "13": "BUS1",
+        "14": "BUS0",
+        "15": "CS_RESET",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U70",
+      "symbol": "HC377",
+      "value": "74HC377",
+      "footprint": "Package_DIP:DIP-20_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "CS_SND_EN_N",
+        "11": "CLK_MAR",
+        "3": "BUS0",
+        "4": "BUS1",
+        "7": "BUS2",
+        "8": "BUS3",
+        "13": "BUS4",
+        "14": "BUS5",
+        "17": "BUS6",
+        "18": "BUS7",
+        "2": "CS_SND0",
+        "5": "CS_SND1",
+        "6": "CS_SND2",
+        "9": "CS_SND3",
+        "12": "CS_SND4",
+        "15": "CS_SND5",
+        "16": "CS_SND6",
+        "19": "CS_SND7",
+        "10": "GND",
+        "20": "+5V"
+      }
+    },
+    {
+      "ref": "U71",
+      "symbol": "HC32",
+      "value": "74HC32",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "CS_INH_EXT",
+        "2": "CS_IO_HIT",
+        "3": "CS_INH_IO",
+        "4": "CS_INH_IO",
+        "5": "CS_ATTR_CPU",
+        "6": "CS_RAM_INH",
+        "9": "CS_VGA_WE_RAW",
+        "10": "CS_PENDING_ATTR",
+        "8": "CS_BITMAP_WE_N",
+        "12": "CS_VGA_WE_RAW",
+        "13": "CS_PENDING_BITMAP",
+        "11": "CS_ATTR_WE_N",
+        "14": "+5V",
+        "7": "GND"
+      }
+    },
+    {
+      "ref": "U72",
+      "symbol": "HC32",
+      "value": "74HC32",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "CS_Y1_N",
+        "2": "~{RO}",
+        "3": "CS_STATUS_OE_N",
+        "4": "CS_Y0_N",
+        "5": "~{RI}",
+        "6": "CS_SND_EN_N",
+        "9": "GND",
+        "10": "GND",
+        "12": "GND",
+        "13": "GND",
+        "14": "+5V",
+        "7": "GND"
+      }
+    },
+    {
+      "ref": "U74",
+      "symbol": "SN76489AN",
+      "value": "SN76489AN",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "PSG",
+      "pins": {
+        "3": "CS_SND7",
+        "2": "CS_SND6",
+        "1": "CS_SND5",
+        "15": "CS_SND4",
+        "13": "CS_SND3",
+        "12": "CS_SND2",
+        "11": "CS_SND1",
+        "10": "CS_SND0",
+        "4": "CS_SN_READY",
+        "5": "CS_SN_WRITE_N",
+        "6": "CS_SN_WRITE_N",
+        "7": "CS_AUDIO_RAW",
+        "14": "CS_SN_CLK",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U75",
+      "symbol": "HCT244",
+      "value": "74HCT244",
+      "footprint": "Package_DIP:DIP-20_W7.62mm_Socket",
+      "sheet": "PSG",
+      "pins": {
+        "1": "CS_STATUS_OE_N",
+        "19": "CS_STATUS_OE_N",
+        "2": "CS_SN_READY",
+        "4": "CS_ATTR_MODE",
+        "6": "CS_COLOR_EN",
+        "8": "CS_AUDIO_EN",
+        "11": "GND",
+        "13": "GND",
+        "15": "GND",
+        "17": "GND",
+        "18": "BUS0",
+        "16": "BUS1",
+        "14": "BUS2",
+        "12": "BUS3",
+        "9": "BUS4",
+        "7": "BUS5",
+        "5": "BUS6",
+        "3": "BUS7",
+        "10": "GND",
+        "20": "+5V"
+      }
+    },
+    {
+      "ref": "U76",
+      "symbol": "POR",
+      "value": "MCP130-450DI/TO",
+      "footprint": "Package_TO_SOT_THT:TO-92_Inline",
+      "sheet": "PSG",
+      "pins": {
+        "1": "~{RESET}",
+        "2": "+5V",
+        "3": "GND"
+      }
+    },
+    {
+      "ref": "X2",
+      "symbol": "OSC",
+      "value": "3.579545MHz 5V FULL",
+      "footprint": "Oscillator:Oscillator_DIP-14",
+      "sheet": "PSG",
+      "pins": {
+        "14": "+5V",
+        "7": "GND",
+        "8": "CS_SN_CLK"
+      }
+    },
+    {
+      "ref": "U77",
+      "symbol": "SRAM",
+      "value": "AS6C62256-55PCN ATTRIBUTE",
+      "footprint": "Package_DIP:DIP-28_W15.24mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "10": "CS_VA0",
+        "9": "CS_VA1",
+        "8": "CS_VA2",
+        "7": "CS_VA3",
+        "6": "CS_VA4",
+        "5": "CS_VA5",
+        "4": "CS_CA6",
+        "3": "CS_CA7",
+        "25": "CS_CA8",
+        "24": "CS_CA9",
+        "21": "CS_CA10",
+        "1": "GND",
+        "2": "GND",
+        "23": "GND",
+        "26": "GND",
+        "20": "GND",
+        "22": "~{VGA_GET}",
+        "27": "CS_ATTR_WE_N",
+        "11": "CS_ATTR_D0",
+        "12": "CS_ATTR_D1",
+        "13": "CS_ATTR_D2",
+        "15": "CS_ATTR_D3",
+        "16": "CS_ATTR_D4",
+        "17": "CS_ATTR_D5",
+        "18": "CS_ATTR_D6",
+        "19": "CS_ATTR_D7",
+        "14": "GND",
+        "28": "+5V"
+      }
+    },
+    {
+      "ref": "U78",
+      "symbol": "HC283",
+      "value": "74HC283",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "7": "CS_VA8",
+        "5": "CS_VA9",
+        "3": "CS_VA10",
+        "14": "CS_VA11",
+        "12": "CS_VA12",
+        "6": "GND",
+        "2": "GND",
+        "15": "GND",
+        "11": "GND",
+        "4": "CS_CA6",
+        "1": "CS_CA7",
+        "13": "CS_CA8",
+        "10": "CS_CA9",
+        "9": "CS_ROW_CARRY",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U79",
+      "symbol": "HC86",
+      "value": "74HC86",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_ROW_CARRY",
+        "2": "CS_VA13",
+        "3": "CS_CA10",
+        "4": "A15",
+        "5": "+5V",
+        "6": "CS_A15_N",
+        "9": "CS_ACTIVE_LATCH",
+        "10": "+5V",
+        "8": "CS_RGB_BLANK",
+        "12": "GND",
+        "13": "GND",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U80",
+      "symbol": "HC245",
+      "value": "74HC245",
+      "footprint": "Package_DIP:DIP-20_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "+5V",
+        "19": "~{VREG_OE}",
+        "2": "CS_VDATA0",
+        "3": "CS_VDATA1",
+        "4": "CS_VDATA2",
+        "5": "CS_VDATA3",
+        "6": "CS_VDATA4",
+        "7": "CS_VDATA5",
+        "8": "CS_VDATA6",
+        "9": "CS_VDATA7",
+        "18": "CS_ATTR_D0",
+        "17": "CS_ATTR_D1",
+        "16": "CS_ATTR_D2",
+        "15": "CS_ATTR_D3",
+        "14": "CS_ATTR_D4",
+        "13": "CS_ATTR_D5",
+        "12": "CS_ATTR_D6",
+        "11": "CS_ATTR_D7",
+        "10": "GND",
+        "20": "+5V"
+      }
+    },
+    {
+      "ref": "U81",
+      "symbol": "HCT377",
+      "value": "74HCT377",
+      "footprint": "Package_DIP:DIP-20_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "~{VGA_GET}",
+        "11": "16MHz",
+        "3": "CS_ATTR_D0",
+        "4": "CS_ATTR_D1",
+        "7": "CS_ATTR_D2",
+        "8": "CS_ATTR_D3",
+        "13": "CS_ATTR_D4",
+        "14": "CS_ATTR_D5",
+        "17": "CS_ATTR_D6",
+        "18": "CS_ATTR_D7",
+        "2": "CS_ATTR_Q0",
+        "5": "CS_ATTR_Q1",
+        "6": "CS_ATTR_Q2",
+        "9": "CS_ATTR_Q3",
+        "12": "CS_ATTR_Q4",
+        "15": "CS_ATTR_Q5",
+        "16": "CS_ATTR_Q6",
+        "19": "CS_ATTR_Q7",
+        "10": "GND",
+        "20": "+5V"
+      }
+    },
+    {
+      "ref": "U82",
+      "symbol": "HC74",
+      "value": "74HC74",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "~{RESET}",
+        "2": "CS_ATTR_MODE",
+        "3": "CS_VREG_CP",
+        "4": "+5V",
+        "5": "CS_PENDING_ATTR",
+        "6": "CS_PENDING_BITMAP",
+        "10": "+5V",
+        "11": "GND",
+        "12": "GND",
+        "13": "~{RESET}",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U83",
+      "symbol": "HC173",
+      "value": "74HC173",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "1": "GND",
+        "2": "GND",
+        "3": "CS_ACTIVE_LATCH",
+        "4": "CS_COLOR_LATCH",
+        "7": "16MHz",
+        "9": "~{VGA_GET}",
+        "10": "GND",
+        "11": "GND",
+        "12": "GND",
+        "13": "CS_COLOR_EN",
+        "14": "CS_ACTIVE",
+        "15": "CS_RESET",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U84",
+      "symbol": "HC08",
+      "value": "74HC08",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_VA3",
+        "2": "CS_VA2",
+        "3": "CS_H12",
+        "4": "GND",
+        "5": "GND",
+        "9": "GND",
+        "10": "GND",
+        "12": "GND",
+        "13": "GND",
+        "14": "+5V",
+        "7": "GND"
+      }
+    },
+    {
+      "ref": "U85",
+      "symbol": "HC4002",
+      "value": "74HC4002",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "2": "CS_CA7",
+        "3": "CS_CA8",
+        "4": "CS_CA9",
+        "5": "CS_CA10",
+        "1": "CS_VBAD",
+        "9": "CS_VA5",
+        "10": "CS_VA4",
+        "11": "CS_H12",
+        "12": "GND",
+        "13": "CS_HLOW",
+        "14": "+5V",
+        "7": "GND"
+      }
+    },
+    {
+      "ref": "U86",
+      "symbol": "HC4002",
+      "value": "74HC4002",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "2": "CS_HHIGH_OK",
+        "3": "CS_HHIGH_OK",
+        "4": "CS_HHIGH_OK",
+        "5": "CS_HHIGH_OK",
+        "1": "CS_HHIGH_BAD",
+        "9": "CS_VBAD",
+        "10": "CS_HLOW",
+        "11": "CS_HHIGH_BAD",
+        "12": "CS_V256",
+        "13": "CS_ACTIVE",
+        "14": "+5V",
+        "7": "GND"
+      }
+    },
+    {
+      "ref": "U87",
+      "symbol": "HC30",
+      "value": "74HC30",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_VA5",
+        "2": "CS_VA4",
+        "3": "CS_VA3",
+        "4": "CS_VA2",
+        "5": "CS_VA1",
+        "6": "+5V",
+        "11": "+5V",
+        "12": "+5V",
+        "8": "CS_HHIGH_OK",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U88",
+      "symbol": "HC157",
+      "value": "74HC157",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_PIXEL",
+        "15": "GND",
+        "2": "CS_ATTR_Q4",
+        "5": "CS_ATTR_Q5",
+        "11": "CS_ATTR_Q6",
+        "14": "CS_ATTR_Q7",
+        "3": "CS_ATTR_Q0",
+        "6": "CS_ATTR_Q1",
+        "10": "CS_ATTR_Q2",
+        "13": "CS_ATTR_Q3",
+        "4": "CS_COLOR0",
+        "7": "CS_COLOR1",
+        "9": "CS_COLOR2",
+        "12": "CS_COLOR3",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U89",
+      "symbol": "HC157",
+      "value": "74HC157",
+      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_COLOR_LATCH",
+        "15": "GND",
+        "2": "CS_PIXEL",
+        "5": "CS_PIXEL",
+        "11": "CS_PIXEL",
+        "14": "CS_PIXEL",
+        "3": "CS_COLOR0",
+        "6": "CS_COLOR1",
+        "10": "CS_COLOR2",
+        "13": "CS_COLOR3",
+        "4": "CS_B",
+        "7": "CS_G",
+        "9": "CS_R",
+        "12": "CS_I",
+        "8": "GND",
+        "16": "+5V"
+      }
+    },
+    {
+      "ref": "U90",
+      "symbol": "AC244",
+      "value": "74AC244",
+      "footprint": "Package_DIP:DIP-20_W7.62mm_Socket",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_RGB_BLANK",
+        "19": "CS_RGB_BLANK",
+        "2": "CS_R",
+        "4": "CS_I",
+        "6": "CS_G",
+        "8": "CS_I",
+        "11": "CS_B",
+        "13": "CS_I",
+        "15": "GND",
+        "17": "GND",
+        "18": "CS_DAC_R",
+        "16": "CS_DAC_RI",
+        "14": "CS_DAC_G",
+        "12": "CS_DAC_GI",
+        "9": "CS_DAC_B",
+        "7": "CS_DAC_BI",
+        "10": "GND",
+        "20": "+5V"
+      }
+    },
+    {
+      "ref": "R28",
+      "symbol": "R",
+      "value": "750",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_DAC_G",
+        "2": "CS_VGA_G"
+      }
+    },
+    {
+      "ref": "R29",
+      "symbol": "R",
+      "value": "750",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_DAC_B",
+        "2": "CS_VGA_B"
+      }
+    },
+    {
+      "ref": "R30",
+      "symbol": "R",
+      "value": "1.5k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_DAC_RI",
+        "2": "CS_VGA_R"
+      }
+    },
+    {
+      "ref": "R31",
+      "symbol": "R",
+      "value": "1.5k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_DAC_GI",
+        "2": "CS_VGA_G"
+      }
+    },
+    {
+      "ref": "R32",
+      "symbol": "R",
+      "value": "1.5k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Palette",
+      "pins": {
+        "1": "CS_DAC_BI",
+        "2": "CS_VGA_B"
+      }
+    },
+    {
+      "ref": "R33",
+      "symbol": "R",
+      "value": "4.7k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "PSG",
+      "pins": {
+        "1": "+5V",
+        "2": "CS_SN_READY"
+      }
+    },
+    {
+      "ref": "R34",
+      "symbol": "R",
+      "value": "1k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "PSG",
+      "pins": {
+        "1": "CS_AUDIO_AC",
+        "2": "CS_LINE_OUT"
+      }
+    },
+    {
+      "ref": "R35",
+      "symbol": "R",
+      "value": "10k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "PSG",
+      "pins": {
+        "1": "CS_LINE_OUT",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "R36",
+      "symbol": "R",
+      "value": "100k",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "PSG",
+      "pins": {
+        "1": "+5V",
+        "2": "CS_AUDIO_MUTE"
+      }
+    },
+    {
+      "ref": "Q1",
+      "symbol": "2N7000",
+      "value": "2N7000",
+      "footprint": "Package_TO_SOT_THT:TO-92_Inline",
+      "sheet": "PSG",
+      "pins": {
+        "1": "GND",
+        "2": "CS_AUDIO_MUTE",
+        "3": "CS_LINE_OUT"
+      }
+    },
+    {
+      "ref": "J6",
+      "symbol": "CONN2",
+      "value": "MONO LINE OUT / EXTERNAL AMP",
+      "footprint": "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical",
+      "sheet": "PSG",
+      "pins": {
+        "1": "CS_LINE_OUT",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C62",
+      "symbol": "C",
+      "value": "220n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "PSG",
+      "pins": {
+        "1": "CS_AUDIO_RAW",
+        "2": "CS_AUDIO_AC"
+      }
+    },
+    {
+      "ref": "C34",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C35",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C36",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C37",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C38",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C39",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C40",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C41",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C42",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C44",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C45",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C46",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C47",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C48",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C49",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C50",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C51",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C52",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C53",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C54",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C55",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C56",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C57",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C58",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C59",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C60",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C61",
+      "symbol": "CP",
+      "value": "10u 16V",
+      "footprint": "Capacitor_THT:CP_Radial_D5.0mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C63",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    }
+  ],
+  "gates": [
+    {
+      "op": "NAND",
+      "inputs": [
+        "A15",
+        "A14",
+        "A13",
+        "A12",
+        "A11",
+        "A10",
+        "A9",
+        "CS_A8_N"
+      ],
+      "output": "CS_FE_N",
+      "ref": "U64",
+      "input_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "11",
+        "12"
+      ],
+      "output_pin": "8"
+    },
+    {
+      "op": "NOT",
+      "inputs": [
+        "A8"
+      ],
+      "output": "CS_A8_N",
+      "ref": "U65",
+      "input_pins": [
+        "1"
+      ],
+      "output_pin": "2"
+    },
+    {
+      "op": "NOT",
+      "inputs": [
+        "CS_FE_N"
+      ],
+      "output": "CS_FE",
+      "ref": "U65",
+      "input_pins": [
+        "3"
+      ],
+      "output_pin": "4"
+    },
+    {
+      "op": "NOT",
+      "inputs": [
+        "A4"
+      ],
+      "output": "CS_A4_N",
+      "ref": "U65",
+      "input_pins": [
+        "5"
+      ],
+      "output_pin": "6"
+    },
+    {
+      "op": "NOT",
+      "inputs": [
+        "CS_SN_WRITE"
+      ],
+      "output": "CS_SN_WRITE_N",
+      "ref": "U65",
+      "input_pins": [
+        "9"
+      ],
+      "output_pin": "8"
+    },
+    {
+      "op": "NOT",
+      "inputs": [
+        "CS_AUDIO_EN"
+      ],
+      "output": "CS_AUDIO_MUTE",
+      "ref": "U65",
+      "input_pins": [
+        "11"
+      ],
+      "output_pin": "10"
+    },
+    {
+      "op": "NOT",
+      "inputs": [
+        "~{RESET}"
+      ],
+      "output": "CS_RESET",
+      "ref": "U65",
+      "input_pins": [
+        "13"
+      ],
+      "output_pin": "12"
+    },
+    {
+      "op": "AND",
+      "inputs": [
+        "A7",
+        "A6",
+        "A5"
+      ],
+      "output": "CS_LO",
+      "ref": "U67",
+      "input_pins": [
+        "1",
+        "2",
+        "13"
+      ],
+      "output_pin": "12"
+    },
+    {
+      "op": "AND",
+      "inputs": [
+        "CS_FE",
+        "CS_LO",
+        "CS_A4_N"
+      ],
+      "output": "CS_IO_HIT",
+      "ref": "U67",
+      "input_pins": [
+        "3",
+        "4",
+        "5"
+      ],
+      "output_pin": "6"
+    },
+    {
+      "op": "AND",
+      "inputs": [
+        "CS_ATTR_MODE",
+        "A14",
+        "CS_A15_N"
+      ],
+      "output": "CS_ATTR_CPU",
+      "ref": "U68",
+      "input_pins": [
+        "1",
+        "2",
+        "13"
+      ],
+      "output_pin": "12"
+    },
+    {
+      "op": "OR",
+      "inputs": [
+        "CS_INH_EXT",
+        "CS_IO_HIT"
+      ],
+      "output": "CS_INH_IO",
+      "ref": "U71",
+      "input_pins": [
+        "1",
+        "2"
+      ],
+      "output_pin": "3"
+    },
+    {
+      "op": "OR",
+      "inputs": [
+        "CS_INH_IO",
+        "CS_ATTR_CPU"
+      ],
+      "output": "CS_RAM_INH",
+      "ref": "U71",
+      "input_pins": [
+        "4",
+        "5"
+      ],
+      "output_pin": "6"
+    },
+    {
+      "op": "OR",
+      "inputs": [
+        "CS_VGA_WE_RAW",
+        "CS_PENDING_ATTR"
+      ],
+      "output": "CS_BITMAP_WE_N",
+      "ref": "U71",
+      "input_pins": [
+        "9",
+        "10"
+      ],
+      "output_pin": "8"
+    },
+    {
+      "op": "OR",
+      "inputs": [
+        "CS_VGA_WE_RAW",
+        "CS_PENDING_BITMAP"
+      ],
+      "output": "CS_ATTR_WE_N",
+      "ref": "U71",
+      "input_pins": [
+        "12",
+        "13"
+      ],
+      "output_pin": "11"
+    },
+    {
+      "op": "OR",
+      "inputs": [
+        "CS_Y1_N",
+        "~{RO}"
+      ],
+      "output": "CS_STATUS_OE_N",
+      "ref": "U72",
+      "input_pins": [
+        "1",
+        "2"
+      ],
+      "output_pin": "3"
+    },
+    {
+      "op": "OR",
+      "inputs": [
+        "CS_Y0_N",
+        "~{RI}"
+      ],
+      "output": "CS_SND_EN_N",
+      "ref": "U72",
+      "input_pins": [
+        "4",
+        "5"
+      ],
+      "output_pin": "6"
+    },
+    {
+      "op": "XOR",
+      "inputs": [
+        "CS_ROW_CARRY",
+        "CS_VA13"
+      ],
+      "output": "CS_CA10",
+      "ref": "U79",
+      "input_pins": [
+        "1",
+        "2"
+      ],
+      "output_pin": "3"
+    },
+    {
+      "op": "XOR",
+      "inputs": [
+        "A15",
+        "+5V"
+      ],
+      "output": "CS_A15_N",
+      "ref": "U79",
+      "input_pins": [
+        "4",
+        "5"
+      ],
+      "output_pin": "6"
+    },
+    {
+      "op": "XOR",
+      "inputs": [
+        "CS_ACTIVE_LATCH",
+        "+5V"
+      ],
+      "output": "CS_RGB_BLANK",
+      "ref": "U79",
+      "input_pins": [
+        "9",
+        "10"
+      ],
+      "output_pin": "8"
+    },
+    {
+      "op": "AND",
+      "inputs": [
+        "CS_VA3",
+        "CS_VA2"
+      ],
+      "output": "CS_H12",
+      "ref": "U84",
+      "input_pins": [
+        "1",
+        "2"
+      ],
+      "output_pin": "3"
+    },
+    {
+      "op": "NOR",
+      "inputs": [
+        "CS_CA7",
+        "CS_CA8",
+        "CS_CA9",
+        "CS_CA10"
+      ],
+      "output": "CS_VBAD",
+      "ref": "U85",
+      "input_pins": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "output_pin": "1"
+    },
+    {
+      "op": "NOR",
+      "inputs": [
+        "CS_VA5",
+        "CS_VA4",
+        "CS_H12",
+        "GND"
+      ],
+      "output": "CS_HLOW",
+      "ref": "U85",
+      "input_pins": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "output_pin": "13"
+    },
+    {
+      "op": "NOR",
+      "inputs": [
+        "CS_HHIGH_OK",
+        "CS_HHIGH_OK",
+        "CS_HHIGH_OK",
+        "CS_HHIGH_OK"
+      ],
+      "output": "CS_HHIGH_BAD",
+      "ref": "U86",
+      "input_pins": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "output_pin": "1"
+    },
+    {
+      "op": "NOR",
+      "inputs": [
+        "CS_VBAD",
+        "CS_HLOW",
+        "CS_HHIGH_BAD",
+        "CS_V256"
+      ],
+      "output": "CS_ACTIVE",
+      "ref": "U86",
+      "input_pins": [
+        "9",
+        "10",
+        "11",
+        "12"
+      ],
+      "output_pin": "13"
+    },
+    {
+      "op": "NAND",
+      "inputs": [
+        "CS_VA5",
+        "CS_VA4",
+        "CS_VA3",
+        "CS_VA2",
+        "CS_VA1",
+        "+5V",
+        "+5V",
+        "+5V"
+      ],
+      "output": "CS_HHIGH_OK",
+      "ref": "U87",
+      "input_pins": [
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "11",
+        "12"
+      ],
+      "output_pin": "8"
+    }
+  ],
+  "symbol_pins": {
+    "HC30": {
+      "1": {
+        "name": "",
+        "type": "input"
+      },
+      "2": {
+        "name": "",
+        "type": "input"
+      },
+      "3": {
+        "name": "",
+        "type": "input"
+      },
+      "4": {
+        "name": "",
+        "type": "input"
+      },
+      "5": {
+        "name": "",
+        "type": "input"
+      },
+      "6": {
+        "name": "",
+        "type": "input"
+      },
+      "8": {
+        "name": "",
+        "type": "output"
+      },
+      "11": {
+        "name": "",
+        "type": "input"
+      },
+      "12": {
+        "name": "",
+        "type": "input"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC04": {
+      "1": {
+        "name": "",
+        "type": "input"
+      },
+      "2": {
+        "name": "",
+        "type": "output"
+      },
+      "3": {
+        "name": "",
+        "type": "input"
+      },
+      "4": {
+        "name": "",
+        "type": "output"
+      },
+      "5": {
+        "name": "",
+        "type": "input"
+      },
+      "6": {
+        "name": "",
+        "type": "output"
+      },
+      "8": {
+        "name": "",
+        "type": "output"
+      },
+      "9": {
+        "name": "",
+        "type": "input"
+      },
+      "10": {
+        "name": "",
+        "type": "output"
+      },
+      "11": {
+        "name": "",
+        "type": "input"
+      },
+      "12": {
+        "name": "",
+        "type": "output"
+      },
+      "13": {
+        "name": "",
+        "type": "input"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC138": {
+      "1": {
+        "name": "A0",
+        "type": "input"
+      },
+      "2": {
+        "name": "A1",
+        "type": "input"
+      },
+      "3": {
+        "name": "A2",
+        "type": "input"
+      },
+      "4": {
+        "name": "~{E0}",
+        "type": "input"
+      },
+      "5": {
+        "name": "~{E1}",
+        "type": "input"
+      },
+      "6": {
+        "name": "E2",
+        "type": "input"
+      },
+      "7": {
+        "name": "~{Y7}",
+        "type": "output"
+      },
+      "8": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "9": {
+        "name": "~{Y6}",
+        "type": "output"
+      },
+      "10": {
+        "name": "~{Y5}",
+        "type": "output"
+      },
+      "11": {
+        "name": "~{Y4}",
+        "type": "output"
+      },
+      "12": {
+        "name": "~{Y3}",
+        "type": "output"
+      },
+      "13": {
+        "name": "~{Y2}",
+        "type": "output"
+      },
+      "14": {
+        "name": "~{Y1}",
+        "type": "output"
+      },
+      "15": {
+        "name": "~{Y0}",
+        "type": "output"
+      },
+      "16": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC11": {
+      "1": {
+        "name": "",
+        "type": "input"
+      },
+      "2": {
+        "name": "",
+        "type": "input"
+      },
+      "12": {
+        "name": "",
+        "type": "output"
+      },
+      "13": {
+        "name": "",
+        "type": "input"
+      },
+      "3": {
+        "name": "",
+        "type": "input"
+      },
+      "4": {
+        "name": "",
+        "type": "input"
+      },
+      "5": {
+        "name": "",
+        "type": "input"
+      },
+      "6": {
+        "name": "",
+        "type": "output"
+      },
+      "8": {
+        "name": "",
+        "type": "output"
+      },
+      "9": {
+        "name": "",
+        "type": "input"
+      },
+      "10": {
+        "name": "",
+        "type": "input"
+      },
+      "11": {
+        "name": "",
+        "type": "input"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC173": {
+      "1": {
+        "name": "Oe1",
+        "type": "input"
+      },
+      "2": {
+        "name": "Oe2",
+        "type": "input"
+      },
+      "3": {
+        "name": "Q0",
+        "type": "tri_state"
+      },
+      "4": {
+        "name": "Q1",
+        "type": "tri_state"
+      },
+      "5": {
+        "name": "Q2",
+        "type": "tri_state"
+      },
+      "6": {
+        "name": "Q3",
+        "type": "tri_state"
+      },
+      "7": {
+        "name": "Cp",
+        "type": "input"
+      },
+      "8": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "9": {
+        "name": "E1",
+        "type": "input"
+      },
+      "10": {
+        "name": "E2",
+        "type": "input"
+      },
+      "11": {
+        "name": "D3",
+        "type": "input"
+      },
+      "12": {
+        "name": "D2",
+        "type": "input"
+      },
+      "13": {
+        "name": "D1",
+        "type": "input"
+      },
+      "14": {
+        "name": "D0",
+        "type": "input"
+      },
+      "15": {
+        "name": "Mr",
+        "type": "input"
+      },
+      "16": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC574": {
+      "2": {
+        "name": "D0",
+        "type": "input"
+      },
+      "3": {
+        "name": "D1",
+        "type": "input"
+      },
+      "4": {
+        "name": "D2",
+        "type": "input"
+      },
+      "5": {
+        "name": "D3",
+        "type": "input"
+      },
+      "6": {
+        "name": "D4",
+        "type": "input"
+      },
+      "7": {
+        "name": "D5",
+        "type": "input"
+      },
+      "8": {
+        "name": "D6",
+        "type": "input"
+      },
+      "9": {
+        "name": "D7",
+        "type": "input"
+      },
+      "11": {
+        "name": "Cp",
+        "type": "input"
+      },
+      "1": {
+        "name": "OE",
+        "type": "input"
+      },
+      "20": {
+        "name": "VCC",
+        "type": "power_in"
+      },
+      "10": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "19": {
+        "name": "Q0",
+        "type": "tri_state"
+      },
+      "18": {
+        "name": "Q1",
+        "type": "tri_state"
+      },
+      "17": {
+        "name": "Q2",
+        "type": "tri_state"
+      },
+      "16": {
+        "name": "Q3",
+        "type": "tri_state"
+      },
+      "15": {
+        "name": "Q4",
+        "type": "tri_state"
+      },
+      "14": {
+        "name": "Q5",
+        "type": "tri_state"
+      },
+      "13": {
+        "name": "Q6",
+        "type": "tri_state"
+      },
+      "12": {
+        "name": "Q7",
+        "type": "tri_state"
+      }
+    },
+    "HC32": {
+      "1": {
+        "name": "~",
+        "type": "input"
+      },
+      "2": {
+        "name": "~",
+        "type": "input"
+      },
+      "3": {
+        "name": "~",
+        "type": "output"
+      },
+      "4": {
+        "name": "~",
+        "type": "input"
+      },
+      "5": {
+        "name": "~",
+        "type": "input"
+      },
+      "6": {
+        "name": "~",
+        "type": "output"
+      },
+      "9": {
+        "name": "~",
+        "type": "input"
+      },
+      "10": {
+        "name": "~",
+        "type": "input"
+      },
+      "8": {
+        "name": "~",
+        "type": "output"
+      },
+      "12": {
+        "name": "~",
+        "type": "input"
+      },
+      "13": {
+        "name": "~",
+        "type": "input"
+      },
+      "11": {
+        "name": "~",
+        "type": "output"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      }
+    },
+    "SN76489AN": {
+      "1": {
+        "name": "D2",
+        "type": "input"
+      },
+      "2": {
+        "name": "D1",
+        "type": "input"
+      },
+      "3": {
+        "name": "D0",
+        "type": "input"
+      },
+      "4": {
+        "name": "READY",
+        "type": "open_collector"
+      },
+      "5": {
+        "name": "~{WE}",
+        "type": "input"
+      },
+      "6": {
+        "name": "~{CE}",
+        "type": "input"
+      },
+      "7": {
+        "name": "AUDIO_OUT",
+        "type": "output"
+      },
+      "8": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "9": {
+        "name": "NC",
+        "type": "no_connect"
+      },
+      "10": {
+        "name": "D7",
+        "type": "input"
+      },
+      "11": {
+        "name": "D6",
+        "type": "input"
+      },
+      "12": {
+        "name": "D5",
+        "type": "input"
+      },
+      "13": {
+        "name": "D4",
+        "type": "input"
+      },
+      "14": {
+        "name": "CLOCK",
+        "type": "input"
+      },
+      "15": {
+        "name": "D3",
+        "type": "input"
+      },
+      "16": {
+        "name": "V_{CC}",
+        "type": "power_in"
+      }
+    },
+    "HCT244": {
+      "1": {
+        "name": "1OE",
+        "type": "input"
+      },
+      "2": {
+        "name": "1A0",
+        "type": "input"
+      },
+      "3": {
+        "name": "2Y0",
+        "type": "tri_state"
+      },
+      "4": {
+        "name": "1A1",
+        "type": "input"
+      },
+      "5": {
+        "name": "2Y1",
+        "type": "tri_state"
+      },
+      "6": {
+        "name": "1A2",
+        "type": "input"
+      },
+      "7": {
+        "name": "2Y2",
+        "type": "tri_state"
+      },
+      "8": {
+        "name": "1A3",
+        "type": "input"
+      },
+      "9": {
+        "name": "2Y3",
+        "type": "tri_state"
+      },
+      "10": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "11": {
+        "name": "2A3",
+        "type": "input"
+      },
+      "12": {
+        "name": "1Y3",
+        "type": "tri_state"
+      },
+      "13": {
+        "name": "2A2",
+        "type": "input"
+      },
+      "14": {
+        "name": "1Y2",
+        "type": "tri_state"
+      },
+      "15": {
+        "name": "2A1",
+        "type": "input"
+      },
+      "16": {
+        "name": "1Y1",
+        "type": "tri_state"
+      },
+      "17": {
+        "name": "2A0",
+        "type": "input"
+      },
+      "18": {
+        "name": "1Y0",
+        "type": "tri_state"
+      },
+      "19": {
+        "name": "2OE",
+        "type": "input"
+      },
+      "20": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC283": {
+      "1": {
+        "name": "S2",
+        "type": "output"
+      },
+      "2": {
+        "name": "B2",
+        "type": "input"
+      },
+      "3": {
+        "name": "A2",
+        "type": "input"
+      },
+      "4": {
+        "name": "S1",
+        "type": "output"
+      },
+      "5": {
+        "name": "A1",
+        "type": "input"
+      },
+      "6": {
+        "name": "B1",
+        "type": "input"
+      },
+      "7": {
+        "name": "C0",
+        "type": "input"
+      },
+      "8": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "9": {
+        "name": "C4",
+        "type": "output"
+      },
+      "10": {
+        "name": "S4",
+        "type": "output"
+      },
+      "11": {
+        "name": "B4",
+        "type": "input"
+      },
+      "12": {
+        "name": "A4",
+        "type": "input"
+      },
+      "13": {
+        "name": "S3",
+        "type": "output"
+      },
+      "14": {
+        "name": "A3",
+        "type": "input"
+      },
+      "15": {
+        "name": "B3",
+        "type": "input"
+      },
+      "16": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC86": {
+      "1": {
+        "name": "",
+        "type": "input"
+      },
+      "2": {
+        "name": "",
+        "type": "input"
+      },
+      "3": {
+        "name": "",
+        "type": "output"
+      },
+      "4": {
+        "name": "",
+        "type": "input"
+      },
+      "5": {
+        "name": "",
+        "type": "input"
+      },
+      "6": {
+        "name": "",
+        "type": "output"
+      },
+      "8": {
+        "name": "",
+        "type": "output"
+      },
+      "9": {
+        "name": "",
+        "type": "input"
+      },
+      "10": {
+        "name": "",
+        "type": "input"
+      },
+      "11": {
+        "name": "",
+        "type": "output"
+      },
+      "12": {
+        "name": "",
+        "type": "input"
+      },
+      "13": {
+        "name": "",
+        "type": "input"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC245": {
+      "1": {
+        "name": "A->B",
+        "type": "input"
+      },
+      "2": {
+        "name": "A0",
+        "type": "tri_state"
+      },
+      "3": {
+        "name": "A1",
+        "type": "tri_state"
+      },
+      "4": {
+        "name": "A2",
+        "type": "tri_state"
+      },
+      "5": {
+        "name": "A3",
+        "type": "tri_state"
+      },
+      "6": {
+        "name": "A4",
+        "type": "tri_state"
+      },
+      "7": {
+        "name": "A5",
+        "type": "tri_state"
+      },
+      "8": {
+        "name": "A6",
+        "type": "tri_state"
+      },
+      "9": {
+        "name": "A7",
+        "type": "tri_state"
+      },
+      "10": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "11": {
+        "name": "B7",
+        "type": "tri_state"
+      },
+      "12": {
+        "name": "B6",
+        "type": "tri_state"
+      },
+      "13": {
+        "name": "B5",
+        "type": "tri_state"
+      },
+      "14": {
+        "name": "B4",
+        "type": "tri_state"
+      },
+      "15": {
+        "name": "B3",
+        "type": "tri_state"
+      },
+      "16": {
+        "name": "B2",
+        "type": "tri_state"
+      },
+      "17": {
+        "name": "B1",
+        "type": "tri_state"
+      },
+      "18": {
+        "name": "B0",
+        "type": "tri_state"
+      },
+      "19": {
+        "name": "CE",
+        "type": "input"
+      },
+      "20": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC377": {
+      "1": {
+        "name": "~{E}",
+        "type": "input"
+      },
+      "2": {
+        "name": "Q0",
+        "type": "output"
+      },
+      "3": {
+        "name": "D0",
+        "type": "input"
+      },
+      "4": {
+        "name": "D1",
+        "type": "input"
+      },
+      "5": {
+        "name": "Q1",
+        "type": "output"
+      },
+      "6": {
+        "name": "Q2",
+        "type": "output"
+      },
+      "7": {
+        "name": "D2",
+        "type": "input"
+      },
+      "8": {
+        "name": "D3",
+        "type": "input"
+      },
+      "9": {
+        "name": "Q3",
+        "type": "output"
+      },
+      "10": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "11": {
+        "name": "CP",
+        "type": "input"
+      },
+      "12": {
+        "name": "Q4",
+        "type": "output"
+      },
+      "13": {
+        "name": "D4",
+        "type": "input"
+      },
+      "14": {
+        "name": "D5",
+        "type": "input"
+      },
+      "15": {
+        "name": "Q5",
+        "type": "output"
+      },
+      "16": {
+        "name": "Q6",
+        "type": "output"
+      },
+      "17": {
+        "name": "D6",
+        "type": "input"
+      },
+      "18": {
+        "name": "D7",
+        "type": "input"
+      },
+      "19": {
+        "name": "Q7",
+        "type": "output"
+      },
+      "20": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC74": {
+      "1": {
+        "name": "~{R}",
+        "type": "input"
+      },
+      "2": {
+        "name": "D",
+        "type": "input"
+      },
+      "3": {
+        "name": "C",
+        "type": "input"
+      },
+      "4": {
+        "name": "~{S}",
+        "type": "input"
+      },
+      "5": {
+        "name": "Q",
+        "type": "output"
+      },
+      "6": {
+        "name": "~{Q}",
+        "type": "output"
+      },
+      "8": {
+        "name": "~{Q}",
+        "type": "output"
+      },
+      "9": {
+        "name": "Q",
+        "type": "output"
+      },
+      "10": {
+        "name": "~{S}",
+        "type": "input"
+      },
+      "11": {
+        "name": "C",
+        "type": "input"
+      },
+      "12": {
+        "name": "D",
+        "type": "input"
+      },
+      "13": {
+        "name": "~{R}",
+        "type": "input"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HCT377": {
+      "1": {
+        "name": "~{E}",
+        "type": "input"
+      },
+      "2": {
+        "name": "Q0",
+        "type": "output"
+      },
+      "3": {
+        "name": "D0",
+        "type": "input"
+      },
+      "4": {
+        "name": "D1",
+        "type": "input"
+      },
+      "5": {
+        "name": "Q1",
+        "type": "output"
+      },
+      "6": {
+        "name": "Q2",
+        "type": "output"
+      },
+      "7": {
+        "name": "D2",
+        "type": "input"
+      },
+      "8": {
+        "name": "D3",
+        "type": "input"
+      },
+      "9": {
+        "name": "Q3",
+        "type": "output"
+      },
+      "10": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "11": {
+        "name": "CP",
+        "type": "input"
+      },
+      "12": {
+        "name": "Q4",
+        "type": "output"
+      },
+      "13": {
+        "name": "D4",
+        "type": "input"
+      },
+      "14": {
+        "name": "D5",
+        "type": "input"
+      },
+      "15": {
+        "name": "Q5",
+        "type": "output"
+      },
+      "16": {
+        "name": "Q6",
+        "type": "output"
+      },
+      "17": {
+        "name": "D6",
+        "type": "input"
+      },
+      "18": {
+        "name": "D7",
+        "type": "input"
+      },
+      "19": {
+        "name": "Q7",
+        "type": "output"
+      },
+      "20": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "HC08": {
+      "1": {
+        "name": "~",
+        "type": "input"
+      },
+      "2": {
+        "name": "~",
+        "type": "input"
+      },
+      "3": {
+        "name": "~",
+        "type": "output"
+      },
+      "4": {
+        "name": "~",
+        "type": "input"
+      },
+      "5": {
+        "name": "~",
+        "type": "input"
+      },
+      "6": {
+        "name": "~",
+        "type": "output"
+      },
+      "9": {
+        "name": "~",
+        "type": "input"
+      },
+      "10": {
+        "name": "~",
+        "type": "input"
+      },
+      "8": {
+        "name": "~",
+        "type": "output"
+      },
+      "12": {
+        "name": "~",
+        "type": "input"
+      },
+      "13": {
+        "name": "~",
+        "type": "input"
+      },
+      "11": {
+        "name": "~",
+        "type": "output"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      }
+    },
+    "HC4002": {
+      "2": {
+        "name": "~",
+        "type": "input"
+      },
+      "3": {
+        "name": "~",
+        "type": "input"
+      },
+      "4": {
+        "name": "~",
+        "type": "input"
+      },
+      "5": {
+        "name": "~",
+        "type": "input"
+      },
+      "1": {
+        "name": "~",
+        "type": "output"
+      },
+      "9": {
+        "name": "~",
+        "type": "input"
+      },
+      "10": {
+        "name": "~",
+        "type": "input"
+      },
+      "11": {
+        "name": "~",
+        "type": "input"
+      },
+      "12": {
+        "name": "~",
+        "type": "input"
+      },
+      "13": {
+        "name": "~",
+        "type": "output"
+      },
+      "8": {
+        "name": "~",
+        "type": "no_connect"
+      },
+      "14": {
+        "name": "VDD",
+        "type": "power_in"
+      },
+      "7": {
+        "name": "VSS",
+        "type": "power_in"
+      },
+      "6": {
+        "name": "~",
+        "type": "no_connect"
+      }
+    },
+    "HC157": {
+      "1": {
+        "name": "S",
+        "type": "input"
+      },
+      "2": {
+        "name": "I0a",
+        "type": "input"
+      },
+      "3": {
+        "name": "I1a",
+        "type": "input"
+      },
+      "4": {
+        "name": "Za",
+        "type": "output"
+      },
+      "5": {
+        "name": "I0b",
+        "type": "input"
+      },
+      "6": {
+        "name": "I1b",
+        "type": "input"
+      },
+      "7": {
+        "name": "Zb",
+        "type": "output"
+      },
+      "8": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "9": {
+        "name": "Zc",
+        "type": "output"
+      },
+      "10": {
+        "name": "I1c",
+        "type": "input"
+      },
+      "11": {
+        "name": "I0c",
+        "type": "input"
+      },
+      "12": {
+        "name": "Zd",
+        "type": "output"
+      },
+      "13": {
+        "name": "I1d",
+        "type": "input"
+      },
+      "14": {
+        "name": "I0d",
+        "type": "input"
+      },
+      "15": {
+        "name": "E",
+        "type": "input"
+      },
+      "16": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "AC244": {
+      "1": {
+        "name": "OEa",
+        "type": "input"
+      },
+      "2": {
+        "name": "I0a",
+        "type": "input"
+      },
+      "3": {
+        "name": "O3b",
+        "type": "tri_state"
+      },
+      "4": {
+        "name": "I1a",
+        "type": "input"
+      },
+      "5": {
+        "name": "O2b",
+        "type": "tri_state"
+      },
+      "6": {
+        "name": "I2a",
+        "type": "input"
+      },
+      "7": {
+        "name": "O1b",
+        "type": "tri_state"
+      },
+      "8": {
+        "name": "I3a",
+        "type": "input"
+      },
+      "9": {
+        "name": "O0b",
+        "type": "tri_state"
+      },
+      "10": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "11": {
+        "name": "I0b",
+        "type": "input"
+      },
+      "12": {
+        "name": "O3a",
+        "type": "tri_state"
+      },
+      "13": {
+        "name": "I1b",
+        "type": "input"
+      },
+      "14": {
+        "name": "O2a",
+        "type": "tri_state"
+      },
+      "15": {
+        "name": "I2b",
+        "type": "input"
+      },
+      "16": {
+        "name": "O1a",
+        "type": "tri_state"
+      },
+      "17": {
+        "name": "I3b",
+        "type": "input"
+      },
+      "18": {
+        "name": "O0a",
+        "type": "tri_state"
+      },
+      "19": {
+        "name": "OEb",
+        "type": "input"
+      },
+      "20": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "POR": {
+      "2": {
+        "name": "VDD",
+        "type": "power_in"
+      },
+      "1": {
+        "name": "~{RST}",
+        "type": "open_collector"
+      },
+      "3": {
+        "name": "VSS",
+        "type": "power_in"
+      }
+    },
+    "2N7000": {
+      "1": {
+        "name": "S",
+        "type": "passive"
+      },
+      "2": {
+        "name": "G",
+        "type": "input"
+      },
+      "3": {
+        "name": "D",
+        "type": "passive"
+      }
+    },
+    "R": {
+      "1": {
+        "name": "1",
+        "type": "passive"
+      },
+      "2": {
+        "name": "2",
+        "type": "passive"
+      }
+    },
+    "C": {
+      "1": {
+        "name": "1",
+        "type": "passive"
+      },
+      "2": {
+        "name": "2",
+        "type": "passive"
+      }
+    },
+    "CP": {
+      "1": {
+        "name": "1",
+        "type": "passive"
+      },
+      "2": {
+        "name": "2",
+        "type": "passive"
+      }
+    },
+    "CONN2": {
+      "1": {
+        "name": "1",
+        "type": "passive"
+      },
+      "2": {
+        "name": "2",
+        "type": "passive"
+      }
+    },
+    "OSC": {
+      "1": {
+        "name": "NC",
+        "type": "no_connect"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "8": {
+        "name": "OUT",
+        "type": "output"
+      }
+    },
+    "SRAM": {
+      "1": {
+        "name": "A14",
+        "type": "input"
+      },
+      "2": {
+        "name": "A12",
+        "type": "input"
+      },
+      "3": {
+        "name": "A7",
+        "type": "input"
+      },
+      "4": {
+        "name": "A6",
+        "type": "input"
+      },
+      "5": {
+        "name": "A5",
+        "type": "input"
+      },
+      "6": {
+        "name": "A4",
+        "type": "input"
+      },
+      "7": {
+        "name": "A3",
+        "type": "input"
+      },
+      "8": {
+        "name": "A2",
+        "type": "input"
+      },
+      "9": {
+        "name": "A1",
+        "type": "input"
+      },
+      "10": {
+        "name": "A0",
+        "type": "input"
+      },
+      "11": {
+        "name": "I/O0",
+        "type": "bidirectional"
+      },
+      "12": {
+        "name": "I/O1",
+        "type": "bidirectional"
+      },
+      "13": {
+        "name": "I/O2",
+        "type": "bidirectional"
+      },
+      "14": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "28": {
+        "name": "VCC",
+        "type": "power_in"
+      },
+      "27": {
+        "name": "~{WE}",
+        "type": "input"
+      },
+      "26": {
+        "name": "A13",
+        "type": "input"
+      },
+      "25": {
+        "name": "A8",
+        "type": "input"
+      },
+      "24": {
+        "name": "A9",
+        "type": "input"
+      },
+      "23": {
+        "name": "A11",
+        "type": "input"
+      },
+      "22": {
+        "name": "~{OE}",
+        "type": "input"
+      },
+      "21": {
+        "name": "A10",
+        "type": "input"
+      },
+      "20": {
+        "name": "~{CE}",
+        "type": "input"
+      },
+      "19": {
+        "name": "I/O7",
+        "type": "bidirectional"
+      },
+      "18": {
+        "name": "I/O6",
+        "type": "bidirectional"
+      },
+      "17": {
+        "name": "I/O5",
+        "type": "bidirectional"
+      },
+      "16": {
+        "name": "I/O4",
+        "type": "bidirectional"
+      },
+      "15": {
+        "name": "I/O3",
+        "type": "bidirectional"
+      }
+    }
+  },
+  "source_sha256": {
+    ".gitignore": "7b2c6694a053ac8b073f58489b9bce5c5603aefa4dbeb035d66acb64be75ba78",
+    "8-Bit CPU 32k.kicad_pcb": "b9fe6bd9b403edd4583769d451fc42da99ff35fbeb7db027b242dc70a0f76c4a",
+    "8-Bit CPU 32k.kicad_prl": "6e918d3d7c9853be12b558119f9f7f2a9406fae012238710cf7bee0dfe288b23",
+    "8-Bit CPU 32k.kicad_pro": "a9d103bece55cb47b52a9c6efbf07a915b2e605c1b3b15023021d9652d69fa4a",
+    "8-Bit CPU 32k.kicad_sch": "7dd1e7d264ab9f4c67669bc0bed8bdf62b2cbf387bcae213155d95f419ed0199",
+    "ALU.kicad_sch": "dc21aea61afaf4c2023eb30ad5e5202f272c26b506142593fcf74821a2627b8e",
+    "ArduinoPC.pretty/FP_MINI_DIN_6_PS2.kicad_mod": "b8285e1a6d44f68cf51cadd67521db3d8142553e31f60b5f1de406670871bf8e",
+    "ArduinoPC.pretty/VGA DSUB15HD_female.kicad_mod": "f1868eccad511dc1042e551e6ae3205f1ec3fa322971ee7ffb7b81d736c4e899",
+    "IR.kicad_sch": "0006967cb8b8ed7e7d5d0b967ac93a8d57721577711b7b1dc2573c722f970c47",
+    "PC.kicad_sch": "fddf6a9ce9290184db0d66be4eb011c4a11f581081282663a75694590b3114ee",
+    "PROVENANCE.md": "126f69e5f43bf32b5fe285bebcbbf482eb3cd696d33080da7fd6d3941ff0c392",
+    "RAM.kicad_sch": "d339b7b77e1d0011671520d4faf1f4bb0134cf3de00f69ee2e8c817a87e08c87",
+    "Redux.kicad_sym": "d846976fbcf43515132789a8dcf9be945648b15e4867238ca549f017d46e2deb",
+    "Redux_Footprints.pretty/PinSocket_1x06_P2.54mm_Vertical.kicad_mod": "455c2504860b8e5d9e7d6c56996735cf98d2518b414d8526e164f8452ee8cfe7",
+    "Redux_Footprints.pretty/PinSocket_2x03_P2.54mm_Vertical.kicad_mod": "d2155770e95b0160f379b7501abb5ee310456bceb3e60a9aee3028c84a9ea588",
+    "Redux_Footprints.pretty/PinSocket_2x16_P2.54mm_Vertical.kicad_mod": "9f5285883b77b0b25e25cbb6608a7a116beb86151bd5f91a8e5f7b93cdb7fbd4",
+    "Redux_Footprints.pretty/R_Array_SIP9.kicad_mod": "7699e76a7a3d2b83d99252cf89ccb33c9600023be10df7efb2c544d240d36fc4",
+    "RegB.kicad_sch": "3125180f89de209872fcc275b12f7e316ca460babd9c970a34c6089fed6564cb",
+    "UART_RX.kicad_sch": "595db34a0af0600f84ad077c234e417f10b81182658f93a6a281106560e02f6d",
+    "VGA.kicad_sch": "654ca16acfb62c7f60672c40bb4fe9ec97c3429014d7bf0694d13247942754bf",
+    "baseline-invariants.json": "39d71f08948bf4d5f13636c677e88b3bce6910b32df2f5255ec7089823b22cc3",
+    "fp-lib-table": "b04908fe6e9b54f258abc4b5a3d65d540e024f719df04da265c3fb4c2a65a664",
+    "logo.pretty/logo.kicad_mod": "413bedc9741aa2a96758e6b1f3372d5398d5cebe055435e70aad89576cc9edf7",
+    "ps2.kicad_sch": "38695b589508f9d157388345fd55e0b856f078fdc30ac84e60d3b2b164fc4aac",
+    "sym-lib-table": "c149e01eda90574c1532f62c1868c053cffa15fcde5f6a165bf9c1fd5ab50ba9"
+  }
+}

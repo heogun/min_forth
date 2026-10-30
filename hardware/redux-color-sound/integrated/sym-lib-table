@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name "Redux")(type "KiCad")(uri "${KIPRJMOD}/Redux.kicad_sym")(options "")(descr "Frozen embedded Redux symbols; see PROVENANCE.md"))
+(lib (name "Extensions")(type "KiCad")(uri "${KIPRJMOD}/Extensions.kicad_sym")(options "")(descr "Pin-level integrated extension draft"))
+)

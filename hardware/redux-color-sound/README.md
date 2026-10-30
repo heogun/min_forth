@@ -1,6 +1,10 @@
 # Redux 1.4 — Attribute Color + SN76489 통합 보드
 
-상태: **원본 경고를 해결한 기준 CAD 작업본은 준비됨. 컬러·음원 통합 회로와 제조용 Gerber는 아직 없다.**
+상태: **컬러·SN76489 통합 회로도와 PCB 부품/net 배치 초안이 추가됨. 배선·최악 조건 타이밍 검증 미완료, 제조 금지.**
+
+실제 추가 회로와 현재 검증 상태: **[CIRCUIT.md](CIRCUIT.md)**.
+KiCad에서는 `integrated/8-Bit CPU 32k.kicad_pro`를 연다.
+`cad/`는 경고를 해결한 기존 흑백 보드 기준본이며, 추가 회로가 있는 프로젝트와 구분한다.
 
 2026-10-30 사용자 선택: 기존 Revision 1.4 Redux를 기반으로 컬러와
 SN76489 음원을 하나의 새 PCB에 통합한다. 원본 `minimal64/`는 변경하지 않는다.
@@ -112,6 +116,8 @@ CPU → 주소/데이터 유지 → 영상 읽기 외 구간에 Attribute 쓰기
 - 읽기/쓰기 주소 MUX, 데이터 래치, pending 제어가 필요하다.
 - 새 Attribute 요청이 미처리 요청을 덮어쓰지 않도록 최소 간격 또는 상태 읽기를 정의한다.
 - CPU 쓰기 시점과 SRAM commit이 달라질 경우 주소와 데이터가 함께 보존되어야 한다.
+- 실제 추가 회로는 기존 VREG의 주소·데이터 유지 및 영상 쓰기 slot을 공유한다.
+  제어 bit 2로 비트맵/Attribute 쓰기를 선택하고, 쓰기 캡처 시 plane도 함께 저장한다.
 - SRAM 전원 투입 내용은 미정이다. 초기화 전에는 컬러 출력을 활성화하지 않는다.
 - 비표시 구간은 모든 RGB를 검정으로 강제한다. HSYNC/VSYNC만으로 active-video를
   판정하거나 기존 VRAM의 0 데이터를 검정 대신 사용하지 않는다.
@@ -144,26 +150,26 @@ CPU 제어 쓰기 → 리셋 가능한 제어 레지스터 → ~WE
 - 기본 출력은 외부 앰프에 연결 가능한 오디오 출력을 우선 검토한다.
   온보드 LM386 스피커 앰프는 선택 실장 후보이며, 헤드폰 출력과 동일시하지 않는다.
 
-## 5. 주소 배치 — 후보, 아직 ABI 아님
+## 5. 주소 배치 — 추가 회로 초안
 
 기존 참고 보드와의 음원 제어 관례를 일부 유지할 후보:
 
 | 주소 | 후보 역할 |
 | --- | --- |
 | `0xFEE0` | 음원 데이터 래치 |
-| `0xFEE1` | 음원/Attribute 상태 읽기 후보 — bit 배치는 미정 |
-| `0xFEE2` | 제어 레지스터 — bit 1 음원 write, 나머지 컬러/mute는 미정 |
+| `0xFEE1` | 상태 읽기 — READY/Attribute mode/color enable/audio enable |
+| `0xFEE2` | 제어 레지스터 — bit 0 컬러, bit 1 음원 write, bit 2 Attribute mode, bit 3 unmute |
 | `0xFEE3` | 미할당, 참고 보드 SPI와 겹치므로 함부로 재사용하지 않음 |
-| `0xFEE4` | Attribute 주소 low 8비트 |
-| `0xFEE5` | Attribute 주소 high 3비트 |
-| `0xFEE6` | Attribute 데이터 쓰기 요청 |
+| `0xFEE4` | 예약 — 초기의 간접 주소 포트안은 채택하지 않음 |
+| `0xFEE5` | 예약 |
+| `0xFEE6` | 예약 |
 | `0xFEE7` | 미할당 |
 
 - 자동 증가·Attribute CPU read-back은 기본 요구사항에 넣지 않는다. 필요 시 비용 평가한다.
-- HC138 재사용 시 발생할 수 있는 `0xFEE8..0xFEEF` alias는 명시적으로 결정한다.
-- 원본 참고 보드는 INH로 `0xFEC0..0xFEFF` SRAM을 제외하지만 그 전체 범위를
-  그대로 가져올지는 미정이다. bank 선택, FLASH 읽기/쓰기, 실행 중 버스 구동까지 분석한다.
-- MinOS·Forth dictionary 상한·기존 프로그램과 주소 충돌을 확인하기 전에는 확정하지 않는다.
+- `0xFEE8..0xFEEF`는 bit 3 미디코딩 alias다. 실제 RAM 제외 범위는 `0xFEE0..0xFEEF`다.
+- 초기안과 달리 Attribute는 제어 bit 2를 설정하고 기존 `0x4000..0x7fff` VREG 창으로 쓴다.
+- MinOS·Forth dictionary/프로그램은 I/O 16바이트를 RAM으로 사용하면 안 된다.
+  새 메모리맵의 펌웨어·에뮬레이터 지원은 아직 추가하지 않았다.
 - 외부 확장 카드가 같은 주소를 선택하면 충돌한다. 온보드 I/O disable 수단을 고려한다.
 
 ## 6. 배치·검증 조건
@@ -198,7 +204,10 @@ CPU 제어 쓰기 → 리셋 가능한 제어 레지스터 → ~WE
 - 완료: [수정 CAD 작업본](cad/PROVENANCE.md)의 ERC·DRC·패리티 0건,
   기존 DRC 제외 항목 제거, 원본 회로 연결·동박 형상 보존 검사.
   KiCad에서는 `cad/8-Bit CPU 32k.kicad_pro`를 연다.
-- 미완료: 제조사 최대값 기반 타이밍 표, 논리 모델, 컬러·음원 추가 회로도·PCB·BOM.
+- 완료: 실제 통합 회로도 5개 sheet, PCB 부품·pad/net 반영, 추가 BOM 초안,
+  디지털/정적 테스트 24개. [현재 상태](CIRCUIT.md)를 참고한다.
+- 미완료: 추가 회로 배선, 최종 배치, 제조사 최대값 기반 타이밍 검증,
+  새 장치의 에뮬레이터·펌웨어 지원 및 실기 검증.
 - KiCad 10.0.7 설치 후 원본 CAD의 ERC/DRC/회로도 parity 기준 검사를 실행했다.
   결과와 재현 방법은 [KICAD_BASELINE.md](KICAD_BASELINE.md)를 참고한다.
   수정 기준 작업본도 같은 도구로 검사했다. 통합 회로도·PCB 검증이나 제조 출력이 완료된 것은 아니다.
