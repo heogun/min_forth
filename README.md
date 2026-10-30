@@ -48,3 +48,4 @@ Python 도우미는 실행 파일과 ROM을 자동으로 다시 빌드하지 않
 - 에뮬레이터 사용법과 정확도 범위: [`minredux/README.md`](minredux/README.md)
 - ISA 검증 내역: [`minredux/ISA_VALIDATION.md`](minredux/ISA_VALIDATION.md)
 - 벤치마크 하네스: [`benchmark.md`](benchmark.md)
+- Cycle-exact 제안과 타당성 검토: [`CYCLE_EXACT_ROADMAP.md`](CYCLE_EXACT_ROADMAP.md), [`CYCLE_EXACT_REVIEW.md`](CYCLE_EXACT_REVIEW.md) (구현 승인/실기 검증 완료를 뜻하지 않음)

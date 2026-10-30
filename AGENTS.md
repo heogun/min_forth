@@ -7,6 +7,10 @@
 - `minimal64/Revision 1.4 Redux/` supplies the reference ROMs, microcode CSVs, MinOS sources, and assembler. `PROGRESS.md` records implementation history and debugging lessons; prefer current scripts over its recorded sizes/counts.
 - `extended-min/` is a separate interpreter/toolchain. Read `extended-min/AGENTS.md` and `extended-min/ARCHITECTURE.md` before editing it; use its local skills where applicable. It uses global BespokeASM, not the bundled slu4 assembler used by Forth. Keep its two targets synchronized and compile default + `USE_ACCELERATOR` for each, as its guide requires.
 
+## Commit and push
+
+- After completing requested work, commit the related changes and push to the configured user-owned remote. Review existing changes before staging; do not include unrelated user work, force-push, or discard changes. Report the commit IDs and whether the push succeeded; if blocked, report the blocker rather than claiming completion.
+
 ## Build and verify Forth/emulator
 
 Run the kernel build from the workspace root:
