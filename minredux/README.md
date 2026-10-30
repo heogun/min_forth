@@ -7,21 +7,22 @@ Minimal 64x4 Revision 1.4 Redux의 제어 ROM을 실행하는 Rust 디지털 에
 이 디렉터리에서 실행한다.
 
 ```sh
-cargo test
+cargo test --all-targets
 cargo build --release
 python3 regress.py
+python3 abort_regress.py -v
 ```
 
 `cargo test`는 CPU·주변장치 검사이며, `regress.py`는 `../minforth/build`의 기존 Forth 커널 이미지를 사용하는 별도의 화면 출력 회귀다. Python 도우미는 release 실행 파일을 자동으로 재빌드하지 않는다. 커널 재빌드 명령은 상위 `AGENTS.md`를 참고한다.
 
 전체 ISA만 검사하려면 `cargo test tests::isa`. opcode별 보고서는 `MINREDUX_ISA_REPORT=1 cargo test all_public_opcodes -- --nocapture`. 검증 범위·원본 ROM 결함·식별 hash는 [ISA_VALIDATION.md](ISA_VALIDATION.md)를 참고한다.
 
-결함 3건을 수정한 제어 ROM은 `../roms/redux-1.4-isa-fixes-v1/`에 있으며, 에뮬레이터·벤치마크·커널 빌드의 기본 ROM이다. `../minimal64/Revision 1.4 Redux/FLASH Images/`의 원본 이미지는 provenance/diff 용도로만 보존하고 명시 요청 없이 실행하지 않는다.
+결함 3건을 수정한 제어 ROM은 **`../minimal64/Revision 1.4 Redux/FLASH Images/`에 직접 설치**되어 있다. 이 경로가 현재 수정 ROM의 단일 기준이며, 삭제된 원본 ROM이나 별도 `roms/` 번들은 필요 없다. `python3 verify_rom.py`로 수정본 SHA-256과 CSV의 524,288워드를 대조한다. `--write-images`는 검토한 수정 CSV에서 수정 이미지로만 명시적으로 재생성한다. Forth 빌드도 이 검사를 먼저 실행한다.
 
 ## 실행 모드
 
 ```sh
-# 원본 MinOS: 기본 ROM 경로는 현재 작업 디렉터리 기준
+# 수정 제어 ROM + 변경 없는 MinOS: 기본 경로는 현재 작업 디렉터리 기준
 ./target/release/minredux run --cycles 400000 --no-output --text --stats
 
 # Forth 이미지로 대화형 실행; Ctrl-]로 종료

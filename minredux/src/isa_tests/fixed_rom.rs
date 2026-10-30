@@ -1,7 +1,5 @@
-//! The corrected `roms/redux-1.4-isa-fixes-v1` bundle is the default execution
-//! target. These tests pin its fixed behavior (no semantic exceptions, exact
-//! XOR writeback, corrected WIN wakeup) and diff it against the read-only
-//! upstream images kept in `minimal64`.
+//! Corrected ROMs are installed in place at the primary minimal64 ROM path.
+//! No old ROM copy, deleted bundle or old-behavior exception is required.
 use super::*;
 
 #[test]
@@ -20,38 +18,24 @@ fn fixed_rom_passes_all_255_opcodes_without_semantic_exceptions() {
 }
 
 #[test]
-fn fixed_rom_only_changes_reviewed_words_and_preserves_program_flash() {
-    let original = super::original_images();
-    let fixed = super::images();
-    assert_eq!(fixed.flash, original.flash);
-    let before = ControlRom::from_images(&original).unwrap();
-    let after = ControlRom::from_images(&fixed).unwrap();
-    let mut changed = 0;
-    for (index, (&old, &new)) in before.words.iter().zip(after.words.iter()).enumerate() {
-        if old == new {
-            continue;
+fn fixed_rom_contains_all_reviewed_corrected_slots() {
+    let ctrl = ControlRom::from_images(&images()).unwrap();
+    let mut checked = 0;
+    for flags in 0x40..0x80usize {
+        for (opcode, step, expected) in [
+            (0x52, 5, 0),
+            (0x52, 9, EO | ES | EC | AI | RI | MC | MIL | MIH | IC),
+            (0x54, 8, 0),
+        ] {
+            assert_eq!(ctrl.words[flags << 12 | opcode << 4 | step], expected);
+            checked += 1;
         }
-        changed += 1;
-        let flags = index >> 12;
-        let opcode = (index >> 4) & 255;
-        let step = index & 15;
-        assert_ne!(flags & F_R as usize, 0);
-        match (opcode, step) {
-            (0x52, 5) | (0x54, 8) => {
-                assert_eq!(old, MIL | MZ | MIH);
-                assert_eq!(new, 0);
-            }
-            (0x52, 9) => assert_eq!(new, old | RI),
-            (4, 1) => {
-                assert_eq!(flags & (F_T | F_K) as usize, (F_T | F_K) as usize);
-                assert_eq!(old, BI | FI);
-                assert_eq!(new, BI);
-            }
-            _ => panic!("unreviewed ROM change: {index:05x}"),
+        if flags & (F_K | F_T) as usize == (F_K | F_T) as usize {
+            assert_eq!(ctrl.words[flags << 12 | 4 << 4 | 1], BI);
+            checked += 1;
         }
     }
-    assert_eq!(changed, 208);
-    assert_eq!(fixed.ctrl_msb, original.ctrl_msb);
+    assert_eq!(checked, 208);
 }
 
 #[test]
@@ -192,13 +176,9 @@ fn fixed_rom_boots_unmodified_minos() {
 }
 
 #[test]
-fn generated_fixed_rom_bundle_is_reproducible_without_writing() {
+fn fixed_rom_csv_and_pinned_hashes_are_reproducible_without_writing() {
     let status = std::process::Command::new("python3")
-        .arg(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/../roms/build_redux_isa_fixes.py"
-        ))
-        .arg("--check")
+        .arg(concat!(env!("CARGO_MANIFEST_DIR"), "/verify_rom.py"))
         .output()
         .expect("python3 is required to verify generated ROM artifacts");
     assert!(

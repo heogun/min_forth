@@ -52,9 +52,10 @@ python3 minforth/tools/build.py minforth/forth/kernel.fs minforth 0x1000 --out m
 
 The kernel builder also writes `minforth.symbols.json`, obtained from the same
 preprocessed source and assembler as `minforth.bin`. The control ROMs it pairs
-with are copied from `roms/redux-1.4-isa-fixes-v1/`; the unmodified upstream
-images in `minimal64/Revision 1.4 Redux/FLASH Images/` are kept read-only for
-provenance and diffs.
+with are copied from **`minimal64/Revision 1.4 Redux/FLASH Images/`**, where the
+corrected images are installed in place. Old ROMs and a separate `roms/` bundle
+are not required. `python3 minredux/verify_rom.py` checks corrected hashes/CSV
+before builds. The kernel must end below its checkpoint RAM at `26c0`.
 
 From `minredux/`, rebuild the release frontend if needed, then:
 

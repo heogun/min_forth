@@ -30,19 +30,19 @@ cargo test
 
 아래는 수정 전 upstream ROM에서 확인한 결함 기록이다. 당시에는 독립 기대값과의 차이를 명시적으로 검출한 뒤 **원본 ROM의 정확한 관찰 결과**를 검사했고, opcode별 Rust 보정은 하지 않았다.
 
-세 결함의 수정본은 `../roms/redux-1.4-isa-fixes-v1/`에 별도 번들로 두며, 2026-10-30부터 에뮬레이터·벤치마크·커널 빌드의 기본 ROM이다. `../minimal64/Revision 1.4 Redux/FLASH Images/`의 원본 이미지는 diff/provenance 용도로만 보존하고 명시 요청 없이 실행하지 않는다. 수정본에는 255개 전체 ISA 행렬, XOR 전수 검사, WIN 4,608개 조합 및 MinOS 부팅 검사를 적용한다.
+세 결함의 수정본은 **`../minimal64/Revision 1.4 Redux/FLASH Images/`에 직접 설치**되어 있다. 현재 CSV도 수정본과 일치하며, 삭제된 원본이나 별도 번들은 필요 없다. 모든 실행·빌드·검증이 이 단일 경로를 사용한다. 활성 255-opcode 행렬은 불일치 예외 0건을 요구하며, XOR 전수·WIN 4,608조합·MinOS 부팅 검사를 수행한다.
 
 ### 0x52 BXR (`XR.B`): 목적지 writeback 누락
 
 - 초기 A=1, RAM[1200]=0에서 `XR.B 0x1200`의 의도된 결과는 A=1, RAM[1200]=1이다.
 - 원본은 A=1을 계산하지만 RAM[1200]은 0에 머무르고, scratch RAM[00ff]에 AND 중간값 0을 남긴다.
-- 근거: `microcode_def.csv`의 `XR_B`는 scratch로 MAR을 바꾼 뒤 목적지 복원·최종 `RI`가 없다.
+- 근거: 수정 전 `XR_B`는 scratch로 MAR을 바꾸고 최종 `RI`가 없었다. 현재 정의는 목적지 MAR 유지 및 최종 writeback을 포함한다.
 
 ### 0x54 RXR (`XR.R`): scratch 주소로 writeback
 
 - RAM[4500..4501]=0x1200, A=1, RAM[1200]=0에서 `XR.R 0x4500`의 의도된 결과는 RAM[1200]=1이다.
 - 원본은 RAM[1200]을 변경하지 않고 최종 XOR 값 1을 RAM[00ff]에 쓴다. BXR과 달리 scratch에 AND가 아닌 XOR 값이 남는다.
-- 근거: `XR_R`은 최종 `RI`가 있지만 MAR은 여전히 scratch 00ff를 가리킨다.
+- 근거: 수정 전 `XR_R`은 최종 `RI`가 있지만 MAR이 scratch 00ff를 가리켰다. 현재는 목적지에 저장한다.
 - 전체 행렬에서 두 opcode 각각 **7개**의 실제 의미 불일치가 수정 전 원본에서 나타났다. 수정본의 기본 ISA 행렬은 두 opcode 모두 불일치가 0임을 요구하며, A·플래그·클록·다른 RAM 위치도 일반 검사와 똑같이 비교한다.
 
 ### 0x04 WIN: ffff 대기 중 입력 도착 시 잘못된 주소로 wakeup
@@ -60,7 +60,7 @@ cargo test
 
 ## 검증한 제어 ROM 식별
 
-실행 대상: `../roms/redux-1.4-isa-fixes-v1/`. 각 파일은 524,288 bytes이다. SHA-256:
+실행 대상: `../minimal64/Revision 1.4 Redux/FLASH Images/`의 수정본. 각 파일은 524,288 bytes이다. SHA-256:
 
 ```text
 ctrl_lsb.bin a3e8c3b2d84ce2bc07ac545450ff930c24a4064e7da61f048ab590b885d4abbd
@@ -68,7 +68,7 @@ ctrl_msb.bin 3b04671b89b859f84e9043e0fd6e5af015102241bad7318119154030e8db0f40
 ctrl_hsb.bin 94e6179d5c378260c34abd424f9328de438fe94025267cc73fd26e428bf679ca
 ```
 
-Provenance/diff 용도로만 보존하는 원본: `../minimal64/Revision 1.4 Redux/FLASH Images/`. SHA-256:
+수정 전의 역사적 SHA-256 (파일 복사본을 요구하거나 복원하지 않음):
 
 ```text
 ctrl_lsb.bin d056f45db6da4c67d5b843cd49ec19879ac286204d036e34dd4ac68e6928ec34
@@ -76,4 +76,4 @@ ctrl_msb.bin 3b04671b89b859f84e9043e0fd6e5af015102241bad7318119154030e8db0f40
 ctrl_hsb.bin d10100d6d9c7bb87c599fce032d4d39f7f75e5d4a4adefdc425b978c33864ad1
 ```
 
-번들 재현성은 `python3 roms/build_redux_isa_fixes.py --check`로 확인하며 원본 이미지는 읽기만 한다. 원본 ROM은 명시 요청 없이 실행하지 않는다.
+`python3 verify_rom.py`로 현재 수정본 hash와 CSV 재조립 524,288워드의 완전 일치를 확인한다. `--write-images`는 현재 CSV가 검토한 수정 hash를 생성할 때만 수정 이미지로 명시 재생성한다. 알 수 없는 기존 이미지는 덮어쓰지 않으며 삭제된 원본/생성 번들에 의존하지 않는다.

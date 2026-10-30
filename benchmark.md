@@ -8,12 +8,14 @@
 
 기존 7종의 알고리즘·입력·raw hook 측정은 유지하고 **정밀 준비 단계·컴파일/토큰화·메모리 관찰·전후 비교**를 추가했다. 아래 v1 표/진행 기록은 당시 결과를 보존한 것이다.
 
+**현재 실행 기준은 수정 ROM만**이며, 설치 위치는 `minimal64/Revision 1.4 Redux/FLASH Images/`다. 원본 파일 및 별도 `roms/` 번들은 필요 없다. 빌드 전 `minredux/verify_rom.py`로 이 위치의 수정 hash·CSV를 검사하며 현재 결과를 원본 ROM 실행과 섞지 않는다.
+
 ```sh
 # 7종 + empty + 호출/스택/DO/파서 진단 4종, 반복 측정과 관찰자 무영향 검사
 python3 benchmarks/run.py --stage 3 --diagnostics --repeat 2 --verify-profile
 
 # 동일 제어 ROM의 기존 결과와 클록/크기/단계별 비용 비교
-python3 benchmarks/run.py --baseline benchmarks/results/baseline-original-v1/results.json
+python3 benchmarks/run.py --baseline benchmarks/results/baseline-fixed-v1/results.json
 python3 benchmarks/compare.py BASELINE/results.json CANDIDATE/results.json
 ```
 
@@ -65,7 +67,7 @@ PC뿐 아니라 `SC=0`, 하드웨어 SP와 실제 JPS 복귀 주소로 함수 �
 
 `--verify-profile`은 케이스마다 **관찰자 없이도 한 번 더 실행**하여 시작/종료/클록/스택 값과 전체 64KiB RAM이 일치하는지 검사한다. JSON의 `observer_verified`에 결과를 기록한다. 호스트 실제 경과 시간은 CPU 가상 클록과 혼동하지 않는다.
 
-v2 원본 ROM의 측정 예 (숫자는 준비 구간/정의 규모에 대한 값이며 실행 클록 표와 별개):
+v2 수정 ROM의 측정 예 (숫자는 준비 구간/정의 규모에 대한 값이며 실행 클록 표와 별개):
 
 | 작업 | Min 토큰화 클록 | Forth 컴파일 클록 | Forth 정의 증가 bytes | nf_parse 클록 / 호출 수 |
 | --- | ---: | ---: | ---: | ---: |
@@ -79,6 +81,15 @@ v2 원본 ROM의 측정 예 (숫자는 준비 구간/정의 규모에 대한 값
 
 현재 설정의 최초 OS_Prompt 경계는 양쪽 모두 **218,975클록**이다. Min 재귀 Fib(6)의 observed hardware stack peak는 **234 bytes**로 256바이트 하드웨어 스택의 제약도 실제 수치로 드러난다. 관찰된 span/peak를 전체 live memory 또는 더 깊은 재귀의 안전성으로 일반화하지 않는다.
 
+### P1 최종 검증
+
+- 수정 ROM에서 12항목(기본 7종 + empty + 진단 4종) × 2언어 × 2회 = **48회** 계측 결과 검증.
+- 동일한 24개 케이스/언어 조합을 계측 없이 추가 실행하여 클록·전체 RAM 일치 확인. 합계 **72회** 실행 검증. 결과: `benchmarks/results/p1-fixed-final-v2/results.json`.
+- 수정 v1 대비 기본 7종 및 empty의 실행 클록 변화 **0.000%**. 커널은 ABORT 지원으로 4,472→4,743 bytes, boot dictionary는 primitive header 추가로 11 bytes 증가.
+- primary 경로로 통일한 뒤 `empty`/`micro-parse`를 추가 재검증하여 클록·RAM·단계·코드 크기가 동일함을 확인: `benchmarks/results/p1-primary-path-v2/results.json`. primary 및 `minforth/build/` 제어 ROM의 hash도 위 전체 검증 결과와 동일.
+- host 계약/비교 검사 **17/17**, observer unit **4/4**, 수정 ROM 기반 Rust core **45 통과 + PR opt-in 1 제외**, Forth 회귀 **39/39**, ABORT-quote 전용 **13/13** 통과.
+- 과거 원본 대비 결과는 아래 역사적 기록일 뿐이며 이후 검증에 원본 ROM을 실행하거나 복원하지 않는다.
+
 ## 단계별 진행
 
 | 단계 | 내용 | 상태 |
@@ -91,7 +102,7 @@ v2 원본 ROM의 측정 예 (숫자는 준비 구간/정의 규모에 대한 값
 
 ## 측정 원칙
 
-- 원본 ROM과 커널/FLASH를 덮어쓰지 않고 격리된 이미지를 생성한다.
+- 설치된 수정 ROM과 기존 커널/FLASH를 덮어쓰지 않고 격리된 벤치마크 이미지를 생성한다.
 - 같은 제어 ROM을 양쪽에 적용하고 ROM·커널·소스 hash를 결과에 기록한다.
 - 입력 초기화, 실행, 정답 검증을 구분한다. 실행 중에는 화면/UART 출력을 하지 않는다.
 - 화면 문자열 polling 대신 매 CPU 클록의 명령 경계에서 공통 측정 hook 진입을 감지한다.

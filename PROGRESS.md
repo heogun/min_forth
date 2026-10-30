@@ -2,6 +2,8 @@
 
 최종 업데이트: 2026-10-30
 
+**현재 ROM 정책:** 수정 ROM은 `minimal64/Revision 1.4 Redux/FLASH Images/`에 직접 설치되어 있으며 이 위치를 빌드·에뮬레이터·테스트의 단일 기준으로 사용한다. 삭제된 원본 ROM이나 별도 `roms/` 번들은 필요 없다. 아래의 원본/수정본 분리·비교 기록은 과거 이력이다. 현재 검증은 수정 ROM만 실행하며 `python3 minredux/verify_rom.py`가 수정 SHA-256과 CSV 전체를 검사한다.
+
 ## 목표
 
 - [x] Minimal 64x4 **Revision 1.4 Redux**용 고속 마이크로코드 실행 에뮬레이터 구현
@@ -57,7 +59,7 @@
 
 ### 수정 ROM 제작과 참조 ROM 반영
 
-- [x] 수정 제어 ROM 3종을 `roms/redux-1.4-isa-fixes-v1/`에 원본과 분리해 저장했다. 2026-10-30부터 에뮬레이터·벤치마크·커널 빌드의 기본 ROM이며, `minimal64/Revision 1.4 Redux/FLASH Images/`의 원본 이미지는 provenance/diff fixture로만 유지한다.
+- [x] 수정 제어 ROM 3종은 현재 `minimal64/Revision 1.4 Redux/FLASH Images/`에 직접 설치되어 있다. 에뮬레이터·벤치마크·커널 빌드·Rust 검증은 이 경로만 기본으로 사용하며, 삭제된 원본 파일이나 별도 번들은 필요 없다. `minredux/verify_rom.py`로 현재 수정 hash와 CSV 재현성을 확인한다.
 - [x] 재현 가능한 생성 도구에 원본 hash 확인·원본 경로 쓰기 금지·기존 다른 내용 덮어쓰기 방지 추가.
 - [x] XR.B/XR.R의 MAR을 목적지에 유지하여 in-place AND/OR/XOR writeback 구현. 기존 10/13클록 유지.
 - [x] WIN 대기 경로의 FI를 low-byte 감소 시점으로 늦춰 중간 ready-row 전환 시 잘못된 high-byte 감소 방지.
@@ -176,7 +178,7 @@
 ### 출력 / 문자열
 
 - [x] `."` (컴파일 전용, 중첩 루프 안에서도 동작)
-- [ ] `ABORT"`
+- [x] `ABORT"` (컴파일 전용, 조건부 메시지·스택/루프/컴파일 복구·미완성 정의 롤백)
 
 ### 컴파일 / 제어 흐름
 
@@ -221,8 +223,8 @@
 
 | 권고 순서 | 우선순위 | 중요도 | 항목 | 판단 근거 / 완료 조건 |
 | --- | --- | --- | --- | --- |
-| 1 | P1 | 높음 | 벤치마크 하네스 정리 | 최적화 효과를 판단할 선행 작업. 부팅·입력·컴파일·실행 비용을 구분하고 실행 클록과 코드 크기를 기록. 기존 `speed.fs` 외에 호출·스택·숫자 파싱·DO 진입 중심의 작은 측정 추가. |
-| 2 | P1 | 높음 | `ABORT"` | 오류 메시지와 정상 인터프리터 복귀를 위한 기능 보강. 단순 출력이 아니라 abort 시 데이터/리턴 스택, 루프 상태 및 컴파일 상태 복구 정책을 먼저 정하고 참·거짓 조건 및 중첩 호출/루프에서 회귀 검사. 실행 속도 개선과는 별개. |
+| 1 | P1 | 높음 | 벤치마크 하네스 정리 — 완료 | 실제 함수 경계로 부팅·입력·로드·토큰화/컴파일·실행 분리, 코드 크기·메모리 high-water, 진단 4종·자동 전후 비교·계측 무영향 검사 구현. `benchmark.md`의 v2 규격 참조. |
+| 2 | P1 | 높음 | `ABORT"` — 완료 | 참/거짓·메시지·전체 스택/루프 복구·현재 줄 폐기·미완성 colon 정의 롤백을 구현하고 전용 13개 회귀로 검증. BASE·완료된 사전·변수 보존. |
 | 3 | P2 | 높음 | tail-call `JPA` 최적화 | 안전하게 적용할 수 있는 마지막 호출에서 `JPS`/`RTS` 왕복 제거. 단순 끝 바이트 패치 금지: 제어 흐름, 인라인 데이터, 리턴 스택 사용을 구분하여 증명 가능한 경우만 적용. 효과와 코드 크기 확인. |
 | 4 | P2 | 높음 | 스택 인덱싱 비용 절감 | 여러 원시 단어의 공통 비용을 줄일 가능성이 있음. 먼저 프로파일로 비중 확인. split-byte 스택 및 순환 경계를 유지하고 산술·메모리·중첩 호출 회귀 검사. |
 | 5 | P2 | 중간 | 핫 패스 원시 단어 인라인화 | 자주 호출되는 짧은 단어만 선별. 호출 제거 이득과 사전 메모리 증가를 함께 측정하며 분기 패치·`EXECUTE`·리턴 스택 의미를 유지. |
@@ -230,7 +232,7 @@
 | 7 | P3 | 낮음 | `DO` 인라인 컴파일 | 절감은 루프 반복마다가 아니라 진입마다 발생. 이미 LOOP가 인라인이므로 우선 낮게 둠. 짧은 루프를 자주 진입하는 측정에서 이득이 클 때 진행하고 중첩 캐시·`J`·`LEAVE`·`UNLOOP` 유지. |
 | 8 | P3 | 낮음 | 상수 중복 제거 | 주로 코드 크기 개선 후보이며 대상(리터럴/상수 정의)과 변환 규칙부터 명확히 해야 함. 간접 참조 비용 때문에 느려질 수 있으므로 실제 중복량·속도·사전 크기 측정 후 결정. |
 
-- [ ] [P1 / 순서 2] `ABORT"`
+- [x] [P1 / 순서 2] `ABORT"` — 구현 및 수정 ROM 회귀 13/13 통과
 - [ ] [P2 / 순서 3] tail-call `JPA` 최적화
 - [ ] [P2 / 순서 4] 스택 인덱싱 비용 절감
 - [ ] [P2 / 순서 5] 핫 패스 원시 단어 인라인화
@@ -238,7 +240,7 @@
 - [ ] [P3 / 순서 7] `DO` 인라인 컴파일 (현재 `JPS wDORUN` 호출 오버헤드)
 - [ ] [P3 / 순서 8] 상수 중복 제거
 
-공통 완료 조건: 커널 재빌드 후 Forth 회귀 통과, 추가한 기능/경계 회귀 통과. 최적화는 동일 입력·동일 ROM에서 전후 클록과 생성 코드 크기를 비교하며, 원본 및 수정 제어 ROM 양쪽에서 확인한다. 기능 안전성을 희생하는 최적화는 채택하지 않는다.
+공통 완료 조건: 커널 재빌드 후 Forth 회귀 통과, 추가한 기능/경계 회귀 통과. 최적화는 동일 입력·동일 **수정 ROM**에서 전후 클록과 생성 코드 크기를 비교한다. 원본 ROM은 더 이상 실행하지 않는다. 기능 안전성을 희생하는 최적화는 채택하지 않는다.
 
 ## 5. 벤치마크 / 성능
 
@@ -252,7 +254,17 @@
 - [x] `LOOP` 인라인 컴파일 후 재측정: **3,538,944 cycles**
 - [x] **Min 대비 약 59.22배 빠름 확인**
 - [x] 빈 루프 기준 비용 측정: 약 72 cycles/iter (인라인 후 약 29 cycles/iter)
-- [ ] [P1 / 순서 1] 벤치마크 하네스 정리 (**부분 완료**: 7종 비교 스위트·실행 구간 분리 구현, 순수 토큰화/컴파일 시간·메모리 high-water 분리는 후속; `benchmark.md` 참조)
+- [x] [P1 / 순서 1] 벤치마크 하네스 정리 — v2 단계별 클록·코드 크기·메모리 high-water·진단 4종·자동 diff·계측 무영향 검사 완료 (`benchmark.md`)
+
+### P1 완료 기록 (2026-10-30, 수정 ROM 기준)
+
+- **ABORT-quote**: 컴파일 전용 immediate 단어, `( flag -- )`. 0이면 inline 문자열을 넘기고 계속 실행. 비제로이면 메시지/개행 출력 후 현재 줄과 전체 caller frame을 폐기하고 REPL로 복귀. 데이터/하드웨어 SP=fe, 루프 스택=2800, loop cache·compiler/control/LEAVE 깊이 초기화. BASE·완료된 정의·변수 보존. 컴파일 중 abort 시 `26c0..26c3`의 HERE/LATEST checkpoint로 미완성 정의를 롤백. 빈 문자열·high-byte-only flag·page-crossing string·중첩 반환/루프·미완성 IF/DO/LEAVE를 포함한 **13/13** 전용 검사 통과. 사용법은 `minforth/README.md`.
+- **하네스 v2**: 실제 실행 바이트와 대조한 Min/MinOS/Forth 심볼 및 JPS 복귀 PC/SP로 단계를 추적. `phases` 합은 RESET부터 end hook까지와 일치하고 execute는 기존 raw 클록과 일치. Forth compile은 입력 대기를 제외한 실제 토큰 처리/lookup/parse/emit, Min은 Tokenizer 구간을 별도로 측정. 부품별 함수 비용은 포괄값이므로 단계 합과 구별한다.
+- **메모리/크기**: native runtime bytes, Forth boot/소스 사전 증가량, Min resident source/token bytes, 실제 RI 주소의 call/variable/temp/workspace span, 데이터/루프/하드웨어 스택 peak 기록. span/peak를 전체 live memory 총량으로 오해하지 않도록 규격 명시. 재귀 Fib(6)의 Min hardware stack peak는 234 bytes.
+- **진단/비교**: `micro-call`, `micro-stack`, `micro-do`, `micro-parse` 4종 추가. `benchmarks/compare.py` 및 `--baseline`은 PASS·동일 ROM/입력/파라미터/정답에서만 클록·코드 크기·단계별 비용을 비교한다. 기존 7종의 실행 클록은 수정본 v1 기준 대비 **모두 0.000% 변화**, 새 ABORT primitive header로 총 사전은 11 bytes 증가.
+- 수정 ROM에서 7종+empty+진단4종 × Min/Forth × 2회 = **48개** 계측 결과가 정답·스택·클록·단계·메모리 반복 재현성을 통과. 각 케이스를 계측 없이 한 번 더 실행한 **24개** 결과도 클록·전체 64KiB RAM 동일. 산출물: `benchmarks/results/p1-fixed-final-v2/results.json`. 현재 primary 경로로 전환한 뒤 `empty`/`micro-parse`의 추가 대조도 동일함을 확인 (`p1-primary-path-v2`).
+- **현재 단일 ROM 경로 정리**: 빌드·CLI·벤치마크·Rust tests 모두 `minimal64/Revision 1.4 Redux/FLASH Images/`의 수정본을 사용. CSV도 수정본에 맞추고 활성 CSV/ROM 검사는 예외 없이 524,288워드 완전 일치를 요구. `verify_rom.py`는 수정본 hash까지 pin하며 삭제된 원본/생성 번들에 의존하지 않음. 원본 결함을 정답으로 삼던 WIN/XOR 예외는 활성 oracle에서 제거.
+- 현재 `minforth/build/`를 **4,743 bytes** 커널과 수정 제어 ROM으로 재빌드. 기존 Forth **39/39**, ABORT 전용 **13/13**, host 하네스 **17/17**, Rust core **45 통과 + opt-in 1 제외**, observer unit **4/4** 통과. 이전 4,472-byte 커널 대비 +271 bytes. P2/P3 최적화는 아직 수행하지 않음.
 
 ### Min vs Forth 비교 스위트 (2026-10-29)
 
@@ -302,8 +314,9 @@ cargo build --release
 
 ## 현재 상태 메모
 
-- 현재 소스의 격리 커널 빌드: `4472` bytes at `0x1000` (벤치마크 산출물; 기존 `minforth/build/`는 자동 갱신하지 않음)
-- 회귀 테스트: `minredux/regress.py` **39/39 통과** (현재 소스 격리 빌드, 원본·수정 제어 ROM 각각)
+- 현재 커널 빌드: `4743` bytes at `0x1000`, `minforth/build/`에 수정 제어 ROM과 함께 갱신 완료
+- 회귀 테스트: 기존 Forth **39/39** + ABORT 전용 **13/13** 통과 (수정 ROM만 실행)
+- 최종 점검: 현재 primary 경로의 수정 ROM/CSV hash 일치, 기본 CLI MinOS `READY.` 부팅, Rust **49 통과 + opt-in 1 제외**, host **17/17**, Clippy·포맷 통과. P1 미완료 체크박스 0개.
 - 사전 HERE는 `0x8000`에서 증가
 - DO/LOOP 테스트: `: t 0 10 0 DO I + LOOP . ; t` → `45` 확인
 - 중첩 루프 + `J`: `: n 0 3 0 DO 3 0 DO I J + + LOOP LOOP . ; n` → `18` 확인

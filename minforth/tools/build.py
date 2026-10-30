@@ -21,7 +21,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 REPO = os.path.dirname(ROOT)
 ASM = os.path.join(ROOT, "tools", "asm")
-ROM = os.path.join(REPO, "roms", "redux-1.4-isa-fixes-v1")
+ROM = os.path.join(REPO, "minimal64", "Revision 1.4 Redux", "FLASH Images")
 
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 import hex2bin  # noqa: E402
@@ -234,6 +234,10 @@ def assemble(source_text, symbols=None, emitted=None):
 
 
 def main():
+    verify = os.path.join(REPO, "minredux", "verify_rom.py")
+    checked = subprocess.run([sys.executable, verify], capture_output=True, text=True)
+    if checked.returncode:
+        raise SystemExit(checked.stdout + checked.stderr)
     args = sys.argv[1:]
     if len(args) < 3:
         print(__doc__)
@@ -275,6 +279,9 @@ def main():
     dest = int(dest_s, 0)
     if base != dest:
         raise SystemExit(f"source assembles at 0x{base:04x}, expected 0x{dest:04x}")
+    if (os.path.realpath(src) == os.path.realpath(os.path.join(ROOT, "forth", "kernel.fs"))
+            and base + len(binary) > symbols["nfDefHere"]):
+        raise SystemExit("kernel overlaps compiler rollback checkpoint at 0x26c0")
 
     os.makedirs(outdir, exist_ok=True)
     tmpbin = os.path.join(outdir, name + ".bin")

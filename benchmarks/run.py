@@ -14,7 +14,7 @@ from cases import basic_cases, diagnostic_cases, extended_cases, mandelbrot_case
 from compare import compare
 
 ROOT = Path(__file__).resolve().parents[1]
-REFERENCE = ROOT / "roms/redux-1.4-isa-fixes-v1"
+REFERENCE = ROOT / "minimal64/Revision 1.4 Redux/FLASH Images"
 
 
 def load_tool(name):
