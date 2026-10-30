@@ -1,0 +1,1542 @@
+﻿Minimal 64x4 Home Computer
+by slu4
+updated July 12th 2026
+Manual
+
+
+Welcome to the World of the ‘Minimal Home Computer’, the most computer from the least logic or the shortest way from TTL to Space Invaders.
+Although the Minimal is a fully usable stand-alone computer, one of its main features is its simplicity – to the point that people get bored and ask for color and sound and I perfectly understand that. To me, the way of getting excited about the Minimal is to appreciate just how simple and maxed out this tiny system is. It is a handful of TTL chips pretending to be "just a normal computer".
+
+
+The Minimal 64x4 packs four(!) times the computational power of a Commodore C64 or Apple II and doubles the performance of its predecessor, the Minimal 64. It can run some serious software including video game classics like TETRIS and SPACE INVADERS in fully bitmapped graphics mode. It features a native text editor and a native assembler that is capable of assembling itself. It even comes with its own unique Python-like high-level programming language ‘Min’. And last but not least, it’s completely free for any non-commercial use.
+
+
+This manual provides a comprehensive step-by-step introduction to builders and first-time users of the Minimal 64x4 and at the same time serves as a reference and programming handbook. The section ‘CPU Architecture’ gives a more in-depth explanation of how it all works.
+
+
+If you like this project and want to give something back, you can do so via PayPal. Thanks! https://paypal.me/CarstenHerting
+
+
+Have fun!
+
+
+________________
+
+
+Copyright (c) 2024, 2025, 2026 slu4
+
+
+THE 'MINIMAL 64x4 HOME COMPUTER' INCLUDING THIS DOCUMENTATION IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THIS DOCUMENTATION OR THE USE OR OTHER DEALINGS IN THIS DOCUMENTATION.
+THE 'MINIMAL 64x4 HOME COMPUTER' MIGHT UNINTENTIONALLY INTERFERE WITH RADIO SIGNALS OR DISTURB OTHER ELECTRONIC DEVICES. USE THIS DEVICE FOR EDUCATIONAL PURPOSES ONLY AND DON’T EMBED IT IN ANOTHER PRODUCT.
+Acknowledgements
+During the development of this CPU system I’ve had - and still have - many interesting conversations with people around the world, making valuable contributions and keeping me motivated. Thank you all for joining in!
+
+
+I also wish to express my sincere gratitude to everyone who has made a monetary contribution to this project. From my own experience, I know that it’s a big step from liking a project to becoming a financial supporter! You are awesome and keep the next PCB update coming!
+
+
+Last but not least, a special ‘Thanks You’ goes to...
+... Nils Kulberg for contributing the initial expansion port idea and for interesting discussions around writing high-level languages.
+... Michael Kamprath for writing his Mandelbrot demo and putting the expansion port to a tough test with speech synthesis.
+... Hans Jacob for building and testing various Minimal 64x4 prototypes and writing awesome games on it (Sokoban, Atomix, Loderunner).
+Building the Hardware
+All relevant build information is compiled in the GitHub repository https://github.com/slu4coder/The-Minimal-64-Home-Computer:
+
+
+o KiCAD project files with detailed schematics and PCB layout
+o PCB Gerber files
+o Source code of all available software on the Minimal 64x4
+o Binary images of the FLASH SSD (OS, demos and games) and
+  the control ROM microcode
+o Win64 cross-assembler
+o Win64 Minimal 64x4 emulator
+
+
+Step 0. Since the Minimal 64x4 in an evolutionary project, as of today, there are two versions available for you to choose:
+
+
+        o Minimal 64x4 Revision 1.1
+        o Minimal 64x4 Revision 1.4 “Redux”
+
+
+I have designed the Redux just for fun to make it even more minimalistic: It uses 4 ICs less than the original, which I consider quite an achievement ;-)
+It is *not* fully software-compatible (although the differences are slight) to the original Minimal 64x4 since it features an improved and more orthogonal instruction set with some small microcode tweaks. The OS and API have seen improvements, too, resulting in an overall 5% performance gain and a slightly snappier feel.
+The serial interface now runs on 7 data bits and the serial OUT command features hardware waiting, which was a fun thing to implement.
+
+
+In this document, I will use this nice brown text color to highlight information specific to the Minimal 64x4 Redux.
+
+
+Step 1. Download the GitHub repository and send the Gerber files (.zip folder) to a PCB manufacturer of your liking:
+
+
+  
+
+
+
+Step 2. Shop for parts according to the bill of materials below. They are all pretty standard. It is a good idea to double-check the actual footprints of the VGA and PS/2 connectors you order match the footprints on the PCB.
+
+
+I recommend sourcing your ICs from trusted suppliers only. The Minimal requires tight timing tolerances. Damaged or unauthorized IC clones from untrusted budget suppliers are known to cause problems.
+Bill of Materials (BOM)
+Minimal 64x4 Rev1.1 BOM
+Quantity
+	Reference
+	Value
+	Capacitances:
+	29
+	C1..29
+	100nF ceramic
+	4
+	C30..33
+	22pF ceramic
+	Connectors:
+	1
+	J1
+	PinSocket 1x6 P2.54mm Vertical
+	1
+	J2
+	Mini DIN6 PS/2 Connector
+	1
+	J3
+	PinSocket 2x16 P2.54mm Vertical
+	1
+	J4
+	VGA Connector DSUB15HD Female
+	1
+	J5
+	PinSocket 2x3 P2.54mm Vertical
+	Resistors:
+	4
+	R1, R3..R5
+	4.7k (0207, 0.6W)
+	2
+	R6, R26
+	150 (0207, 0.6W)
+	2
+	R7, R8
+	68 (0207, 0.6W)
+	16
+	R2, R9..R23
+	470 (0207, 0.6W)
+	1
+	R24
+	200 (0207, 0.6W)
+	1
+	R25
+	100 (0207, 0.6W)
+	1
+	R27
+	0..470 (see ‘Troubleshooting’)
+	Switches:
+	1
+	SW1
+	SW_PUSH_BUTTON_6mm
+	IC Package DIP-14:
+	2
+	U54, U57
+	74HC86 XOR
+	1
+	U67
+	74HC4002 4-input NOR
+	2
+	U61, U63
+	74HC08 AND
+	6
+	U7, U33, U2, U60, U62, U58
+	74HC32 OR
+	2
+	U1,U6
+	74HC02 NOR
+	3
+	U3..4,U8
+	74HC00 NAND
+	1
+	U9
+	74HCT132 NAND (Schmitt trigger)
+	IC Package DIP-16:
+	14
+	U11, U15, U19, U24, U26..30, U32, U48..49, U52..53
+	74HC161 4-bit counter/register
+	2
+	U18, U14
+	74HC193 4-bit counter
+	2
+	U39, U37
+	74HC590 8-bit counter
+	2
+	U16, U17
+	74HC595 shift register
+	2
+	U12, U13
+	74HC165 shift register
+	1
+	U35
+	74HC166 shift register
+	2
+	U55, U59
+	74HC283 4-bit adder
+	4
+	U43, U47, U51, U22
+	74HC157 quad 2-input multiplexer
+	IC Package DIP-20:
+	4
+	U5, U45, U10, U20
+	74HC377 8-bit register
+	3
+	U40..41, U38
+	74HC574 8-bit register
+	8
+	U56, U42, U65, U66, U44, U64, U50, U46
+	74HC245 8-bit buffer
+	IC Package DIP-32:
+	3
+	U21, U23, U25
+	SST39SF010 128KB FLASH (70ns)
+	1
+	U31
+	SST39SF040 512KB FLASH (70ns)
+	1
+	U34
+	AS6C1008 SRAM *
+	1
+	U36
+	AS6C62256 or AS6C1008 SRAM *
+	Oscillators:
+	1
+	X1
+	16MHz (DIP-14)
+	* 55ns and 70ns versions work fine.
+
+
+At least the 4 FLASH ICs require DIP-32 sockets. For socketing all ICs (recommended) include the following:
+
+
+Quantity | Socket | Width
+---------+--------+--------
+    6    | DIP-32 | 15.24mm
+   15    | DIP-20 | 7.62mm
+   29    | DIP-16 | 7.62mm
+   17    | DIP-14 | 7.62mm
+
+
+Minimal 64x4 Rev1.4 BOM
+Quantity
+	Reference
+	Value
+	Capacitances:
+	20
+	C1..20
+	100nF ceramic
+	2
+	C32..33
+	22pF ceramic
+	Connectors:
+	1
+	J1
+	PinSocket 1x6 P2.54mm Vertical
+	1
+	J2
+	Mini DIN6 PS/2 Connector
+	1
+	J3
+	PinSocket 2x16 P2.54mm Vertical
+	1
+	J4
+	VGA Connector DSUB15HD Female
+	1
+	J5
+	PinSocket 2x3 P2.54mm Vertical
+	Resistors:
+	4
+	R1, R3, R4, R5
+	4.7k (0207, 0.6W)
+	2
+	R6, R26
+	150 (0207, 0.6W)
+	2
+	R7, R8
+	68 (0207, 0.6W)
+	15
+	R2, R9..22
+	470 (0207, 0.6W)
+	1
+	RN1
+	470 Resistor Array SIP9
+	1
+	R25
+	100 (0207, 0.6W)
+	1
+	R27
+	0..470 (see ‘Troubleshooting’)
+	Switches:
+	1
+	SW1
+	SW_PUSH_BUTTON_6mm
+	IC Package DIP-14:
+	2
+	U54, U57
+	74HC86 XOR
+	1
+	U13
+	74HC4002 4-input NOR
+	2
+	U61, U63
+	74HC08 AND
+	4
+	U5, U10, U20, U45
+	74HC32 OR
+	2
+	U1,U6
+	74HC02 NOR
+	4
+	U2, U4, U8, U11
+	74HC00 NAND
+	1
+	U9
+	74HCT132 NAND (Schmitt trigger)
+	IC Package DIP-16:
+	13
+	U15, U19, U24, U26..30, U32, U48, U49, U52, U53
+	74HC161 4-bit counter/register
+	2
+	U14, U18
+	74HC193 4-bit counter
+	2
+	U39, U37
+	74HC590 8-bit counter
+	2
+	U16, U17
+	74HC595 shift register
+	1
+	U12
+	74HC165 shift register
+	1
+	U35
+	74HC166 shift register
+	2
+	U55, U59
+	74HC283 4-bit adder
+	4
+	U22, U43, U47, U51
+	74HC157 quad 2-input multiplexer
+	IC Package DIP-20:
+	4
+	U5, U10, U20, U45
+	74HC377 8-bit register
+	3
+	U40..41, U38
+	74HC574 8-bit register
+	7
+	U33, U42, U44, U46, U50, U56, U58
+	74HC245 8-bit buffer
+	IC Package DIP-28 and DIP-32:
+	4
+	U22, U43, U47, U51
+	SST39SF040 512KB FLASH (70ns)
+	1
+	U34
+	AS6C1008 SRAM *
+	1
+	U36
+	AS6C62256
+	Oscillators:
+	1
+	X1
+	16MHz (DIP-14)
+	* 55ns and 70ns versions work fine.
+
+
+At least the 4 FLASH ICs require DIP-32 sockets (width 15.24mm). For socketing all ICs (recommended) include the following:
+
+
+Quantity | Socket | Width
+---------+--------+--------
+    1    | DIP-28 | 15.24mm
+    5    | DIP-32 | 15.24mm
+   14    | DIP-20 | 7.62mm
+   27    | DIP-16 | 7.62mm
+   16    | DIP-14 | 7.62mm
+
+
+Step 3. Plan for about 3 hours of soldering  :P . Since this only involves old-school through-hole parts in dual in-line packages (DIP), soldering can easily be done by hand. Carefully inspect all soldering joints for proper electrical contact.
+
+
+The 74HC logic family is susceptible to ESD damage, so it’s a good idea to ensure proper grounding of your workspace. Make sure all ICs sit in their sockets without any bent pins.
+
+
+My fully assembled PCB looks like this:
+
+
+  
+
+Revision 1.1
+
+
+  
+
+Revision 1.4 Redux
+
+
+On the left hand side we have the expansion port in the middle and the VGA connector at the top. On the right, we see the PS/2 socket at the bottom and the UART port at the top.
+
+
+Step 4. Write the FLASH images (3x 128KB (512KB) control ROM and 1x 512KB SSD FLASH). If you do not have a FLASH programmer at hand, I recommend building my DIY version: www.youtube.com/watch?v=2crXqNlBazg.
+More info: https://github.com/slu4coder/SST39SF010-FLASH-Programmer.
+It is available for both Windows and Linux.
+
+
+  
+  
+
+
+
+Step 5. Connect your PC via a USB-to-serial breakout board (5V version) to the Minimal 64x4’s UART port (e.g. Windows: TeraTerm, Linux: Picocom) for data transfer. Not all boards share the same pinout. My board is based upon the IC FT232. In the picture below, from bottom to top the pins are labeled GND, CTS, 5V, TXD, RXD and DTR (not used here).
+  
+
+Step 6. Disconnect your USB-to-serial breakout board from the *USB port* prior to plugging it into the Minimal’s UART socket. Make sure that GND and 5V line up correctly. Verify that the UART TxD (transmit) line cross-connects to the breakout board’s RxD (receive) line and vice versa. Only then connect the *USB plug* to your USB power supply or port and power up the Minimal 64x4. Press the RESET button.
+
+
+“Hot-plugging” an improperly grounded Minimal 64x4 may cause unwanted write operations to the FLASH IC, potentially leading to data loss, making a re-programming of the FLASH IC necessary. I recommend connecting and disconnecting the Minimal 64x4 always via the *USB plug*. This will establish a solid ground connection.
+Serial Port Configuration
+The configuration of the serial port of your PC will look a bit different in each terminal emulation (I quite like the lightweight ‘Tera Term’ for Windows). Set the following parameters:
+
+
+o bit rate 500Kbps,
+o 1 start bit, 2 stop bits, no parity bits, no flow control,
+o Minimal 64x4: 8 data bits, Minimal 64x4 Redux: 7 data bits,
+o Set the ‘new line character’ to be LF (0x0a) like in UNIX.
+o Set a transmit delay of 10ms/line to ensure that the CPU
+  has enough time to process a line of HEX input data.
+  The proper delay may depend on your host system.
+o I recommend setting the terminal emulation to 50 x 30 using
+  the C64-style TrueType font https://style64.org/c64-truetype.
+  
+If you are on Linux, you might (as I did) have trouble setting the required 10ms line delay. I ended up using ‘picocom’:
+
+
+picocom -b 500000 --databits 7 --parity n --stopbits 2 --flow n --imap lfcrlf --omap crlf /dev/ttyUSB0
+
+
+For the line delay, we then need a little bash script ‘send.sh’ included in the ‘Programs/asm’ section of the repository.
+
+
+        ./asm.exe <file>.asm | ./send.sh
+
+
+You can verify the signals RX and TX at the marked test pads, respectively.
+The Minimal 64x4 supports RTS/CTS flow control for a slightly improved upload speed since with RTS/CTS, line delays can be omitted. However, not all USB-to-serial converter ICs support RTS/CTS flow control in a suitable way. As of today, CH340G works fine while FTDI232 and CP2102 are not suitable due to slight differences in their hardware implementations.
+PS/2 Keyboard
+The Minimal 64x4 handles any "dumb" PS/2 keyboard (5V, 100mA) sending plain keystroke data using the PC compatible default keyboard ‘Scan Code Set 2’ as shown below. Key releases are prepended by the release code 0xf0.
+
+
+      
+
+
+Depending on the length of the PS/2 cable, the CLK rise time of some keyboards may violate the <400ns specification of 74HC inputs. Some keyboards may even send 3.3V rather than 5V signals. The Minimal 64x4 handles these conditions by employing 74HCT132 Schmitt-trigger inputs.
+
+
+Some modern PS/2 keyboards require a two-way handshake at start-up. This procedure is not supported by the Minimal 64x4 hardware.
+
+
+When your PS/2 keyboard is hooked up to the Minimal 64x4, you can verify its signals by monitoring the voltage levels at the test points labeled CLK and DAT next to the PS/2 connector on the PCB.
+VGA Monitor
+Any computer monitor capable of displaying the VGA industry standard 640 x 480 (60Hz) should process the Minimal’s video signal correctly. Below you see the result of an auto-detection of a Neovo X15-A multi-mode LCD monitor (left) next to a vintage monochrome IBM 8503 CRT from 1987 (right).
+
+
+         
+
+
+Some modern TVs and VGA-to-HDMI converters – specifically those detecting a large variety of different video modes automatically – might get confused and not discriminate the Minimal 64x4’s 640x480 60Hz video mode correctly against other resolutions.
+
+
+You can verify the horizontal and vertical sync pulses at the test points labeled HS (4µs active low pulse every 32µs) and VS (64µs active low pulse every 16.7ms) on the PCB, respectively.
+The Minimal 64x4 does not feature hardware blanking intervals but relies on its software to clear the corresponding parts of the video RAM. At power-up, the entire video RAM is filled with random garbage. The blanking intervals will be cleared by the OS after pressing the reset button.
+
+
+IMPROPERLY CLEARED BLANKING INTERVALS MAY DAMAGE OR DESTROY A VINTAGE CRT MONITOR. CONNECT A VINTAGE CRT MONITOR ONLY AFTER SETTING THE BLANKING INTERVALS CORRECTLY, i.e. A SYSTEM RESET.
+
+
+Operating System MinOS
+After pressing the reset button we are greeted by a splash screen (in case your Minimal refuses to start see section ‘Troubleshooting’):
+     
+
+
+The operating system 'MinOS 2' features a command line input and a file system that transforms the onboard 512KB FLASH storage into an easy-to-use contiguous SSD drive. It can autostart files and may be updated ‘in-situ’.
+Commands
+MinOS loads and executes any filename you enter. Thus, any file can be viewed as an 'OS command'. MinOS comes with the following built-in commands (optional parameters are shown in square [] brackets, <x>, <y>, <z> can be HEX values between '0' and 'ffff', <b> can be a HEX value between ‘0’ and ‘ff’). Please note that only HEX format and only without format prefix ‘0x’ is supported:
+
+
+run [<x>]
+starts execution at hex address 0x0100, optionally at <x>.
+
+
+dir
+displays the file directory of the SSD. Press ESC to halt.
+
+
+del <file>
+deletes a file from the SSD.
+
+
+show <file>
+displays a text file. Page breaks are denoted by a 'percent' sign. Type in ‘show manual ENTER’ to open the on-board reference manual of the Minimal 64x4.
+
+
+format
+formats the SSD user area (banks 3..127).
+
+
+defrag
+frees up unused SSD storage fragments. Use this from time to time.
+
+
+memset <x> <y> <b>
+fills the RAM area at address <x>..<y> with byte value <b>.
+
+
+mon [<x>]
+starts a memory monitor [at memory address <x>].
+  
+  ENTER                exits the monitor to the OS prompt.
+  <x>                        changes the monitor address to <x>.
+  [<x>].<y>        displays an address range <x>..<y>
+  :<d>[ <b>]        deposits <b> at current address.
+  #<b>                activates SSD bank <b> (>= 0x80 for RAM)
+memmove <x> <y> <z>
+moves memory area <x>..<y> to <z>. Source and destination may overlap.
+
+
+receive
+receives an 'Intel HEX File' you paste via the UART terminal connection and writes the data into RAM. OS FLASH images generated by 'asm os.asm' are automatically detected and written 'in situ' to the FLASH sectors 0..2 after your confirmation.
+
+
+save <x> <y> <name>
+saves memory area <x>..<y> under the filename <name> onto the SSD.
+File Format
+Data is stored as a ‘file’ by prepending a header containing the following information:
+
+
+        20  bytes        filename (including zero-termination)
+         2  bytes        destination RAM address of the file data
+         2  bytes        bytecount N of the data section
+         N  bytes        data section
+Autostart
+MinOS lets you autostart files stored on the SSD. At boot-up, the OS searches for a batch text file ‘autostart’. In case the file exists, each white-space separated entry of that file is interpreted as a filename, the corresponding data is loaded into memory and executed as a subroutine. If you intend to call multiple programs from ‘autostart’, make sure that each program hands back control to the OS via a proper ‘return from subroutine’ RTS instruction.
+
+
+Autostarting code containing an endless loop will leave the CPU stuck, with a reset immediately restarting that code. To escape such a situation, hold down the RESET button, press ESC on the PS/2 keyboard and release RESET. MinOS will then skip the autostart sequence.
+Updating
+The OS source code ‘os.asm’ can be assembled into a HEX file with 'asm os.asm'. The HEX file can then be transferred into the first 3 banks of the 512KB FLASH SSD ROM of the MINIMAL 64x4. In case you already have a version of MinOS installed, the OS can be updated 'in situ': Upload the HEX file into the Minimal 64x4’s RAM by typing 'receive ENTER' and pasting the HEX file into a terminal to the MINIMAL 64x4 via the UART interface. The image will be written to the FLASH banks 0-2. Upon pressing RESET, the new OS boots. Your file data remains unchanged on the SSD.
+Localization
+To change the keyboard localization you will have to change and update the OS. Don’t worry, it is very straight-forward: Just open 'os.asm', search for 'PS2Table:' and replace the following two sections (25 lines) with the code in the file ‘keyboard_<X>.asm’ as provided on the Minimal 64x4 GitHub. <X> stands for either ‘US’, ‘GB’ or ‘DE’ localization. If neither of those fits your needs you will have to tweak one of the existing files. Once you have modified the OS to your needs, upload it into the Minimal as described in the above section.
+Memory Layout
+The 16-bit address space of the Minimal 64x4 reaches 64KB via the addresses 0x0000..0xffff. The lowest 4KB, i.e. 0x0000..0x0fff, can either represent RAM or one of the 128 4KB banks of FLASH memory. The active FLASH bank is set by the OS file system using the 8-bit bank register. The address space 0x1000..0xffff always represents RAM.
+
+
+0x0000..0fff 4KB FLASH/RAM  depending on bank:
+             0: OS kernel & API image
+             1: OS data (charset, tables)
+             2: OS command files
+             3..127: SSD file storage
+             >= 128: RAM (FLASH disabled)
+
+
+0x0000..00ff ZERO PAGE (256 bytes):
+  0080..00ff OS & API variables
+  00cd..00fe 50 bytes OS line input buffer
+  00ff       system register
+
+
+0x1000..3fff 12KB RAM:
+  0100..0fff used by text editor 'edit'
+  1000..1fff used by assembler 'asm'
+  1000..2fff used by language 'min'
+  3000..3fff temp storage and OS commands
+
+
+0x4000..7fff 16KB VIDEO RAM (64 x 256 bytes):
+  430c       start of 400 x 240 pixels viewport
+
+
+0x8000..efff 28KB RAM:
+  f000..fdff MinOS & API functions
+  fe00..feff reserved for expansion cards
+
+
+0xff00..ffff CPU STACK (256 bytes):
+  ffff       stack pointer LSB
+
+
+FLASH banks 0..2 contain a write-protected and self-loading image of the operating system MinOS and its built-in OS commands. All other SSD memory can be utilized for your own programs and data.
+
+
+Upon pressing the reset button, the program counter, bank and memory address register are cleared. The code at address 0x0000 of bank 0 - the OS bootloader if you will - will copy the OS from FLASH into the RAM area 0xf000..0xfeff and then start the operating system.
+
+
+Several of Minimal’s native software development tools, e.g. the text editor, the assembler and the programming language ‘Min’, make use of various memory areas. See the section ‘Native Tool Chain’ for more information.
+
+
+The Minimal 64x4 uses a set of 256 8x8 pixel characters roughly resembling the style of a Commodore C64 or VIC-20. The character set is stored on bank 1 of the FLASH SSD. The order of the characters follows ASCII conventions. In the picture below, the character set is shown in rows of 32 characters from left to right, starting at index zero in the left upper corner.
+
+
+  
+
+Programming
+Writing your programs “in the very language of the Minimal 64x4” will yield the fastest code and also the deepest understanding of the inner workings of this CPU and of computers in general.
+The Minimal 64x4 can perform 256 distinct operations, each identified by a unique 8-bit value called opcode. In order to make programming more accessible to humans, each opcode maps to a mnemonic.
+Chaining these mnemonics in a way that solves a given problem is called ‘programming in assembly language’. In order to run such programs, an ‘assembler’ will have to translate the mnemonics back to a chain of opcodes, the so-called ‘machine code’, and store the data at a specific location in RAM for execution.
+Let’s discuss the instruction set of the Minimal 64x4 and explore ways of programming this machine.
+Instruction Set
+In Minimal 64x4 assembly, a mnemonic maps directly to a unique opcode, i.e. no information about the opcode is hidden in the argument syntax. Instruction arguments are appended in the same order in which they will later reside in memory as machine code. The advantage of this notation is its closeness to the hardware, facilitating self-modifying code. As a downside, multiple mnemonics exist for “the same task”, e.g. LDI, LDZ, LDB, LDT, LDR and LDS all load a value into the accumulator, while representing different addressing modes.
+
+
+Idea collection: As an alternative, we could represent all of the above instructions with a single ‘load’ mnemonic in combination with a more expressive syntax, e.g.
+
+
+        LDI 0x01        =         load #0x01        loads immediate value
+        LDZ 0x01        =         load 0x01        loads value from zero-page
+        LDB 0x1000        =         load 0x1000        loads value from memory address
+        LDT 0x01        =         load (0x01)        loads value from relative ZP address
+        LDR 0x1000        =         load (0x1000)        loads value from relative address
+        LDS 1                =         load (SP+1)        loads value from stack
+
+
+A possible way forward for a more modern assembly syntax could be to reduce the instruction set to a few base instructions, i.e. add, sub, adc, sbc, neg, not, and, or, xor, ld, st, move, in conjunction with the following:
+
+
+  o use address extensions in "from.to" format: b, w, l, b@, w@, l@, s, i, i.e. addb@.b@.
+  o have the assembler handle zero-page instructions according to the arguments used
+  o have the assembler handle fast branches (use LSB instead of 0x1234 or label)
+  o biggest disadvantage: we lose the control over the actual mnemonic
+  o self-modifying code is rendered quasi-impossible
+
+
+Writing such an assembler would be an interesting project. Go for it if you want to contribute!
+
+
+Most instructions fall into just a few basic categories. With a bit of practice the notation will become quite intuitive.
+All Minimal 64x4 mnemonics consist of 3 letters. The leading letter(s) hint at the category, whereas trailing letter(s) often specify additional information (addressing modes, branching conditions, etc.). The following rules may help to get an intuitive understanding of the instruction set and its mnemonics.
+
+
+1. Data is transferred by ‘move’, ‘load’ and ‘store’ instructions:
+
+
+        M - transfers         from source != A                to destination != A
+        L - transfers         from source != A                to destination == A
+        S - transfers         from source == A                to destination != A
+
+
+        where A denotes the accumulator. ‘move’ instructions use the
+         trailing two letters to specify the source and destination
+         addressing modes.
+
+
+        o Most ‘load’ and ‘store’ commands use trailing letters ‘LD_’
+           (“load data”) and ‘ST_’ (“store data”). Redux uses ‘SD_’.
+o Single letters ‘L__’ and ‘S__’ are only used for indexed
+  addressing modes.
+
+
+2. Branching instructions use a leading ‘J__’ (‘jump’).
+Conditional branching uses ‘B__’ (‘branch’).
+8-bit (‘fast’) branching uses ‘F__’.
+
+
+3. Stack-related instructions have a trailing ‘__S’ (‘stack’).
+
+
+4. Single-argument functions use two leading letters:
+
+
+CL - clear
+NO - bitwise NOT                NE - negate
+IN - increment                DE - decrement
+LL - log shift left        LR - log shift right
+RL - rotate left                RR - rotate right
+LD - load to A                ST - store A to (Redux uses SD)
+RD - read FLASH data        WD - write FLASH data
+AN - bitwise AND                OR - bitwise OR                XR - bitwise XOR
+AD - add                        SU - subtract                CP - compare
+AC - add with C                SC - sub with C
+
+
+5. Two-argument functions use only the leading letter:
+
+
+M - move        A - add        S - sub        C - compare
+
+
+6. The following RAM addressing modes are supported:
+
+
+I - immediate value
+        
+        absolute addressing:
+
+
+B - byte in RAM                        Z - byte in zero page
+                W - word in RAM                        V - word in zero page
+                L - long in RAM                        Q - long in zero page
+        
+        relative addressing (pointer):
+
+
+R - byte pointer in RAM        T - byte pointer in zero page
+
+
+7. Addressing modes are specified in “from->to” order if applicable.
+
+
+8. Instructions storing its result in a memory location use a dot (“to”) to discriminate against their counterpart storing the result in the accumulator:
+
+
+AD.Z | ADZ                        SU.Z | SUZ                        AN.Z | ANZ
+AD.B | ADB                        SU.B | SUB                        OR.Z | ORZ
+AD.T | ADT                        SU.T | SUT                        XR.Z | XRZ
+AD.R | ADR                        SU.R | SUR                        AN.B | ANB
+AC.Z | ACZ                        SC.Z | SCZ                        OR.B | ORB
+AC.B | ACB                        SC.B | SCB                 XR.B | XRB
+        
+9. Just a few functions support indexed access:
+
+
+                L - Load                        S - Store                        R - Read FLASH
+
+
+        Arguments involved are:
+
+
+                A - A-indexed                Z - Z-indexed                P - page
+
+
+Click the following table for full instruction details of the original Minimal 64x4 or the Minimal 64x4 Redux.
+
+
+Minimal 64x4
+
+
+Minimal 64x4 Instruction Set
+
+
+Instructions no longer available on Minimal 64x4 Redux are marked in yellow.
+
+
+Minimal 64x4 Redux
+
+
+Minimal 64x4 Redux Instruction Set
+
+
+In the Redux instruction set the following changes are implemented for a streamlined and more orthogonal design (marked in green):
+
+
+o Renaming ‘ST_’ instructions (“store”) into ‘SD_’ (“store data”) matching
+  ‘LD_’ (“load data”) and avoiding conflicts with addressing mode ‘T’.
+
+
+o New: The 'move' command family (load/store/move) now implements all
+  possible addressing combinations.
+o New: 16-bit-wide comparisons CIV, CIW, CVV
+o New: OUT now features a hardware wait of 160 cycles (no more software wait
+  required!)
+o New: Relative targets for bitwise logic commands: AN.T, AN.R, OR.T,
+  OR.R, XR.T, XR.R
+o New: CL5 clears 5 bytes at rel ZP address and advances pointer by 5 bytes,
+  allowing for very fast screen clearing
+o New: Add, sub, compare with addressing modes _TZ, _ZT, _TT
+o New: CLD ('clear data in accumulator') just for orthogonality
+
+
+Something has to give...
+
+
+o Discarded: 4-byte instructions NOL, NEL, INL, DEL, AIL, SIL, ADL, SUL
+o Discarded: CLC/SEC (CLC = ADI 0, SEC = SUI 0 with similar speed).
+o Discarded: some add/sub-with-carry instructions (_CB, _C.B, _CV, _CW),
+  keeping only immediate and zero-page add/sub-with-carry instructions
+o Discarded: Addressing combinations mixing zero-page with absolute
+  addressing, with the 'move' command family being the only exception
+
+
+As an example, let’s find the instruction to add the constant value 5 to a byte in RAM at address 0x4000: We pick ‘A’ for add, ‘I’ for ‘immediate value’ as source and B for ‘byte at absolute address’  as destination. We then append the arguments in from-to order, separated either by a space or comma:
+
+
+        AIB 5,0x4000
+
+
+On the Minimal 64x4, this instruction will produce the machine code
+        
+        0xb0 0x05 0x00 0x40
+
+
+where 0xb0 is the instruction’s opcode, 0x05 is the first argument and 0x00 0x40 is the 16-bit destination address in little-endian format.
+
+
+I/O Operations
+Using PS/2 and UART for I/O is really easy on the Minimal 64x4 and only involves the following four instructions:
+
+
+OUT sends the content of the accumulator via UART to a terminal. Please keep in mind that the Minimal 64x4 does not feature any output buffer. 
+
+
+On the original Minimal 64x4, it is up to you to wait 160 cycles (= 10 NOP instructions) for the current UART transmission to complete before sending the next byte.
+
+
+On the Minimal 64x4 Redux, OUT waits 160 cycles for the transmission to complete. No additional software waiting is required.
+
+
+INT moves the content of the UART (terminal) receiver register into the accumulator and clears the receiver. An empty register will read 0xff. INT provides non-blocking input.
+
+
+INK moves and clears the content of the PS/2 keyboard register into the accumulator. An empty register will yield 0xff. INK also provides non-blocking input.
+
+
+WIN (wait on input) halts the CPU if both UART and PS/2 registers contain no input (0xff). WIN is usually followed by a subsequent readout via INT/INK.
+
+
+Stack Operations
+The memory address 0xffff holds the LSB of the CPU stack pointer (the MSB is always 0xff). The stack pointer is pointing to the next free memory location on the stack page 0xff00..0xffff and is growing downwards. The stack pointer has to be initialized with
+
+
+        MIB 0xfe,0xffff                        or                LDI 0xfe STB 0xffff
+
+
+which is usually done by the OS. If you plan on using your own software, please keep in mind to include this line in your code. The Minimal offers the following instruction that make use of the stack:
+
+
+JPS <subroutine> pushes the LSB and MSB of the address following the opcode (program counter + 1) to the stack and decrements the stack pointer twice. Next the processor loads the address <subroutine> into the program counter, entering your subroutine. A is not preserved.
+
+
+JAS <subroutine> works a bit slower than JPS but is A-preserving.
+
+
+RTS increments the stack pointer twice and pulls two bytes from the stack and stores them in the program counter. Before the execution is continued, the program counter is incremented twice, effectively pointing it to the next instruction that follows the JPS <subroutine> call. RTS always preserves A.
+
+
+PHS pushes the content of the accumulator onto the stack and decrements the stack pointer.
+
+
+PLS increments the stack pointer and pulls the value stored at that stack position into the accumulator.
+
+
+LDS <index> loads the content of the address (stack pointer + <index>) into the accumulator. <index> can be any signed byte value.
+
+
+STS <index> stores the content of the accumulator to the address (stack pointer + <index>). <index> can be any signed byte value.
+
+
+Fast Branching
+A fast jump as in branching instructions ‘F..’ only acts on the LSB of the program counter and can therefore be executed faster than a full 16-bit jump. Fast jumps are very helpful in time-critical code. The assembler will issue a warning if you try to use a fast jump across a page boundary.
+Assembly Syntax
+There are basically two approaches to assembly programming the Minimal 64x4: Either use the native text editor together with the native assembler right on the Minimal 64x4 for full retro immersion or, more comfortably, write your code on a modern PC and use the provided cross-platform assembler (Windows .exe) to convert your code into an Intel HEX file that can be uploaded to the Minimal 64x4 via UART.
+
+
+The native text editor and native assembler are described in the section ‘Native Tool Chain’. The native assembler supports the same assembly syntax as the cross-platform version described below.
+
+
+The cross-assembler is a command line tool running on your host PC that lets you specify the filename of your source code. It outputs machine language in ‘Intel HEX format’ (see Intel HEX) to the console.
+
+
+  
+
+
+
+Copy this HEX output, then type ‘receive’ on the Minimal 64x4 and simply paste the data into a serial terminal connection (TeraTerm: Alt+V or right mouse button). The Minimal 64x4 will receive your program and store it at the RAM location specified in your source code. You can then either save your data to the SSD using the ‘save’ command or execute it with ‘run’ (see section ‘Operating System’ for more details).
+
+
+The assembler ‘asm.exe’ is written in C++ and runs on Windows. To assemble a file, just type in ‘asm <filename> ENTER’.
+Asm features the command line option -s[<tag>] for printing out a list of symbolic constants [starting with <tag>] and their values.
+
+
+While assembling source code, ‘asm’ uses two pointers: a memory counter (MC) and a program counter (PC). It is important to note that data is always emitted to MC. Labels, however, are defined with respect to PC. Default address for MC and PC is 0x2000.
+
+
+The table below shows the available assembler commands in the form of simple examples. Mnemonics as well as hex digits can be written in upper- or lower-case. Elements (mnemonics, operands, stand-alone data) must be separated by either space or comma.
+
+
+#emit                        starts data emission to MC
+#mute                        mutes data emission to MC but keeps updating PC
+#page                        sets PC (MC) to the next page-aligned address
+#org 0x2000        sets PC (sets MC only when emission is on)
+
+
+; comment                marks the rest of the line as comment
+*                        alias for current MC address value
+
+
+LDI, ldi                instructions are recognized case-insensitively
+label:                defines a label to be the current PC
+<label                LSB operator (at element start only)
+>label                MSB operator (at element start only)
+
+
+0x0a, 0x0A, 123        HEX and DEC byte values
+0xff10, 0xFF10        HEX word values (translation to little-endian)
+'A', “B”                character (equivalent to 65 or 0x41)
+“‘“, ‘“‘                character (equivalent to ‘ or “)
+'AAA', “AAA”        string (equivalent to 65, 65, 65)
+
+
+addr+off-1                handling of simple expressions (no whitespace)
+
+
+Expression parsing is quite primitive as only additions and subtractions without whitespace separators are allowed. However, the assembler checks for correct instruction arguments (byte, word, zero-page, fast-jump, etc) and will inform you about any mismatch.
+Calling Convention
+Although it is really up to you how to handle data transfer to and from subroutines within your code, it can be helpful to stick to a “best practice” use pattern. Let’s suppose, a subroutine expects two parameters <A> and <B> to work with and returns some result <C>.
+
+
+The caller has the responsibility to push these data onto the stack prior to calling the subroutine. Once the caller has regained focus, it cleans up (and in case of <C> processes) all data that it had pushed onto the stack:
+
+
+LDI <C> PHS        ; pushes a container <C> for the return value
+LDI <B> PHS        ; pushed parameter <B>
+        LDI <A> PHS        ; pushes parameter <A>
+        JPS <subroutine>
+        PLS                        ; cleans up <A> from stack
+        PLS                        ; cleans up <B> from stack
+PLS                        ; moves the return value <C> into the A register
+        STB ...                ; stores the result <C> somewhere
+
+
+The callee may now access the stack parameters <A and <B> and store the result in <C> from its perspective (note that the JPS instruction pushes a two-byte return address onto the stack as well):
+        
+<subroutine>:        LDS 3 STB ...        ; loads parameter <A> from stack
+                        LDS 4 STB ...        ; loads parameter <B> from stack
+                        ...                        ; do stuff
+                        STS 5                        ; stores return value in container <C>
+                        RTS                        ; callee hands back control to caller
+
+
+Stack as viewed from the caller’s perspective prior to JPS:
+
+
+Offset:         -4         -3        -2        -1         0         1         2         3        (relative to SP)
+Stack:        ---        ---        ---        ---        ---        <A>        <B>        <C>
+
+
+Stack as viewed from the callee’s perspective right after JPS:
+
+
+Offset:         -2         -1         0         1         2         3         4         5        (relative to SP)
+Stack:        ---        ---        ---        MSB        LSB        <A>        <B>        <C>
+API Functions
+Helpful OS subroutines can be used via a jump table. With a new OS release, API functions may be added or improved. However, the addresses of existing API functions will not change. Thus, your program will always work no matter what OS version you use. In case you need more details about a specific function and its parameters you might want to take a look at the function description and implementation within the MinOS source file ‘os.asm’. For example, if you want to take a look at the ‘_Print’ function, search ‘os.asm’ for ‘_Print:’. You will find the corresponding jump table entry:
+
+
+_Print:        JPA OS_Print
+
+
+If you want to take a closer look at the actual implementation or the required arguments, refer to ‘os.asm’ and search for ‘OS_Print:’.
+
+
+The following list shows the available API functions and data.
+
+
+Addr   API Function        Description
+----------------------------------------------------------------------
+0xf000 _Start:                Start vector of the OS in RAM
+0xf003 _Prompt:                Hands back control to the input prompt
+0xf006 _MemMove:                Moves memory area (may be overlapping)
+0xf009 _Random:                Returns a pseudo-random byte (see _RandomState)
+0xf00c _ScanPS2:                Scans the PS/2 register for new input
+0xf00f _ResetPS2:        Resets the state of PS/2 SHIFT, ALTGR, CTRL
+0xf012 _ReadInput:        Reads any input (PS/2 or serial)
+0xf015 _WaitInput:        Waits for any input (PS/2 or serial)
+0xf018 _ReadLine:        Reads a command line into _ReadBuffer
+0xf01b _SkipSpace:        Skips whitespaces (<= 39) in command line
+0xf01e _ReadHex:                Parses command line input for a HEX value
+0xf021 _SerialWait:        Waits for a UART transmission to complete
+0xf024 _SerialPrint:        Transmits a zero-terminated string via UART
+0xf027 _FindFile:        Searches for file <name> given by _ReadPtr
+0xf02a _LoadFile:        Loads a file <name> given by _ReadPtr
+0xf02d _SaveFile:        Saves data to file <name> defined at _ReadPtr
+0xf030 _ClearVRAM:        Clears the video RAM including blanking areas
+0xf033 _Clear:                Clears the visible video RAM (viewport)
+0xf036 _ClearRow:        Clears the current row from cursor pos onwards
+0xf039 _ScrollUp:        Scrolls up the viewport by 8 pixels
+0xf03c _ScrollDn:        Scrolls down the viewport by 8 pixels
+0xf03f _Char:                Outputs a char at the cursor pos (non-advancing)
+0xf042 _PrintChar:        Prints a char at the cursor pos (advancing)
+0xf045 _Print:                Prints a zero-terminated immediate string
+0xf048 _PrintPtr:        Prints a zero-terminated string at an address
+0xf04b _PrintHex:        Prints a HEX number (advancing)
+0xf04e _SetPixel:        Sets a pixel at position (x, y)
+0xf051 _Line:                Draws a line using Bresenham’s algorithm
+0xf054 _Rect:                Draws a rectangle at (x, y) of size (w, h)
+0xf057 _ClearPixel:        Clears a pixel at position (x, y)
+
+
+Addr   API Data                Description
+----------------------------------------------------------------------
+0x00c0 _XPos:                1 byte: Horizontal cursor position (see _Print)
+0x00c1 _YPos:                1 byte: Vertical cursor position (see _Print)
+0x00c2 _RandomState:        4 bytes: _Random state seed
+0x00c6 _ReadNum:                3 bytes: Number parsed by _ReadHex
+0x00c9 _ReadPtr:                2 bytes: Command line parsing pointer
+0x00cb                        2 bytes: unused
+0x00cd _ReadBuffer:        2 bytes: Address of command line input buffer
+
+
+Most of these functions expect parameters to be pushed onto the stack or in specific locations in the zero page prior to calling. Some may also return values to be pulled from the stack or the zero page. Please refer to the section ‘Calling Convention’ and the source file ‘os.asm’ of the operating system for more information.
+Native Tool Chain
+You want the full retro immersion without a host system? You can write, edit, assemble, organize and run your programs natively on the Minimal 64x4! Here is how.
+Text Editor
+Upload and store the ‘Minimal Editor’ file to your SSD under the filename ‘edit’. It’s 4KB in size and resides in the memory area 0x0100..0x0fff. Text data starts from 0x8000, with lines separated by LF (0x0a). The end of the text is designated by EOF (0x00). The editor can handle files of up to 28KB.
+After power-up, upload and start the editor by entering ‘edit [<filename>]’, the <filename> being optional. Once loaded, the editor can be warm-started by typing 'run', preserving your text document. The following editor commands are available:
+
+
+CTRL q        Quits the editor.
+CTRL n        Starts a new document.
+
+
+CTRL l        Dialog line to input a filename to load.
+CTRL s        Dialog line to save the text as a file.
+
+
+CTRL a        Marks the start of a text block.
+CTRL x        Marks the end of a text blocks and cuts
+out the marked text block to the clipboard.
+CTRL c        Marks the end of a text block and copies
+the marked text block to clipboard.
+CTRL v        Inserts a text block from clipboard at
+the current cursor position.
+
+
+CTRL t        Transmits the current text file via UART.
+CTRL r        Receives text via UART and inserts it at
+the current cursor position.
+Assembler
+Upload and store the ‘Minimal Assembler’ to your SSD. It’s 2KB in size and resides in RAM area 0x1000..0x1fff including a temporary label database during assembly. To assemble a sourcefile <file> from SSD, type 'asm <file>'. In case the source text already resides in RAM you can simply assemble with 'asm'. The native assembler supports the same syntax as the cross-platform version (see section ‘Assembler Programming’).
+Min Language
+Min stands for ‘Min is not Python’. Min is a high-level Python-like programming language that runs natively on the ‘Minimal 64x4 Home Computer’ as an interpreter.
+
+
+The command 'min <file>' loads and interprets a text <file> from SSD, while 'min' interprets a program text currently present in RAM at 0x8000. MIN uses the RAM area 0x1000..0x2dff and the area up to 0x3fff for runtime data storage. The exact language definition in ‘Enhanced Backus-Naur Form’ (EBNF) is provided in the software section of the project repository.
+
+
+If you are familiar with Python you will easily find your way in Min. The following list of features and commands will get you started. I recommend taking a look at the example programs in the project repository.
+
+
+o Python-style code block indentation (2 SPACES)
+o control structure 'if-elif-else', 'while-break'
+o variables with C-style static explicit typing
+o data types 'char' (8-bit) and 'int' (16-bit)
+o local and global variables, @ address operator
+o 'def-return', C-style '&' variable references
+o 'call ..' for assembly/API routine integration
+o full expression handling including '+=', '-='
+o bitwise/logical operators 'and/or/xor/not'
+o [..|..] element access and '_' concatenation
+o decimal and HEX '0xffff' numbers, "..." strings
+o print(..) for text and decimal number output
+o 'use "<library>"' for recursive file import
+o 'std.min' library implements: pos, rnd, clear,
+  line, rect, dot, str, len, strcmp, key, etc.
+Emulator
+The ‘Windows Minimal 64x4 Emulator’ models the Minimal 64x4, its SSD storage, VGA output, UART and PS/2 input in real time cycle-exactly down to microcode level and with a vintage CRT vibe on a 64-bit Windows PC with an OpenGL3.3-compatible graphics card.
+
+
+The emulator is controlled by keyboard shortcuts as detailed on its splash screen shown below on the left. Upon pressing F2 the processor HUD lets you peek inside the inner workings of the Minimal 64x4 (below on the right). Again the available options are given on the screen.
+
+
+  
+  
+
+
+
+The emulator will report an error if it isn’t able to find the image file ‘flash.bin’ alongside its executable. ‘flash.bin’ holds the operating system and SSD content and is being updated each time the emulator is closed.
+
+
+The emulator comes with an integrated ‘Minimal Assembler’: From the emulator’s splash screen you can assemble and upload source files into the Minimal 64x4’s memory by typing ‘l<filename>’ (l for load).
+
+
+Note that if you upload into address 0x0000, e.g. with #org 0x0000 in your source code, the emulator assumes you intend to write your program directly into FLASH memory and proceeds accordingly.
+
+
+You can start your code by typing ‘p<hexaddress>’ (p for set program counter). Both commands may also be used as command line arguments when starting the emulator. As an example, the command line
+
+
+Minimal64x4.exe lprgs/stars.asm p2000
+
+
+will load and assemble the source files ‘stars.asm’ from a folder ‘prgs’ relative to the emulator and then jump to address 0x2000. This allows for powerful integration with for example VS Code’s tasks.
+
+
+
+
+________________
+
+
+Hardware
+Specification
+CPU system clock rate................................. 8MHz
+
+
+Supply voltage range.......................... 4.5V to 5.5V
+
+
+Minimal 64x4: Supply current at 5V 1......... 170mA to 220mA
+Minimal 64x4 Redux: Supply current at 5V 1... 200mA to 250mA
+
+
+UART bit rate...................................... 500Kbps
+
+
+Minimal 64x4:
+UART format.......... 1 start bit, 8 data bits, 2 stop bits
+                           no parity bit, newline LF (0x0a)
+Minimal 64x4 Redux:
+UART format.......... 1 start bit, 7 data bits, 2 stop bits
+                           no parity bit, newline LF (0x0a)
+
+
+UART transmit delay.............................. 10ms/line
+
+
+Average clocks per instruction 2..................... 4.5cpi
+
+
+Processing power 2.................................. 1.8Mips
+1 values may vary with IC manufacturer. Boards with a supply current  of ~300mA usually suffer from damaged ICs and/or cheap budget copies not suitable for the Minimal 64x4.
+2 as running Bresenham’s line drawing demo ‘vga.asm’ as a benchmark. Measuring the processing power of a CPU can be very dependent on the chosen benchmarking code. Choosing a task that represents the actual work the computer is supposed to do is helpful. In the early days of computing the unit ‘Mips’ (million instructions per second) was popular for comparing the performance of different CPUs.
+This unit is a bit unfortunate, since it obviously is insensitive to the amount of work a CPU gets done within a single instruction.
+To give you an example, a feature of the Minimal 64x4 is its word addressing mode: ADW 0xabcd adds the accumulator to the LSB of a 16-bit value at memory address 0xabcd and in case of an overflow also automatically increments the MSB. The famous MOS 6502 processor lacks such a functionality and thus requires multiple simpler 8-bit instructions for the same task. Misleadingly, this drawback leads to an increase in the CPU’s Mips rating.
+
+
+Having that said, the 6502 processor is rated 0.43Mips at 1MHz (as in a Commodore 64 or Apple II) translating into an average of 2.3cpi (‘clocks per instruction’). Obviously, the number of instructions per second (ips) can be calculated by dividing the clock frequency by the number of clocks per instruction. At its time the 6502 was quite an efficiently designed pipelined CPU.
+
+
+The Minimal 64x4 uses on average 4.5cpi when drawing random lines using Bresenham’s line algorithm as a benchmark. Compared to the 6502, this value is higher since the Minimal by its SAP design is less efficient than a pipelined CPU. Additionally, it features many 16-bit and even some 32-bit instructions that the 6502 needs to break down into multiple 8-bit instructions, further distorting the picture as described above. So let’s take any Mips number with a grain of salt.
+On the Minimal 64x4, we reach on average 1.85Mips at 8MHz CPU clock rate which is more than four times the processing power of a C64 or Apple II, placing the Minimal 64x4 well in the ballpark of the Motorola 68000 Processor (1.4Mips at 8MHz) used in the Amiga or Atari ST.
+Expansion Port
+The Minimal 64x4 features a stackable expansion port allowing you to expand the CPU system with any functionality that can be accessed by the ‘memory-mapping’ technique: Within the Minimal 64x4, a so-called INH signal is pulled inactive by default. Whenever an expansion actively pulls INH high, the FLASH memory and RAM of the Minimal 64x4 are disabled (i.e. the ~CE chip enable lines are forced low) and their outputs will remain in a high-impedance state.
+Please note that the layout of the expansion port has changed from Minimal 64 to Minimal 64x4.
+
+
+By pulling INH high, the expansion card effectively hijacks the memory address and bus lines, thus redirecting memory I/O operations of the CPU to the expansion hardware.
+The expansion card pulls the INH signal only high if the CPU accesses certain memory locations associated with the expansion card’s functionality. The necessary address decoding logic resides on the expansion card.
+Within the Minimal 64x4’s address space, the page 0xfe00..0xfeff is reserved for expansion cards and should not be used for other purposes (see the chapter ‘Memory Layout’ for more details). Here is a pinout of the expansion port (top view of the PCB):
+
+
+  
+
+Pin                Direction        Description
+----------------------------------------------------------------------
+1                GND                ground
+2                +5V                supply voltage
+3                INH                RAM/ROM access inhibit signal (active HIGH)
+4                N/C                unused
+5                in/out        reset line of the CPU (active LOW)
+6                out                buffered main system clock
+7..14                in/out        bus lines BUS0..BUS7
+15..30        out                address lines A0..A15
+31                out                Control signal ‘RAM output’ (active LOW)
+32                out                Control signal ‘RAM input’ (active LOW)
+
+
+The expansion port provides direct unbuffered access to vital system signals. Proceed with caution and do not overload any provided signal with too much additional capacitance.
+
+
+________________
+
+
+Troubleshooting
+Your Minimal won’t start up on the first try? Here are a few things to consider:
+I recommend sourcing all ICs from trusted suppliers only. The Minimal 64x4 requires tight timing tolerances. Damaged or unauthorized IC clones from untrusted budget suppliers are known to cause problems.
+
+
+o Inspect *all* solder joints for good electrical contact.
+o Inspect *all* IC sockets for proper orientation. Some ICs are mounted
+  flipped as indicated on the PCB.
+o Inspect *all* ICs for the proper type.
+o Inspect *all* IC pins for proper fit. Pins get bent easily when
+  pressed in.
+o Make sure your FLASH ICs are programmed correctly.
+
+
+If your Minimal 64x4 still won’t start, here is one failure mode that likely causes the trouble: The CPU relies on 24 control signals generated by the 3 large FLASH ICs. It is crucial that the inputs to these FLASH ICs, i.e. the outputs of the step (SC), flags (FR) and instruction (IR) register, change simultaneously. If not, the FLASH ICs outputs will show rapid switching (“spiking”), wrecking CPU timing. This synchronicity is generally established by the system-wide clock.
+But here comes the catch: SC, FR and IR use different IC types. Their propagation delays are slightly different:
+
+
+        74HC377 (IR, FR)        : ~10ns propagation delay
+        74HC161 (SC)        : ~15ns propagation delay
+
+
+The propagation delays might also vary with the quality of your chip supplier. Usually, the counter IC 74HC161 is slightly slower than the registers 74HC377. To compensate for that, the Minimal 64x4 uses a small RC timing constant (R27 together with the input capacitance) to delay the clock input to 74HC377 just so slightly. Usually, 200..470 Ohms do the job.
+
+
+But: I have one single 74HC161 that has for some reason a propagation delay of only 10ns! Being just as fast as the 74HC377, any RC delay would be counterproductive with that IC. Hence, R27 needs to be zero!
+
+
+So if you suspect this causing you trouble, grab your PC scope and take a look at U24 pin 14 against CLK and compare with U10 pin 2 against CLK and adjust R27 as needed. This is how it should line up with both propagation delays 15ns:
+
+
+             
+Red: SC (U24 pin 14), blue: CLK                        Red: IR (U10 pin 2) with R27 = 470 Ohms
+CPU Architecture
+In this section, we discuss the Minimal 64x4 CPU. For sake of clarity, the VGA circuit is described separately in the section ‘Circuit Design’. Let’s start with the general features of the CPU:
+
+
+● Textbook 'Von-Neumann' architecture
+
+
+● 8-bit data bus, 16-bit address bus, 24-bit control word
+● 8MHz CPU clock rate
+● 64KB RAM, 512KB FLASH SSD
+● ALU with 2 data registers and 3 flags (negative, carry, zero)
+● 256 instructions (branching, calls, stack, word and long operations)
+  
+
+Components & Control Signals
+At first glance, even the deliberately simple architecture of the Minimal 64x4 CPU shown in the block diagram above may look a bit daunting. It consists of various functional blocks (shown in blue). Each of these blocks contains several sub-components with inputs and outputs (shown in gray). Their behavior is determined by so-called control signals (shown in red). The magic of any CPU stems from generating its own control signals while at the same time being controlled by them – pressing its own buttons, if you will. To get a grasp of how this works, let’s start with a brief description of each CPU component of the Minimal 64x4.
+
+
+8-Bit Data Bus
+The data bus connects inputs and outputs of components. This backbone of the CPU consists of nothing more than 8 wires (drawn above as a single bold black vertical line). When we say ‘a component outputs something to the bus’ we mean that it drives each bus line to a certain voltage level (0V=LOW, 5V=HIGH), respectively. When we say ‘a component reads something from the bus’ we mean that it copies the currently present bus voltage levels into some internal storage. With each bus line n labeled 0..7 we associate a value 2^n such that in total values 0..255 or -128..127 can be represented by the 8 bus bits. Negative numbers are represented in 2’s complement.
+
+
+________________
+System Clock
+The system clock is not shown in the above block diagram. It synchronizes the actions of all components of a CPU to a common pace. A clock cycle consists of two steps: activation of a specific component’s output followed by reading that output by some other component. Clever timing of these actions enables the Minimal 64x4 to operate at a clock rate of 8MHz which can be considered very fast for a TTL system built from standard 74HC logic. The timing details are described in the section ‘Circuit Design’.
+
+
+A-Register (Accumulator)
+The A-register can hold a single 8-bit data byte. Its input and output is connected to the data bus. The control switch AI (for A in) reads the value on the data bus into the register. AO (for A out) puts the stored value onto the bus. Additionally, A forms a permanent input to the ALU (see below).
+
+
+B-Register
+The B-register works just the same as the A-register. It uses the control signals BI and BO and also permanently inputs to the ALU.
+
+
+Arithmetic and Logic Unit (ALU)
+The ALU adds the values of A and B. EO (for sum out) puts this result onto the bus. ES (for subtract) inverts B prior to adding it to A. EC (for carry in) adds one to the result. This allows us to perform subtractions, since in 2’s complement A - B = A + (~B) + 1, where ~B denotes the inverse of B. Thus, in order to output A - B, the control signals EO, ES and EC must be active.
+Depending on its arithmetic result, the ALU outputs three flags: N negative, C carry and Z zero.
+
+
+N = 1 if the most significant bit of the result is HIGH.
+C = 1 if the result of a calculation exceeds 0xff.
+Z = 1 if the result of a calculation is zero or 0x00.
+
+
+Additionally, the ALU may output the result of A & B (bitwise logical AND) and A | B (bitwise logical OR). The following table summarizes the ALU’s functions and corresponding control signal combinations. ‘X’ denotes an active control signal, ‘-’ denotes inactivity.
+________________
+
+
++-----------+----+----+----+
+| Function  | EO | ES | EC |
++-----------+----+----+----+
+| A + B          |  X |  - |  - |
+| A + B + 1 |  X |  - |  X |
+| A - B          |  X |  X |  X |
+| A - B - 1 |  X |  X |  - |
++-----------+----+----+----+
+| A & B          |  - |  X |  - |
+| A | B          |  - |  - |  X |
++-----------+----+----+----+
+
+
+Program Counter
+The program counter (PC) consists of two 8-bit registers, holding the most significant byte PC_MSB and least significant byte PC_LSB of a 16-bit memory address. The program counter points to the instruction in memory which is currently being processed. Like that MAR, the program counter can also increment (count up one) if CE (for count enable) is active. For writing and reading data to and from the register, four control signals are used: COL/COH for counter out low/high and CIL/CIH for counter in low/high.
+Bank Register
+The bank register (BANK) controls whether RAM or FLASH memory is active. NI (for bank in) reads the bus value into the bank register. In case the most significant bit of BANK is HIGH (i.e. BANK >= 128), FLASH memory is deactivated and RAM is active across the whole 16-bit address space (64KB). With BANK = 0..127, the lowest 4KB of the address space exposes one out of 128 FLASH memory banks.
+
+
+Memory (RAM and FLASH)
+Memory integrates a large number of single-byte register cells into a single IC. Each cell has a unique index or address. To select a certain memory cell, the address bits have to be present at the address inputs of the memory chip. RO (for memory out) will output the content of the selected cell onto the bus. RI (for memory in) stores the bus value into the selected cell.
+
+
+Memory Address Register
+The 16-bit memory address register (MAR) consists of the most significant byte (MAR_MSB) and the least significant byte (MAR_LSB). The MAR output lines permanently define the memory address lines of the RAM and FLASH chip.
+Two control signals MIL and MIH (for memory address register input low and high) read a value from the bus into either the MAR_LSB or MAR_MSB part. ME increments the current value held by MAR.
+
+
+PC-to-MAR Transfer and Zero Page Access
+The control signal MC switches MAR inputs between the bus and the program counter (PC). If MC is low, both MAR_LSB and MAR_MSB will sample the current bus value. If MC is high, however, MAR_LSB will sample PC_LSB while MAR_MSB will sample PC_MSB. By employing the control word MC|MIL|MIH the full 16-bit PC can be transferred to the 16-bit MAR within a single clock cycle while the bus can be used to transfer data between two additional components. This feature improves the efficiency of the CPU pipeline significantly.
+The control signal MZ sets the MAR_MSB inputs to zero while allowing for a simultaneous load of the MAR_LSB, facilitating efficient access to the so-called ‘zero-page’ memory range 0x0000..0x00ff.
+
+
+Bus 0xff Register
+This is a seemingly unspectacular register that can drive each bus line to 5V, such that reading the bus yields 0b11111111 = 0xff = -1. As we will discuss later, this register plays an interesting role in the more sophisticated operations the Minimal 64x4 can perform.
+
+
+I/O Registers
+The PS/2 keyboard register as well as the serial UART receiver may output their current value onto the bus with the corresponding control signals KO (for keyboard out) or TO (for terminal out), respectively. The serial UART may also read the current bus value into its transmitter with TI (for terminal in). TO, KO and TI are not directly outputted by the control ROM but are derived from the signals MZ, AI, BI and AO:
+
+
+        TO = OR(~MZ, ~AI)
+        KO = OR(~MZ, ~BI
+        TI = OR(~MZ, ~AO)
+
+
+Upon read-out, the corresponding register is cleared to 0xff. Subsequent polling of the keyboard or UART receiver without new data arriving will yield 0xff.
+
+
+Instruction Register
+The 8-bit instruction register holds the opcode of the current instruction to be processed. II reads in a new opcode from the bus.
+
+
+________________
+Step Counter
+A 4-bit step counter keeps track of the microstep of the current instruction. At the end of an instruction, this counter is reset to zero with IC (for instruction step clear).
+
+
+Flags Register
+Upon FI the state of the three ALU flags N, C and Z as well as the data ready flags of the UART and PS/2 registers are being sampled.
+Control ROM
+The 4 bits of the step counter together with the 8 bits of the instruction register and the 5-bit flags register form the 17-bit address input to the three control ROMs of the Minimal 64x4. Each control ROM outputs 8 control signals (shown in red), together forming a 24-bit wide control word.
+Processing Instructions
+Upon pressing the reset button, the program counter, the memory address and bank registers and the step counter are set to zero. Regardless of the state of the flags register and instruction register, step 0 of *every* instruction always hold the control word RO|II|CE|ME.
+
+
+Let’s break down step by step what’s happening here. RO puts the content of the memory location defined by the MAR onto the bus. II transfers this value into the instruction register as the new opcode. CE|ME increments both the program counter and the memory address register by one step so that possible arguments of the current instruction become accessible. Since by now, the instruction register “knows” its new instruction, steps 1 to 15 may vary for each instruction, since they are selected by the opcode inside the instruction register and the content of the flags register. Each instruction consists of a unique sequence of up to 16 consecutive control words: the instruction microcode. The full microcode of the entire ‘Minimal 64x4’ instruction set is defined by the file ‘micorcode_def.csv’ and ‘microcode_rom.csv’ in the project repository.
+
+
+Let us analyze the microcode of three related instructions LDI (load immediate byte into A), LDB (load byte from absolute address into A) and LDZ (load byte from zero-page into A):
+
+
+LDI        Step 0:        RO|II|CE|ME                fetches ‘LDI’ opcode from memory
+Step 1:        RO|AI|CE|ME|IC                loads immediate byte, resets SC
+
+
+With each step we increment PC and MAR with CE and ME, respectively. When we reset the step counter with IC at the end of the instruction, the MAR is already pointing to the next instruction in memory.
+
+
+LDB        Step 0:        RO|II|CE|ME                fetches ‘LDB’ opcode from memory
+Step 1:        RO|BI|CE|ME                moves target LSB into B
+Step 2:    RO|MIH|CE                        moves target MSB into MAR_MSB
+Step 3:          BO|MIL                        moves B to MAR_LSB
+Step 4:        RO|AI|MC|MIL|MIH|IC        loads RAM content into A,
+
+
+Note that the PC could not remain in sync with the MAR here. We had to point the MAR at the target memory address instead. You might also be wondering, why the target’s LSB doesn’t go directly to the MAR but takes a little detour through the B register. Note that if we changed the LSB of the MAR right away, we won’t be able to read the target MSB from memory any more!
+In step 4, we finally load the data byte from the target memory address with RO|AI. We also need to set the MAR back to the next instruction to execute. Thankfully, this information isn’t lost but stored in the PC. We only need to transfer it to the MAR. We could use:
+
+
+LDB        ...
+        Step 4: RO|AI
+        Step 5: COL|MIL
+        Step 6: COH|MIH|IC
+
+
+That would cost us additional two clock cycles! More efficiently, the Minimal 64x4 can instead directly connect the 16-bit PC to the MAR by pulling the control signal MC, thus completing the transfer in just one cycle with MC|MIL|MIH. This transfer, since it doesn’t use the bus, can happen in parallel to RO|AI all within step 4 as shown above. In total we are saving two cycles here speeding up this instruction by almost 30%.
+
+
+Let’s now see how zero-page addressing can add to that:
+
+
+LDZ        Step 0: RO|II|CE|ME                         fetches ‘LDZ’ opcode from memory
+        Step 1: RO|MIL|MZ|MIH|CE
+        Step 2: RO|AI|MC|MIL|MIH|IC                same as step 4 of LDB
+
+
+In step 1, the argument, i.e. the zero-page address, is transferred into the LSB of the MAR via the bus by RO|MIL. Simultaneously, MZ|MIH disconnects the MAR_MSB inputs from the bus and instead shunts them to zero. Thus, we are setting the full 16-bit zero-page address in just one cycle instead of three, making LDZ 40% faster than LDB!
+
+
+The Minimal 64x4 runs at a clock rate of 8MHz, giving it an additional 30% speed advantage over its predecessor, the Minimal 64. In total, the Minimal 64x4 is on average 100% faster than the Minimal 64.
+Stack Operations
+The Minimal 64x4 does not have nor does it need a hardware stack pointer for its full stack capability. RAM location 0xffff simply serves as a “stack pointer” while the memory range 0xff00..0xfffe forms the stack memory. The CPU can reach the stack pointer very efficiently within a single clock cycle by using the combination FF|MIL|MIH.
+Circuit Design
+In this section we discuss selected aspects of the ‘Minimal 64x4 Home Computer’ circuit design in greater detail.
+Timing Signals
+We restrict the discussion to the CPU of the Minimal 64x4 excluding the VGA circuit for now. We analyze the relevant timing signals and the critical path limiting the CPU clock rate.
+
+
+In theory, all components of a CPU are synchronized by a single system clock. In real life however, some components require edge-triggering while others are level-triggered and need a certain pulse width to complete their action. Most prominently, the RAM write operation comes to mind. Things get messy since we now have to worry about the order of actions:
+
+
+'RI|ME' requirement: The circuit must guarantee, that with the above control word the RAM write pulse ~WE finishes *priot* to the MAR getting changed by ME (or MIL or MIH).
+
+
+‘EO|...|RI|AI’ requirement: The circuit must guarantee that with the above control word the RAM write pulse ~WE finishes *prior* to a change of the ALU’s output as triggered by the A/B register change.
+
+
+The diagram below shows the relevant timing signals of the Minimal 64x4 CPU. The diagram is based upon careful measurements of the actual component outputs on the PCB and illustrates the circuit behavior at 8.3MHz and 5V supply voltage. One clock cycle takes 120ns or 24 characters with each character representing a duration of 5ns. All signals are measured against the main clock signal CLK_MAR.
+________________
+
+
+16MHz    ------______------______r-----______------______------______------______------______------______------______------______r-----______------______------
+8MHz     ---____________------------____________------------____________------------____________------------____________------------____________------------___
+4MHz     ---________________________------------------------________________________------------------------________________________------------------------___
+2MHz     ---________________________________________________------------------------------------------------________________________________________________---
+
+
+~VREG_OE ____------------------------________________________________________________________________________------------------------__________________________
+VREG out -----zzzzzzzzzzzzzzzzzzzzzzzz-------------mmm_______________WWWW__________________________mmm--------zzzzzzzzzzzzzzzzzzzzzzzz-------WWWW--------------
+74590 to VRAM tthhGGGGGGGGGGGGGG                               ..........                                     tthhGGGGGGGGGGGGGG       ..........
+SRAM out zzzzzzzzzzzzzzzzz-------r-----zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz-------r-----zzzzzzzzzzzzzzzzzzzzzzzz
+~V_NEXT  ----------------_____________ruuu-------------------------------------------------------------------------------_____________ruuu---------------------
+~V_WRITE ----------------------------------____________------------____________------------____________------------------------------------____________--------
+
+
+CLK_MAR/FR/IR/BANK/VGA  ____MMMHH-------____________r-----------____________------------____________------------____________------------____________-----------
+CLK_PC/SC/A/B/Exp       ____RRRVVPP-----____________r-----------____________------------____________------------____________------------____________-----------
+~CLK_PLS                -____--------------------____--------------------____--------------------____--------------------____--------------------____----------
+~RI_PLS, ~TI_PLS        --WWWW--------------------WWWW--------------------WWWW--------------------WWWW--------------------WWWW--------------------WWWW---------
+VREG_CP                 ___________________________r---____________________________________________r---________________________________________________________
+~SET                    ----------------------------____--------------------====--------------------____-------------------------------------------------------
+~DR                     --------------------------------________________--------------------------------_________________________________________--------------
+~V_RI_PLS               ---------------------------------------------____--------------------------------------------------------------------____--------------
+~RESET                  ----------------------------------------------____--------------------------------------------------------------------____-------------
+~UART_DR                -----------______________________//_________________________---------------------------------------------------------------------------
+CTRL WORD               -------------][----------------------][----------------------][----------------------][----------------------][----------------------][
+
+
+ALU ES changing             AAABBBBBBBDDEEEEEPP   ..
+                                             ZZ   ..
+ALU both EC & EO changing   AAABBBBBBBEEEEEPPP    ..
+                                           ZZ     ..
+ALU EO=const, EC changing   AAABBBBBBBEEEEEPP     ..
+                                           ZZ     ..
+ALU ES & EC stable          RRRVVPPEEEEEPPP       ..
+                                        ZZ        ..
+EO to bus                   AAABBBBBBBCCCCCCCCC   ..
+~AND/~OR                    AAABBBBBBBEECCCC      ..
+AO/BO to bus                AAABBBBBBBCCCCCC      ..
+TO to bus                   AAABBBBBBBCCCC        ..
+KO to bus                   AAABBBBBBBCCCC        ..
+Addr changing RAM           MMMGGGGGGGGGGG        ..
+RO to bus (RAM)             AAABBBBBBBCCCCCC      ..
+Addr changing FLASH         MMMGGGGGGGGGGGGGG     ..
+RO to bus (FLASH)           AAABBBBBBBCCCCCCC     ..
+COL/COH to MAR in           AAABBBBBBBCCCC        ..
+COL/COH to bus to CLK       AAABBBBBBBCCCCPP      ..
+FF to bus                   AAABBBBBBBCCCC        ..
+AI/BI to bus to CLK         AAABBBBBBBCCCCCC      ..
+TI to bus to CLK            AAABBBBBBBCCCCC       ..
+FI to Z to CLK              AAABBBBBBBCCCCC       ..
+FI to C to CLK              AAABBBBBBBCCC         ..
+FI to T to CLK              AAABBBBBBB            ..
+MIL to MAR_in to CLK        AAABBBBBBBCCCCCCCPP   .. RO|..|MIL is the only critical path. EO|..|MIL with ES or EC changing is avoided in microcode (PLS).
+MIH to MAR_in to CLK        AAABBBBBBBCCCCCCCPP   ..
+CIL to bus to CLK           AAABBBBBBBCCCCC       ..
+CIH to bus to CLK           AAABBBBBBBCCCC        ..
+RI to bus to CLK            AAABBBBBBBCCCCCC      ..
+NI to bus to CLK            AAABBBBBBBCCCCC       ..
+
+
+Legend:
+A: update of control FLASH inputs (updated SC, IR, FR)
+B: update of control FLASH outputs after address change
+C: update of component output (t_OE) into bus capacitance ~50pF
+c: update of VRAM address lines by 74HC574 register output enabled
+D: stable output of ALU's 74HC86 XORs after ES
+E: update of ALU's 74HC283 Sn after ES
+V: Sn remains valid after a change in An or Bn
+Z: update of zero flag
+z: output is inactive
+P: 74HC157 or 74HC245 propagation delay (measurement)
+t: VRAM address pulled to nominal trigger level 2.5V
+h: VRAM address pulled to worst case trigger level 3.5V
+G: RAM/FLASH output after address change and/or ~CE change
+H: SRAM AS6C1008 output hold from address change (specification)
+M: update of MAR output (RI|ME problem: not allowed during ~WE)
+m: update of VRAM register outputs after CL rising edge
+u: update of 74HC590 VRAM timer/addr output
+R: update A/B register output (EO|..|RI|AI: not during ~WE)
+.: required setup time (74HC161 t_pd: Pn to CL rising edge, SRAM t_AW: address valid to end of write pulse)
+W: Write process (active LOW)
+r: rising edge
+
+
+Supply Voltage Range
+For the 74HC CMOS logic family, from 5.0V down to 4.5V, switching times increase by approximately 20%. Thus, the 95ns duration of the critical path would increase to 115ns at 4.5V. This should still exactly fit in the maximum cycle time of 125ns at 8MHz (10ns stabilization time is required by the sampling inputs). An actual measurement of the lower boundary of the supply voltage for stable operation indeed yields 4.5V on my board, in perfect agreement with the above estimate.
+
+
+Video Graphics Adapter (VGA)
+Any time the CPU writes a byte to the VRAM area 0x4000-0x7fff, data is stored in system RAM as well as in a dedicated video register set VREG (U38, U40, U41). This set holds a. the data byte itself and b. the 16-bit target address and is triggered by the clock signal VREG_CP.
+
+
+If new data is present in VREG, the video circuit will copy the data to the appropriate location in VRAM asynchronously, since every 8th system clock, the video circuit is busy pumping out a data byte from VRAM to the VGA display. In this case, the readout/copy operation of VREG is postponed to the next clock cycle. This implies that the maximum rate at which the CPU may write to VRAM via VREG is reduced to 4MHz, i.e. every other CPU clock cycle. However, this is not a problem, since none of the instructions violate this condition (in CLW and CLL appropriate wait cycles separate consecutive writes). The VRAM is not directly accessible to the CPU for readout but through the mirror image in the system RAM area 0x4000-0x7fff.
+
+
+Register Set VREG
+Whenever the memory address is within 0x4000-0x7fff, i.e. A15=0 and A14=1, a RAM write pulse ~RI_PLS will generate a VREG_CP pulse rising edge, updating VREG. The inverted ~VREG_CP serves as a ~SET input to an S-R latch, outputting a data-ready signal ~DR indicating new data in VREG.
+
+
+Feeding video data to the display
+During 3 out of 4 clock cycles, VREG output to VRAM is activated by ~VREG_OE = LOW. However, every 4th cycle, ~VREG_OE goes HIGH, deactivating the VREG outputs. Now the 74HC590 VRAM counter, being connected to the VRAM's address inputs via 470R resistors, will define the VRAM address. In the second half of this cycle, i.e. when the 8MHz clock signal is HIGH, ~V_NEXT goes LOW and activates the VRAM output to the 74HC166 shift register and also the 74HC166 ~PE input. The next 16MHz VGA clock rising edge within this window will load the value synchronously for subsequent bitwise output to the VGA display.
+
+
+Moving data from VREG to VRAM
+For moving data from VREG to VRAM, three conditions must be met: a) new data is present in VREG, indicated by data ready ~DR = LOW, b) VREG outputs are active, i.e. ~VREG_OE = LOW, and c) CLK_MAR = LOW. The latter condition ensures stable VRAM address lines during a write. If the three conditions are met, the pass-through of the ~DR signal as a VRAM write pulse ~V_RI_PLS is enabled. ~V_RI_PLS also resets the S-R latch, such that 25ns after the falling edge of ~V_RI_PLS, ~DR is reset to HIGH, ending the write pulse another 5ns later.
+
+
+________________
+Keyboard Interface (PS/2)
+
+
+  
+
+
+
+Let's consider a keystroke "M" (PS/2 scan code 0x3a = 58 = 0b00111010). Our circuit receives
+
+
+PS/2 CLK   ------------__--__--__--__--__--__--__--__--__--__--__----------------
+PS/2 DAT   ------------________----____------------________----------------------
+Bit                    STRTBit0Bit1Bit2Bit3Bit4Bit5Bit6Bit7PPPPSTOP
+74HC193    AAAAAAAAAAAAAA999988887777666655554444333322221111000000000000AAAAAAAA
+~TCD=~DR   ----------------------------------------------------__________--------
+SRCLK=CPD  ------------__--__--__--__--__--__--__--__--__--__--__________--------
+S-R Q      ____________--------------------------------------------------________
+74HC193 Q0 _______________----____----____----____----____r---___________________
+~KO        --------------------------------------------------------------_-------
+
+
+starting with a low start bit on PS2_DAT, followed by 8 data bits followed by a parity bit followed by a high stop bit. We intend to sample the eight data bits each on the rising edge of the clock into the 74HC595 register.
+
+
+We assume the S-R latch output is Q=0. 74HC193 is loaded permanently with "10" (0xA) and its output ~PS2_DR=1. In that state, the NAND cascade U9D/U9C is transparent to PS2_CLK signals. A rising edge shifts 74HC595 input and counts down the 74HC193. Note that RCLK is driven by Q0 here, which happens slightly after CPD due to the propagation delay of the 74HC193. Thus RCLK always samples the *current*, not the previous register state. The last time a rising edge occurs is during bit7.
+At that time, we have shifted in 9 bits in total: the low start bit and 8 data bits from which only the databits are now present at the output. As long as ~PS2_DR remains low, i.e. in the "data ready" state, the NAND cascade is intransparent to further PS2_CLK and therefore preserves the current scan code.
+The read-out happens via ~KO=LOW, which outputs the register content onto the bus for transfer into the A register. At the same time, ~KO=0 resets the S-R latch, which in turn sets Q=~PL=0, re-arming the 74HC193 counter and setting ~TCD=~PS2_DR=1.
+This in turn makes the NAND cascade transparent for the next PS2_CLK.
+
+
+I like this circuit a lot since it makes use of every aspect of each component. Pretty neat, isn’t it?
+
+
+Serial Interface (UART)
+
+
+The UART interface of the Minimal 64x4 Revision 1.4 uses 7 data bits in half-duplex mode, with sending data (OUT) taking precedence over receiving data (INP). Input data is buffered in a single-byte register. OUT is implemented as “blocking”, i.e. the CPU waits 160 CPU clock cycles until the datagram has been sent. The circuit is virtually identical to that of the Minimal UART Computer 3. You can find a detailed and technical analysis of this unique UART circuit in the Minimal UART Computer 3 Manual in the section ‘UART Interface’.
+________________
+
+
+Build Gallery  
+  
+
+#2,#4,#5 by Hans Jacob (Germany)
+	  
+
+#3 by Jim Bailey (USA)
+	  
+
+#6 by Michael Kamprath (USA)
+	  
+
+#7 by Robert Barnes (UK)
+	  
+
+#8 by John Morley (UK)
+	  
+
+#9 by David Clifford (Australia)
+	  
+
+#10 by Kevin Peck (Canada)
+	  
+
+#11 by Brian Lewis (Thailand)
+	  
+
+#12 by Péter Gaál (Hungary)
+	  
+
+#13 by Mateusz Matysiak (Poland)
+	  
+
+#14 by Junmin Jang (South Korea)
+	  
+
+#15 by Mikolaj Cichal (Poland)

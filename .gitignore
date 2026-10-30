@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Rust build output
+minredux/target/
+
+# Benchmark run output
+benchmarks/results/
+
+# Generated kernel/ROM images
+minforth/build*/
+minforth/*.symbols.json
+
+# Native assembler binary (rebuild from asm.cpp)
+**/tools/asm
+
+# Third-party clones developed in their own repositories
+minimal64/
+extended-min/
