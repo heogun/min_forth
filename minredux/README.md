@@ -16,7 +16,7 @@ python3 regress.py
 
 전체 ISA만 검사하려면 `cargo test tests::isa`. opcode별 보고서는 `MINREDUX_ISA_REPORT=1 cargo test all_public_opcodes -- --nocapture`. 검증 범위·원본 ROM 결함·식별 hash는 [ISA_VALIDATION.md](ISA_VALIDATION.md)를 참고한다.
 
-결함 3건을 수정한 별도 이미지와 생성 도구는 [`../roms/redux-1.4-isa-fixes-v1/`](../roms/redux-1.4-isa-fixes-v1/)에 있다. `--rom-dir ../roms/redux-1.4-isa-fixes-v1`로 명시적으로 선택하며 원본이나 기본 경로를 교체하지 않는다. 수정본 검사만 실행하려면 `cargo test fixed_rom`. 생성/재현성 검사에는 Python 3도 필요하다.
+결함 3건을 수정한 제어 ROM은 `../minimal64/Revision 1.4 Redux/FLASH Images/`에 그대로 반영되어 있다. 별도 수정 ROM 디렉터리를 선택할 필요가 없으며, 위 검사와 실행은 이 이미지를 기본으로 사용한다.
 
 ## 실행 모드
 

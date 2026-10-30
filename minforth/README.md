@@ -48,13 +48,12 @@ From the workspace root:
 
 ```sh
 python3 minforth/tools/build.py minforth/forth/kernel.fs minforth 0x1000 --out minforth/build-p1
-python3 roms/build_redux_isa_fixes.py --out minforth/build-p1-fixed --flash minforth/build-p1/flash.bin
 ```
 
-The ROM bundle generator refuses to replace different existing output. Use a
-new output path when regenerating a fixed bundle after further kernel edits.
-The kernel builder now also writes `minforth.symbols.json`, obtained from the
-same preprocessed source and assembler as `minforth.bin`.
+The kernel builder also writes `minforth.symbols.json`, obtained from the same
+preprocessed source and assembler as `minforth.bin`. The control ROMs it pairs
+with come from `minimal64/Revision 1.4 Redux/FLASH Images/`, which already
+contains the three ISA fixes.
 
 From `minredux/`, rebuild the release frontend if needed, then:
 
@@ -62,8 +61,6 @@ From `minredux/`, rebuild the release frontend if needed, then:
 cargo build --release
 python3 regress.py --rom-dir ../minforth/build-p1
 python3 abort_regress.py --rom-dir ../minforth/build-p1 -v
-python3 regress.py --rom-dir ../minforth/build-p1-fixed
-python3 abort_regress.py --rom-dir ../minforth/build-p1-fixed -v
 ```
 
 The dedicated 13-case ABORT suite checks whole-cell truth, false continuation,

@@ -111,9 +111,6 @@ python3 benchmarks/run.py --stage 1
 python3 benchmarks/run.py --stage 2
 python3 benchmarks/run.py --stage 3
 
-# 수정 제어 ROM으로 같은 스위트 실행
-python3 benchmarks/run.py --control-rom roms/redux-1.4-isa-fixes-v1
-
 # 특정 항목, 반복 횟수 및 전체 부팅 포함 클록 상한
 python3 benchmarks/run.py --case matrix --case mandelbrot --repeat 3 --max-cycles 300000000
 

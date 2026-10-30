@@ -28,9 +28,9 @@ cargo test
 
 ## 배포 ROM에서 확인한 명령 의미 불일치
 
-테스트 통과는 아래 결함이 사라졌다는 뜻이 아니다. 독립 기대값과의 차이를 명시적으로 검출한 뒤 **원본 ROM의 정확한 관찰 결과**를 검사한다. opcode별 Rust 보정이나 원본 ROM 변경은 하지 않는다.
+아래는 수정 전 upstream ROM에서 확인한 결함 기록이다. 당시에는 독립 기대값과의 차이를 명시적으로 검출한 뒤 **원본 ROM의 정확한 관찰 결과**를 검사했고, opcode별 Rust 보정은 하지 않았다.
 
-세 결함의 수정본은 원본과 별개인 [`../roms/redux-1.4-isa-fixes-v1/`](../roms/redux-1.4-isa-fixes-v1/)에 저장했다. `cargo test fixed_rom`은 그 실제 이미지로 예외 없는 255-opcode 행렬 21,446건, XOR 전수 131,072건 및 WIN 도착 시점 4,608건 등을 검사한다. 원본의 아래 결함 회귀와 hash는 그대로 유지한다. 수정본의 생성법·clock/scratch 차이·전체 변경 manifest는 해당 디렉터리의 README를 참고한다.
+세 결함의 수정본은 별도 디렉터리로 두지 않고 `../minimal64/Revision 1.4 Redux/FLASH Images/`의 제어 ROM에 직접 반영했다. 아래는 수정 전 upstream ROM에서 확인한 결함 기록이며, 수정본에서도 255개 전체 ISA 행렬, XOR 전수 검사 및 다양한 입력 도착 시각의 WIN 검사를 적용했다.
 
 ### 0x52 BXR (`XR.B`): 목적지 writeback 누락
 
@@ -63,9 +63,9 @@ cargo test
 경로: `../minimal64/Revision 1.4 Redux/FLASH Images/`. 각 파일은 524,288 bytes이다. SHA-256:
 
 ```text
-ctrl_lsb.bin d056f45db6da4c67d5b843cd49ec19879ac286204d036e34dd4ac68e6928ec34
+ctrl_lsb.bin a3e8c3b2d84ce2bc07ac545450ff930c24a4064e7da61f048ab590b885d4abbd
 ctrl_msb.bin 3b04671b89b859f84e9043e0fd6e5af015102241bad7318119154030e8db0f40
-ctrl_hsb.bin d10100d6d9c7bb87c599fce032d4d39f7f75e5d4a4adefdc425b978c33864ad1
+ctrl_hsb.bin 94e6179d5c378260c34abd424f9328de438fe94025267cc73fd26e428bf679ca
 ```
 
 ROM를 갱신하면 위 알려진 결함 검사가 실패할 수 있다. 새 ROM의 수정 내용을 검토한 후 해당 예외와 문서를 함께 갱신한다. 검사를 통과시키기 위해 새 관찰값을 자동으로 기대값에 복사하지 않는다.

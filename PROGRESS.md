@@ -55,9 +55,9 @@
 - 최종 검증: `cargo test` **39/39**, `cargo test --release` **39/39**, `cargo clippy --all-targets -- -D warnings`, `cargo fmt --check`, release 재빌드 후 Forth **33/33** 통과. 전체 ISA만 실행: `cd minredux` 후 `cargo test tests::isa`. opcode별 보고서: `MINREDUX_ISA_REPORT=1 cargo test all_public_opcodes -- --nocapture`.
 - 판정 범위: 전체 **opcode coverage**와 위 입력 집합의 독립 검증은 완료했지만 모든 32비트 입력 조합·임의의 self-modifying/alias 조합·모든 비동기 도착 시각의 전수 증명은 아님. 사용자 요청에 따라 실기 타이밍 대조와 확장 포트는 수행하지 않음.
 
-### 원본을 보존한 수정 ROM 별도 제작
+### 수정 ROM 제작과 참조 ROM 반영
 
-- [x] `roms/redux-1.4-isa-fixes-v1/`에 원본과 분리된 3종 제어 ROM, 수정 microcode CSV, 원본과 동일한 MinOS FLASH 및 hash/변경 manifest 저장.
+- [x] 수정 제어 ROM 3종을 `minimal64/Revision 1.4 Redux/FLASH Images/`에 반영했다. 원본과 분리해 두었던 별도 디렉터리는 참조 이미지에 덮어쓴 뒤 제거했다.
 - [x] 재현 가능한 생성 도구에 원본 hash 확인·원본 경로 쓰기 금지·기존 다른 내용 덮어쓰기 방지 추가.
 - [x] XR.B/XR.R의 MAR을 목적지에 유지하여 in-place AND/OR/XOR writeback 구현. 기존 10/13클록 유지.
 - [x] WIN 대기 경로의 FI를 low-byte 감소 시점으로 늦춰 중간 ready-row 전환 시 잘못된 high-byte 감소 방지.
