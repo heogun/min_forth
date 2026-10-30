@@ -348,6 +348,8 @@ npf_fail:
 ; Emit helpers
 ; ---------------------------------------------------------------------------
 nf_cbyte:                       ; A -> *HERE, HERE++
+        CLZ zTailOK              ; any byte after a call invalidates tail position
+        CLZ zEndTarget           ; ...and moves past any end-of-definition target
         SDZ zTMP2                ; save the byte: the pointer setup below
                                  ; uses A, so it must not be clobbered
         LDZ zHERE SDZ zPTR
@@ -363,11 +365,47 @@ nf_cword:                       ; zT0 (lo), zT1 (hi) -> *HERE
         LDZ zT1 JAS nf_cbyte
         RTS
 
-nf_ccall:                       ; compile JPS zXTV
+nf_ccall:                       ; compile JPS zXTV, or inline a selected primitive
+        MIV inltab,zPTR2
+nfi_scan:
+        LDT zPTR2
+        CPI 0
+        BEQ nfi_call
+        SDZ zCOUNT
+        LDZ zPTR2 SDZ zTMP
+        LDZ zPTR2+1 SDZ zTMP2
+        INCW zPTR2
+        LDT zPTR2
+        CPZ zXTV
+        BNE nfi_skip
+        INCW zPTR2
+        LDT zPTR2
+        CPZ zXTV+1
+        BEQ nfi_found
+nfi_skip:
+        LDZ zTMP SDZ zPTR2
+        LDZ zTMP2 SDZ zPTR2+1
+        AIV 3,zPTR2
+        LDZ zCOUNT ADV zPTR2
+        JPA nfi_scan
+nfi_found:
+        AIV 1,zPTR2
+nfi_copy:
+        LDT zPTR2
+        JAS nf_cbyte
+        INCW zPTR2
+        DEZ zCOUNT
+        BNE nfi_copy
+        RTS
+nfi_call:
+        LDZ zHERE SDZ zLastCall
+        LDZ zHERE+1 SDZ zLastCall+1
         LDI 0x69 JAS nf_cbyte
         LDZ zXTV SDZ zT0
         LDZ zXTV+1 SDZ zT1
         JPS nf_cword
+        LDI 1
+        SDZ zTailOK              ; the JPS just emitted is the last code byte
         RTS
 
 nf_clit:                        ; compile inline push of zNUM
@@ -541,68 +579,63 @@ wNIP:
 ; Primitive: arithmetic
 ; ---------------------------------------------------------------------------
 wADD:
-        SETNP
         LZP zSP,0x30 SDZ zT0
         LZP zSP,0x31 SDZ zT1
-        LZP zNP,0x30
+        SIZ 2,zSP
+        LZP zSP,0x30
         ADZ zT0
-        SZP zNP,0x30
-        LZP zNP,0x31
+        SZP zSP,0x30
+        LZP zSP,0x31
         ACZ zT1
-        SZP zNP,0x31
-        SETSPNP
+        SZP zSP,0x31
         RTS
 
 wSUB:
-        SETNP
         LZP zSP,0x30 SDZ zT0
         LZP zSP,0x31 SDZ zT1
-        LZP zNP,0x30
+        SIZ 2,zSP
+        LZP zSP,0x30
         SUZ zT0
-        SZP zNP,0x30
-        LZP zNP,0x31
+        SZP zSP,0x30
+        LZP zSP,0x31
         SCZ zT1
-        SZP zNP,0x31
-        SETSPNP
+        SZP zSP,0x31
         RTS
 
 wAND:
-        SETNP
         LZP zSP,0x30 SDZ zT0
-        LZP zNP,0x30
+        LZP zSP,0x31 SDZ zT1
+        SIZ 2,zSP
+        LZP zSP,0x30
         ANZ zT0
-        SZP zNP,0x30
-        LZP zSP,0x31 SDZ zT0
-        LZP zNP,0x31
-        ANZ zT0
-        SZP zNP,0x31
-        SETSPNP
+        SZP zSP,0x30
+        LZP zSP,0x31
+        ANZ zT1
+        SZP zSP,0x31
         RTS
 
 wOR:
-        SETNP
         LZP zSP,0x30 SDZ zT0
-        LZP zNP,0x30
+        LZP zSP,0x31 SDZ zT1
+        SIZ 2,zSP
+        LZP zSP,0x30
         ORZ zT0
-        SZP zNP,0x30
-        LZP zSP,0x31 SDZ zT0
-        LZP zNP,0x31
-        ORZ zT0
-        SZP zNP,0x31
-        SETSPNP
+        SZP zSP,0x30
+        LZP zSP,0x31
+        ORZ zT1
+        SZP zSP,0x31
         RTS
 
 wXOR:
-        SETNP
         LZP zSP,0x30 SDZ zT0
-        LZP zNP,0x30
+        LZP zSP,0x31 SDZ zT1
+        SIZ 2,zSP
+        LZP zSP,0x30
         XRZ zT0
-        SZP zNP,0x30
-        LZP zSP,0x31 SDZ zT0
-        LZP zNP,0x31
-        XRZ zT0
-        SZP zNP,0x31
-        SETSPNP
+        SZP zSP,0x30
+        LZP zSP,0x31
+        XRZ zT1
+        SZP zSP,0x31
         RTS
 
 wINV:
@@ -657,11 +690,11 @@ w2MUL:
 ; 16-bit multiply by shift/add:  ( a b -- a*b )
 ; zT0/zT1 = multiplicand, zT2/zT3 = multiplier, zNUM = result.
 wMUL:
-        SETNP
-        LZP zNP,0x30 SDZ zT0
-        LZP zNP,0x31 SDZ zT1
         LZP zSP,0x30 SDZ zT2
         LZP zSP,0x31 SDZ zT3
+        SIZ 2,zSP
+        LZP zSP,0x30 SDZ zT0
+        LZP zSP,0x31 SDZ zT1
         CLV zNUM
         LDI 16
         SDZ zCOUNT
@@ -693,9 +726,8 @@ wml_skip:
         SDZ zT2
         DEZ zCOUNT
         BNE wml_loop
-        LDZ zNUM SZP zNP,0x30
-        LDZ zNUM+1 SZP zNP,0x31
-        SETSPNP
+        LDZ zNUM SZP zSP,0x30
+        LDZ zNUM+1 SZP zSP,0x31
         RTS
 
 ; Unsigned 16-bit divide.  Inputs: dividend at zNP, divisor at zSP.
@@ -807,64 +839,56 @@ w2DIV:
 ; Primitive: comparisons (results are 0 or 0xffff)
 ; ---------------------------------------------------------------------------
 wEQ:
-        SETNP
         LZP zSP,0x30 SDZ zT0
         LZP zSP,0x31 SDZ zT1
-        LZP zNP,0x30
+        SIZ 2,zSP
+        LZP zSP,0x30
         CPZ zT0
         BNE nfe_false
-        LZP zNP,0x31
+        LZP zSP,0x31
         CPZ zT1
         BNE nfe_false
 nfe_true:
-        LDI 0xff SZP zNP,0x30
-        SZP zNP,0x31
-        SETSPNP
+        LDI 0xff SZP zSP,0x30
+        SZP zSP,0x31
         RTS
 nfe_false:
-        LDI 0 SZP zNP,0x30
-        SZP zNP,0x31
-        SETSPNP
+        LDI 0 SZP zSP,0x30
+        SZP zSP,0x31
         RTS
 
 wNE:
         JPS wEQ
-        JPS wZEQ
-        RTS
+        JPA wZEQ
 
 wLT:
-        SETNP
         LZP zSP,0x30 SDZ zT0
         LZP zSP,0x31 SDZ zT1
-        LZP zNP,0x30
+        SIZ 2,zSP
+        LZP zSP,0x30
         SUZ zT0
-        LZP zNP,0x31
+        LZP zSP,0x31
         SCZ zT1
         BCC nfl_true
-        LDI 0 SZP zNP,0x30
-        SZP zNP,0x31
-        SETSPNP
+        LDI 0 SZP zSP,0x30
+        SZP zSP,0x31
         RTS
 nfl_true:
-        LDI 0xff SZP zNP,0x30
-        SZP zNP,0x31
-        SETSPNP
+        LDI 0xff SZP zSP,0x30
+        SZP zSP,0x31
         RTS
 
 wGT:
         JPS wSWAP
-        JPS wLT
-        RTS
+        JPA wLT
 
 wGE:
         JPS wLT
-        JPS wZEQ
-        RTS
+        JPA wZEQ
 
 wLE:
         JPS wGT
-        JPS wZEQ
-        RTS
+        JPA wZEQ
 
 wZEQ:
         LZP zSP,0x30 SDZ zT0
@@ -883,8 +907,7 @@ nfz_true:
 wZLT:
         ; unsigned 0 < n  ==  n != 0
         JPS wZEQ
-        JPS wZEQ
-        RTS
+        JPA wZEQ
 
 ; ---------------------------------------------------------------------------
 ; Primitive: memory
@@ -900,15 +923,14 @@ wFETCH:
         RTS
 
 wSTORE:
-        SETNP
         LZP zSP,0x30 SDZ zPTR
         LZP zSP,0x31 SDZ zPTR+1
-        LZP zNP,0x30
+        SIZ 2,zSP
+        LZP zSP,0x30
         SDT zPTR
         INCW zPTR
-        LZP zNP,0x31
+        LZP zSP,0x31
         SDT zPTR
-        SETSPNP
         SIZ 2,zSP              ; consume both value and address
         RTS
 
@@ -921,31 +943,29 @@ wCFETCH:
         RTS
 
 wCSTORE:
-        SETNP
         LZP zSP,0x30 SDZ zPTR
         LZP zSP,0x31 SDZ zPTR+1
-        LZP zNP,0x30
+        SIZ 2,zSP
+        LZP zSP,0x30
         SDT zPTR
-        SETSPNP
         SIZ 2,zSP              ; consume both value and address
         RTS
 
 wADDSTORE:
-        SETNP
         LZP zSP,0x30 SDZ zPTR
         LZP zSP,0x31 SDZ zPTR+1
         LDZ zPTR SDZ zPTR2
         LDZ zPTR+1 SDZ zPTR2+1
         AIV 1,zPTR2
-        LZP zNP,0x30 SDZ zT0
-        LZP zNP,0x31 SDZ zT1
+        SIZ 2,zSP
+        LZP zSP,0x30 SDZ zT0
+        LZP zSP,0x31 SDZ zT1
         LDT zPTR
         ADZ zT0
         SDT zPTR
         LDT zPTR2
         ACZ zT1
         SDT zPTR2
-        SETSPNP
         SIZ 2,zSP              ; consume both value and address
         RTS
 
@@ -1072,8 +1092,7 @@ nflp_nocache:
         RTS
 
 wDROPFRAME:
-        JPS nf_lpop
-        RTS
+        JPA nf_lpop
 
 wI:
         AIZ 2,zSP
@@ -1192,11 +1211,10 @@ wSPACE:
         RTS
 
 wTYPE:
-        SETNP
-        LZP zNP,0x30 SDZ zPTR
-        LZP zNP,0x31 SDZ zPTR+1
         LZP zSP,0x30 SDZ zCOUNT
-        SETSPNP
+        SIZ 2,zSP
+        LZP zSP,0x30 SDZ zPTR
+        LZP zSP,0x31 SDZ zPTR+1
         SIZ 2,zSP
 nft_loop:
         LDZ zCOUNT
@@ -1280,12 +1298,59 @@ wCOLON:
         MZB zLATEST,nfDefLatest
         MZB zLATEST+1,nfDefLatest+1
         JPS nf_create
+        CLZ zTailOK              ; a new definition cannot inherit the previous tail call
+        CLZ zEndTarget
         LDI 1
         SDZ zSTATE
 nfc_done:
         RTS
 
 wSEMI:
+        LDZ zTailOK
+        CPI 0
+        BEQ wsemi_rts
+        ; Return-stack primitives depend on their own call frame. EXECUTE
+        ; can transfer to arbitrary code with the same dependency.
+        LDZ zLastCall SDZ zPTR
+        LDZ zLastCall+1 SDZ zPTR+1
+        AIV 1,zPTR
+        LDT zPTR SDZ zT0
+        INCW zPTR
+        LDT zPTR SDZ zT1
+        MIV taildeny,zPTR2
+        LDI 4 SDZ zCOUNT
+wsemi_check:
+        LDT zPTR2
+        CPZ zT0
+        BNE wsemi_miss
+        INCW zPTR2
+        LDT zPTR2
+        CPZ zT1
+        BEQ wsemi_rts
+        JPA wsemi_skip
+wsemi_miss:
+        INCW zPTR2
+wsemi_skip:
+        INCW zPTR2
+        DEZ zCOUNT
+        BNE wsemi_check
+wsemi_tail:
+        ; The definition ends with a JPS: turn it into a JPA so the callee
+        ; returns straight to our caller.  The flag is only set when no byte
+        ; (inline data, literal, branch...) followed that JPS.
+        LDZ zLastCall SDZ zPTR
+        LDZ zLastCall+1 SDZ zPTR+1
+        LDI 0x66 SDT zPTR
+        CLZ zTailOK
+        ; A forward branch patched to HERE (THEN/REPEAT with nothing emitted
+        ; after it) targets the final RTS.  Keep the RTS for that path; the
+        ; fall-through still uses the JPA and skips the extra return.
+        LDZ zEndTarget
+        CPI 0
+        BNE wsemi_rts
+        CLZ zSTATE
+        RTS
+wsemi_rts:
         LDI 0x6b JAS nf_cbyte
         CLZ zSTATE
         RTS
@@ -1349,6 +1414,8 @@ wTHEN:
         LDZ zHERE SDT zPTR
         INCW zPTR
         LDZ zHERE+1 SDT zPTR
+        LDI 1
+        SDZ zEndTarget
         RTS
 
 wBEGIN:
@@ -1401,6 +1468,8 @@ wREPEAT:
         LDZ zHERE SDT zPTR
         INCW zPTR
         LDZ zHERE+1 SDT zPTR
+        LDI 1
+        SDZ zEndTarget
         RTS
 
 ; ---------------------------------------------------------------------------
@@ -1702,6 +1771,43 @@ wDECIMAL:
 wHEREV:
         LIT zHERE
         RTS
+
+; ---------------------------------------------------------------------------
+; Frame-sensitive tail-call exclusions (four xts, counted by wSEMI).
+; ---------------------------------------------------------------------------
+taildeny:
+        <wEXEC,>wEXEC,<wTOR,>wTOR,<wFROMR,>wFROMR,<wRFETCH,>wRFETCH
+
+; Compile-time inline table: [len][xt_lo][xt_hi][len bytes of code]...
+; Only short, hot primitives whose inlined code is smaller than a call plus
+; its callee's RTS, or which remove enough call overhead to justify the bytes.
+; Terminated by len=0. Templates must be position-independent, with no
+; return-frame dependency. p2_regress.py compares bytes against the primitives.
+; ---------------------------------------------------------------------------
+inltab:
+        3,<wDROP,>wDROP
+        0xd8,2,<zSP                    ; SIZ 2,zSP
+        13,<wI,>wI
+        0xbc,2,<zSP                    ; AIZ 2,zSP
+        0x77,<zCIDX                    ; LDZ zCIDX
+        0x83,<zSP,0x30                 ; SZP zSP,0x30
+        0x77,<zCIDX+1                  ; LDZ zCIDX+1
+        0x83,<zSP,0x31                 ; SZP zSP,0x31
+        29,<wADD,>wADD
+        0x7d,<zSP,0x30,0x7f,<zT0
+        0x7d,<zSP,0x31,0x7f,<zT1
+        0xd8,2,<zSP
+        0x7d,<zSP,0x30,0xb1,<zT0,0x83,<zSP,0x30
+        0x7d,<zSP,0x31,0xfa,<zT1,0x83,<zSP,0x31
+        16,<wINC,>wINC
+        0x7d,<zSP,0x30,0xb0,1,0x83,<zSP,0x30
+        0x7d,<zSP,0x31,0xf9,0,0x83,<zSP,0x31
+        20,<wCFETCH,>wCFETCH
+        0x7d,<zSP,0x30,0x7f,<zPTR
+        0x7d,<zSP,0x31,0x7f,<zPTR+1
+        0x79,<zPTR,0x83,<zSP,0x30
+        0x76,0,0x83,<zSP,0x31
+        0
 
 ; ---------------------------------------------------------------------------
 ; Strings and tables

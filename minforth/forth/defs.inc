@@ -150,13 +150,19 @@ zLSTKP:                               ; next free loop-stack slot (starts 0x2800
 zCIDX:                                ; cached index of the innermost loop
 #org 0x0098
 zCLIM:                                ; cached limit of the innermost loop
+#org 0x009a
+zLastCall:                            ; address of the most recent compiled JPS
+#org 0x009c
+zTailOK:                              ; 1 only while that JPS is the last emitted code
+#org 0x009d
+zEndTarget:                           ; 1 when HERE is a patched forward-branch target
 #org 0x26c0
 nfDefHere:                            ; pre-colon dictionary checkpoint (not ZP)
 #org 0x26c2
 nfDefLatest:                          ; restore on abort during compilation
 #emit
-; (Everything above stays below 0x80 so the MinOS helpers, which use
-;  0x80..0x95 and 0xc0..0xff, cannot clobber the Forth state.)
+; Forth ZP state uses 0x00..0x7f and 0x96..0x9d. MinOS helpers use
+; 0x80..0x95 and 0xc0..0xff; do not allocate Forth state in those ranges.
 
 ; ---------------------------------------------------------------------------
 ; Convenience macros

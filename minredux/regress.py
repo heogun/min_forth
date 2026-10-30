@@ -46,6 +46,18 @@ CASES = [
     ("sq",        [": sq DUP * ;", "12 sq ."], "144"),
     ("div",       ["1000 300 / . 1000 300 MOD ."], "3 100"),
     ("div16",     ["65535 65535 / . 65535 65535 MOD ."], "1 0"),
+    ("tail-chain", [": a 1+ ;", ": b a ;", ": c b ;", "41 c ."], "42"),
+    ("tail-then", [": t IF 7 . THEN ;", "0 t 1 t 9 ."], "7 9"),
+    ("tail-else", [": t IF 7 . ELSE 8 . THEN ;", "1 t 0 t 9 ."], "7 8 9"),
+    ("tail-empty", [": t IF ELSE 8 . THEN ;", "1 t 0 t 9 ."], "8 9"),
+    ("tail-lit", [": t 1+ 5 ;", "2 t . ."], "5 3"),
+    ("tail-string", [': t 1+ ." Hi!" ;', "2 t ."], "Hi!3"),
+    ("tail-rfrom", [": t 42 >R R> ;", "t . 12345 ."], "42 12345"),
+    ("tail-rloop", [": t 0 3 0 DO I >R R> + LOOP ;", "t ."], "3"),
+    ("stack-wrap", [": t 124 0 DO 1 LOOP 124 0 DO DROP LOOP ;",
+                    "99 t . 12345 ."], "99 12345"),
+    ("inline-shadow", [": DROP 1+ ;", ": t 4 DROP ;", "t ."], "5"),
+    ("inline-i", [": idx I ;", ": t 3 0 DO idx . LOOP ;", "t"], "0 1 2"),
 ]
 
 def screen(lines, cycles="6000000", rom_dir="../minforth/build"):

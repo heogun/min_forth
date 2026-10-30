@@ -4,6 +4,40 @@
 
 동일 Redux CPU·제어 ROM에서 Min 토큰 인터프리터와 16비트 Forth의 동일 알고리즘 실행 비용을 비교한다. 공식 CoreMark/Embench 점수가 아닌 프로젝트 전용 스위트다. 기존 `speed.fs`의 59.22배는 해당 작업의 기존 통합 측정값이며 전체 성능을 대표하지 않는다.
 
+## P2 최적화 결과 (2026-10-30, 수정 ROM)
+
+백업 `c5a6c55`의 같은 소스·입력·수정 ROM 기준선과 비교했다. 하네스/알고리즘/Min 실행 파일은 변경하지 않았다. 아래 사전 크기는 **boot primitive headers를 제외한 소스의 전체 정의 증가량**이며, 실행 hook 사이의 raw 클록과 구분한다.
+
+| 작업 | Forth 기준 cycles | P2 cycles | 변화 | 소스 사전 bytes (전→후) |
+| --- | ---: | ---: | ---: | ---: |
+| empty | 123 | 123 | 0.000% | 43→43 |
+| Sieve | 1,654,698 | 1,499,981 | -9.350% | 449→554 |
+| Bubble | 951,076 | 878,495 | -7.631% | 506→650 |
+| Matrix | 398,408 | 383,836 | -3.658% | 736→1,053 |
+| Fib | 11,231 | 10,479 | -6.696% | 144→170 |
+| CRC16 | 988,412 | 923,230 | -6.595% | 501→625 |
+| Search | 521,353 | 465,379 | -10.736% | 4,296→4,417 |
+| Mandelbrot | 29,001,744 | 28,250,261 | -2.591% | 1,000→1,190 |
+| micro-call | 15,438 | 10,756 | -30.328% | 152→201 |
+| micro-stack | 29,774 | 23,108 | -22.389% | 161→223 |
+| micro-do | 66,126 | 56,132 | -15.114% | 194→230 |
+| micro-parse | 1,782 | 1,100 | -38.272% | 601→601 |
+
+- Tail-only는 Fib -1.816%, CRC16 -1.761%, Mandelbrot -0.261%, micro-call -7.048%. 마지막 JPS 이후 바이트 emit 여부와 forward target을 추적하고 `EXECUTE >R R> R@`를 제외한다. 일반 tail 정의는 RTS 1 byte를 절약하지만 분기가 정의 끝을 가리키면 RTS를 보존한다.
+- 스택 인덱싱 단계에서 NP 왕복을 제거한 누적 이득은 알고리즘별 -1.697~-6.268%. DUP/NIP 임시변수 버전은 느려져 채택하지 않았다.
+- 최종 inline은 `DROP I + 1+ C@`만 선택. 각각 call 3 bytes 대신 본문 **3/13/29/16/20 bytes**를 삽입. 짧은 tail 위치의 `1+`는 이미 가능한 tail-call 이득도 고려해야 한다. `C!`/`2*` 포함 후보는 search 사전이 7,380 bytes까지 늘어나 제외했다(최종 4,985 bytes, boot headers 568 포함). `@`/`!`는 절대 분기 재배치가 필요하여 단순 복사하지 않는다.
+- 커널 **4,743→4,988 bytes (+245)**. boot dictionary는 568 bytes로 동일. 소스 사전 증가는 0~317 bytes. Min 클록은 전 항목 동일하고 최종 7종 Min/Forth 실행 배율은 **2.181~10.668x**. 진단 수치를 종합 언어 성능으로 일반화하지 않는다.
+- 컴파일 비용은 증가했다. 예: Matrix **+61,986**, Mandelbrot **+70,127**, micro-parse **+10,289** compile cycles. micro-parse의 실행 -38.272%는 DROP 호출 제거이지 숫자 파서 개선이 아니다. 컴파일 시간을 포함한 손익은 실행 횟수에 달린다.
+- `speed.fs`의 화면 polling 통합 측정은 전후 3,604,480 cycles로 동일. 과거 3,538,944와 직접 비교하지 않는다.
+- 12종 × Min/Forth × 2회 = **48개** 계측 결과와 추가 **24개** 무계측 실행의 클록·전체 RAM 일치 검증을 통과했다. Forth 50/50, ABORT 13/13, 기계어/RAM 전용 5/5도 통과.
+
+로컬 산출물: `benchmarks/results/p2-baseline` / `p2-complete`. 중간 비교: `p2-tail2`, `p2-stack`, `p2-inline1`, `p2-inline-candidates`. 생성 ROM/RAM 전체는 gitignored이며, 전후/중간 수치와 hash는 `benchmarks/p2-summary.json`에 보존한다.
+
+```sh
+python3 benchmarks/run.py --diagnostics --repeat 2 --verify-profile \
+  --baseline benchmarks/results/p2-baseline/results.json
+```
+
 ## P1 하네스 v2 (2026-10-30)
 
 기존 7종의 알고리즘·입력·raw hook 측정은 유지하고 **정밀 준비 단계·컴파일/토큰화·메모리 관찰·전후 비교**를 추가했다. 아래 v1 표/진행 기록은 당시 결과를 보존한 것이다.
@@ -45,7 +79,7 @@ PC뿐 아니라 `SC=0`, 하드웨어 SP와 실제 JPS 복귀 주소로 함수 �
 
 ### 코드 크기와 메모리 high-water
 
-- `runtime_code_bytes`: 실제 런타임 native binary 크기 (현재 Min 6,528 / Forth 4,743 bytes), 공통 MinOS는 제외.
+- `runtime_code_bytes`: 실제 런타임 native binary 크기 (Min 6,528 / P1 Forth 4,743 / P2 Forth 4,988 bytes), 공통 MinOS는 제외.
 - `dictionary_bytes`: 기존 HERE-8000. `compiled_dictionary_bytes`: 여기에 최초 wRepl의 boot dictionary를 뺀 **이번 소스의 헤더·변수·정의·init 함수·bench wrapper 증가량**. 단일 알고리즘 body 크기만 뜻하지 않는다.
 - Min `source_bytes`/`token_bytes`: Loader/Tokenizer 복귀 시 실제 포인터로 얻은 resident span. NUL/종료 토큰 포함.
 - Min call/variable dictionary 및 임시 데이터/식/지역변수 영역: **실제 RI write 주소**의 최대 span. 예: `temporary_data_written_span_bytes`는 3a00..3f7f 내 마지막 실제 쓰기까지의 범위다.

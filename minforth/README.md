@@ -70,3 +70,37 @@ message printing (not just input echo), same-line discard, nested callers and
 return/loop stacks, incomplete-definition rollback including DO/LEAVE patches,
 BASE/dictionary/variable preservation, repeated aborts and a page-crossing
 inline string. See `../benchmark.md` for the P1 measurement harness.
+
+## P2 compiler and stack optimizations
+
+- A final compiled `JPS` becomes `JPA` only if no literal, string, branch or
+  other byte followed it. Forward branches to the definition end retain an
+  `RTS` at that target. `EXECUTE`, `>R`, `R>` and `R@` keep their call frames.
+- `DROP`, `I`, `+`, `1+` and `C@` are inlined by primitive **xt**, not by name.
+  Redefinitions and interpreted execution still use normal dictionary lookup.
+  Templates must be position-independent and must not inspect return frames.
+  `@`/`!` contain absolute INCW branches and cannot simply be copied this way.
+- Binary arithmetic/comparisons and stores now consume stack cells by moving
+  `zSP` directly, avoiding NP setup/copy. The split-byte layout and 8-bit SP
+  behavior are unchanged; this does not add overflow/underflow checking.
+- `zLastCall` (`9a..9b`), `zTailOK` (`9c`) and `zEndTarget` (`9d`) are private
+  compiler state. Every byte emitter must invalidate the last two; currently
+  all emitted definition bytes go through `nf_cbyte`.
+
+The kernel is 4,988 bytes, ending at `237c`, below checkpoint RAM `26c0`.
+Inlining saves execution clocks at a cost in dictionary size and compilation
+time; measured before/after figures are in `../benchmark.md`.
+
+For the current default image, rebuild from the workspace root without
+`--out`, then from `minredux/` run:
+
+```sh
+python3 regress.py
+python3 abort_regress.py
+python3 p2_regress.py
+```
+
+The P2 suite checks generated instructions, retained branch/return targets,
+inline byte equivalence and RAM results (including carry/borrow and memory
+page crossing), rather than accepting echoed UART input as output. It uses
+`../minforth/build` and its matching symbols.

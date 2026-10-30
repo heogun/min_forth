@@ -1,0 +1,92 @@
+{
+  "description": "Curated P2 measurements; not a full run.py report. Arrays follow case_order. Full ROM/RAM artifacts remain gitignored under benchmarks/results/.",
+  "date": "2026-10-30",
+  "backup_commit": "c5a6c55",
+  "backup_tag": "backup/pre-p2-20261030",
+  "measurement": "Raw hook-entry to hook-entry cycles; no subtraction",
+  "input_mode": "buffered; uart_after=200000; no realtime throttle",
+  "case_order": ["empty", "sieve", "bubble", "matrix", "fib", "crc16", "search", "mandelbrot", "micro-call", "micro-stack", "micro-do", "micro-parse"],
+  "control_sha256": {
+    "ctrl_lsb.bin": "a3e8c3b2d84ce2bc07ac545450ff930c24a4064e7da61f048ab590b885d4abbd",
+    "ctrl_msb.bin": "3b04671b89b859f84e9043e0fd6e5af015102241bad7318119154030e8db0f40",
+    "ctrl_hsb.bin": "94e6179d5c378260c34abd424f9328de438fe94025267cc73fd26e428bf679ca"
+  },
+  "cases_sha256": "5f3273c569e48b591582de1b4424f59adb41210c8350d88a92e771d39a851b6f",
+  "runner_sha256": "63092ba87a665329a00de0accb820ca05d2b1954bade35a70a4fe0a06c2d3f71",
+  "min_program_sha256": "764de3ed07721a693f87d7a00c9ae9b8ebb0bd3bcc44e99eb1603f299bfc224b",
+  "min_cycles_all_runs": [250, 12619266, 6330757, 955799, 111788, 8229138, 2668976, 61623162, 460890, 315825, 1206510, 37177],
+  "boot_dictionary_bytes_all_runs": 568,
+  "dictionary_note": "compiled_dictionary_bytes includes source headers, variables, setup/init definitions and bench wrapper, excluding boot dictionary.",
+  "intermediate_note": "Tail/stack/inline intermediate runs are exploratory measurements, not the final frame-sensitive safety validation. Only p2-complete is the adopted, fully observer-verified implementation.",
+  "runs": [
+    {
+      "name": "p2-baseline",
+      "status": "passed",
+      "repeat": 2,
+      "observer_verification_requested": false,
+      "kernel_source_sha256": "c1d4caba18abd3dd40207c278869f02e0e1fdf32e5d5348138871bfb7a6bc974",
+      "kernel_defs_sha256": "990041ed453b2f7bf85cf5dff6e825a2ff3bfa050c8100d9e2c648e4379cce56",
+      "runtime_code_bytes": 4743,
+      "forth_cycles": [123, 1654698, 951076, 398408, 11231, 988412, 521353, 29001744, 15438, 29774, 66126, 1782],
+      "compiled_dictionary_bytes": [43, 449, 506, 736, 144, 501, 4296, 1000, 152, 161, 194, 601],
+      "compile_cycles": [35758, 368580, 390162, 595755, 144653, 384931, 3734967, 880026, 110150, 133710, 119231, 639556]
+    },
+    {
+      "name": "p2-tail2",
+      "status": "passed",
+      "repeat": 2,
+      "observer_verification_requested": false,
+      "kernel_source_sha256": "75033911c9c7bd9c8dbce790bab0e8dd6a2eea370bd0431d5e0f6b617ffbac8a",
+      "kernel_defs_sha256": "587d642021bb0d3dcabef9b2a9e1d356323a00be316dd5149f3870fa255b6f0f",
+      "runtime_code_bytes": 4834,
+      "forth_cycles": [123, 1654698, 951076, 398408, 11027, 971004, 521353, 28926009, 14350, 29774, 66126, 1765],
+      "compiled_dictionary_bytes": [43, 449, 506, 736, 143, 500, 4295, 1000, 151, 161, 194, 600]
+    },
+    {
+      "name": "p2-stack",
+      "status": "passed",
+      "repeat": 2,
+      "observer_verification_requested": false,
+      "kernel_source_sha256": "4b9fd1eca53371714a2fccc0091260ebca94c04aa9734eedbdf615d46848fa66",
+      "kernel_defs_sha256": "587d642021bb0d3dcabef9b2a9e1d356323a00be316dd5149f3870fa255b6f0f",
+      "runtime_code_bytes": 4750,
+      "forth_cycles": [123, 1574678, 910394, 391648, 10527, 931294, 498643, 28390919, 13700, 28484, 64196, 1755],
+      "compiled_dictionary_bytes": [43, 449, 506, 736, 143, 500, 4295, 1000, 151, 161, 194, 600]
+    },
+    {
+      "name": "p2-inline1",
+      "status": "passed",
+      "repeat": 2,
+      "observer_verification_requested": false,
+      "kernel_source_sha256": "c895861c3f534db25f543e015a1283b89a6566067367082c2e987f552c714e63",
+      "kernel_defs_sha256": "587d642021bb0d3dcabef9b2a9e1d356323a00be316dd5149f3870fa255b6f0f",
+      "runtime_code_bytes": 4861,
+      "forth_cycles": [123, 1553174, 899327, 389884, 10527, 928606, 496039, 28379474, 12356, 25796, 60164, 1100],
+      "compiled_dictionary_bytes": [43, 459, 546, 806, 143, 530, 4305, 1060, 161, 171, 204, 601]
+    },
+    {
+      "name": "p2-inline-candidates",
+      "status": "passed",
+      "repeat": 1,
+      "observer_verification_requested": false,
+      "kernel_source_sha256": "2e3eedf6a14a3f36b15ccfdf31411697d172f43946db2fbb44d836aaad9df403",
+      "kernel_defs_sha256": "587d642021bb0d3dcabef9b2a9e1d356323a00be316dd5149f3870fa255b6f0f",
+      "runtime_code_bytes": 4986,
+      "forth_cycles": [123, 1448006, 868079, 380812, 10479, 923230, 465379, 28246229, 10756, 23108, 56132, 1100],
+      "compiled_dictionary_bytes": [43, 626, 692, 1158, 170, 643, 6812, 1208, 201, 223, 230, 601]
+    },
+    {
+      "name": "p2-complete",
+      "status": "passed",
+      "repeat": 2,
+      "observer_verification_requested": true,
+      "observer_verified_all_24_language_cases": true,
+      "kernel_source_sha256": "1a35d523b1d9f381d4c8a5884012917cc5e8aafae3ea3de72d9279a98c203bc2",
+      "kernel_defs_sha256": "28e264a6c3181a82d554eb563a2d66ad11318e1fa54c303031019e0797c48e5c",
+      "runtime_code_bytes": 4988,
+      "forth_cycles": [123, 1499981, 878495, 383836, 10479, 923230, 465379, 28250261, 10756, 23108, 56132, 1100],
+      "compiled_dictionary_bytes": [43, 554, 650, 1053, 170, 625, 4417, 1190, 201, 223, 230, 601],
+      "compile_cycles": [37045, 399707, 427394, 657741, 154177, 416722, 3857867, 950153, 118972, 144459, 126306, 649845]
+    }
+  ]
+}
