@@ -60,9 +60,6 @@
 - 작업 시작: 실기·확장 포트 제외 범위를 반영하고 전체 ISA용 독립 semantic oracle을 추가하는 중.
 - 구현 완료: `minredux/src/isa_tests/`에 arithmetic/data/control의 명령 수준 reference와 공통 검증 harness 추가. 공개 opcode **255/255**, **21,446 cases**, 누락 0개를 실제 opcode별 보고서로 확인. 0xff는 공개 명령이 아닌 OUT 내부 대기 상태로 별도 검사.
 - 강화 검사: 기존 즉시 산술 458,752개 외에 즉시 논리 196,608개, word 단항 연산/shift 655,360개, word 비교 393,216개를 추가. 전체 RAM 및 FLASH, 정의된 A, FR, PC/MAR/BANK/IR, I/O latch/output, 클록을 비교하며 명령 결과로 정의되지 않은 A는 일부 long 조기 종료 경로에서 제외. mutation 검사 4개로 잘못된 A·FI·RAM write·종료 클록을 oracle이 거부하는지 확인.
-- 배포 ROM 결함 1: **0x52 BXR / XR.B**는 최종 목적지 writeback이 없어 목적지가 그대로이고 scratch 00ff에 AND 중간값만 남음. 독립 의도값과 실제 차이가 나는 7 cases를 명시적으로 검사.
-- 배포 ROM 결함 2: **0x54 RXR / XR.R**는 목적지 대신 scratch 00ff에 최종 XOR 값을 씀. 독립 의도값과 실제 차이가 나는 7 cases를 명시적으로 검사.
-- 배포 ROM 결함 3: **WIN at ffff**에서 반복 대기 중 UART/PS2 입력 도착 시 의도된 다음 PC=0000이 아니라 ff00으로 wakeup하는 mid-instruction 제어 행 전환 문제 재현. 정상 8000/80ff wakeup과 함께 별도 검사.
 - ROM 예외는 "ISA 완전 준수"로 숨기지 않고 원본의 정확한 관찰 결과를 별도 assertion으로 고정. 이번 행렬에서 추가 Rust 코어 수정은 필요하지 않았고 원본 ROM/CSV도 변경하지 않음. 상세 재현·ROM hash·검증 한계는 `minredux/ISA_VALIDATION.md`.
 - 최종 검증: `cargo test` **39/39**, `cargo test --release` **39/39**, `cargo clippy --all-targets -- -D warnings`, `cargo fmt --check`, release 재빌드 후 Forth **33/33** 통과. 전체 ISA만 실행: `cd minredux` 후 `cargo test tests::isa`. opcode별 보고서: `MINREDUX_ISA_REPORT=1 cargo test all_public_opcodes -- --nocapture`.
 - 판정 범위: 전체 **opcode coverage**와 위 입력 집합의 독립 검증은 완료했지만 모든 32비트 입력 조합·임의의 self-modifying/alias 조합·모든 비동기 도착 시각의 전수 증명은 아님. 사용자 요청에 따라 실기 타이밍 대조와 확장 포트는 수행하지 않음.
