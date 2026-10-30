@@ -82,13 +82,15 @@ def fingerprint(directory):
     }
 
 
-def run_check(cli, project, output, kind, env):
+def run_check(cli, project, output, kind, env, refill_zones=False):
     extension = 'kicad_sch' if kind == 'erc' else 'kicad_pcb'
     domain = 'sch' if kind == 'erc' else 'pcb'
     command = [str(cli), domain, kind, '--format', 'json', '--severity-all',
                '--exit-code-violations', '--output', str(output / f'{kind}.json')]
     if kind == 'drc':
         command.append('--schematic-parity')
+        if refill_zones:
+            command.append('--refill-zones')
     command.append(str(project / f'{PROJECT}.{extension}'))
     completed = subprocess.run(command, capture_output=True, text=True, env=env)
     (output / f'{kind}.log').write_text(completed.stdout + completed.stderr)
@@ -109,6 +111,8 @@ def main():
     parser.add_argument('--source', type=Path,
                         default=ROOT / 'minimal64/Revision 1.4 Redux/KiCAD9')
     parser.add_argument('--out', type=Path, default=HERE / 'build/kicad-baseline')
+    parser.add_argument('--refill-zones', action='store_true',
+                        help='Refill zones in memory before DRC (never save the source board)')
     args = parser.parse_args()
     source, output = args.source.resolve(), args.out.resolve()
     if output == source or source in output.parents or output in source.parents:
@@ -127,12 +131,14 @@ def main():
             project = temp / 'source'
             shutil.copytree(source, project)
             added = add_footprint_libraries(project, footprints)
-            env = dict(os.environ, KICAD_CONFIG_HOME=str(temp / 'config'))
+            env = dict(os.environ, KICAD_CONFIG_HOME=str(temp / 'config'),
+                       KICAD10_FOOTPRINT_DIR=str(footprints))
             version = subprocess.run([str(cli), 'version'], check=True,
                                      capture_output=True, text=True, env=env).stdout.strip()
             summary = {'kicad_version': version, 'source': str(source),
                        'source_sha256': before, 'added_footprint_libraries': added,
-                       'checks': {kind: run_check(cli, project, output, kind, env)
+                       'refill_zones': args.refill_zones,
+                       'checks': {kind: run_check(cli, project, output, kind, env, args.refill_zones)
                                   for kind in ('erc', 'drc')}}
         if fingerprint(source) != before:
             raise RuntimeError('Source CAD changed while auditing; result is not a stable baseline')

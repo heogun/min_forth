@@ -1,0 +1,12 @@
+(fp_lib_table
+  (lib (name "logo")(type "KiCad")(uri "${KIPRJMOD}/logo.pretty")(options "")(descr ""))
+  (lib (name "ArduinoPC")(type "KiCad")(uri "${KIPRJMOD}/ArduinoPC.pretty")(options "")(descr ""))
+(lib (name "Button_Switch_THT")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/Button_Switch_THT.pretty")(options "")(descr ""))
+(lib (name "Capacitor_THT")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/Capacitor_THT.pretty")(options "")(descr ""))
+(lib (name "Connector_PinSocket_2.54mm")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/Connector_PinSocket_2.54mm.pretty")(options "")(descr ""))
+(lib (name "MountingHole")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/MountingHole.pretty")(options "")(descr ""))
+(lib (name "Oscillator")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/Oscillator.pretty")(options "")(descr ""))
+(lib (name "Package_DIP")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/Package_DIP.pretty")(options "")(descr ""))
+(lib (name "Redux_Footprints")(type "KiCad")(uri "${KIPRJMOD}/Redux_Footprints.pretty")(options "")(descr ""))
+(lib (name "Resistor_THT")(type "KiCad")(uri "${KICAD10_FOOTPRINT_DIR}/Resistor_THT.pretty")(options "")(descr ""))
+)

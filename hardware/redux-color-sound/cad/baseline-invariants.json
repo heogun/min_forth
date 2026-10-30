@@ -1,0 +1,21 @@
+{
+  "embedded_symbol_count": 38,
+  "sheet_count": 9,
+  "schematic_connectivity_unchanged": true,
+  "copper_and_pad_geometry_sha256": "3e697ccb4eb268b62db0fe9bc13fdf8395269e66fa27578c361df4df8a8ea38a",
+  "copper_and_pad_geometry_unchanged": true,
+  "source_unchanged": true,
+  "source_sha256": {
+    "8-Bit CPU 32k.kicad_pcb": "a7355a74b3ad14e3f82e6979c61656383926a91af580e0c253d4c0a3a2c64cc3",
+    "8-Bit CPU 32k.kicad_pro": "e441c22dd8d2e667463848b779fb49703eb054049483069e2635ecee5190de86",
+    "8-Bit CPU 32k.kicad_sch": "518d35bcb0beeb03d6ca44bc965eca4444fb46f1a96918ebeb79aca2abf36e52",
+    "ALU.kicad_sch": "4efbc948a0806118b0aba102635190848d9d62f125cee77562200d871d87cf8f",
+    "IR.kicad_sch": "87c55e33adaeb80b6c315bafe26dda1bc14c896cfd992db4cb53f32a7ae714ba",
+    "PC.kicad_sch": "da2786eb9afee08a3545d1cd3322cd32553adc04063e549679d9bb5cb87e964e",
+    "RAM.kicad_sch": "6bab5924747ee07a95bcd2b8f7cea5d26abbf0506d16b9e884d19a5bcffbcb79",
+    "RegB.kicad_sch": "6035000eac9a96f233981fec4cb22978f810f61d72f787a44e02f278f5ea13e7",
+    "UART_RX.kicad_sch": "de5aa6d43caadf293e8eac690f50583e6bd282d31ea8f7813b022e89edb1286d",
+    "VGA.kicad_sch": "2af997b73ce0f8cc9aaee6fc90f5fefc9a0915070493675eaa9f3e3a4db8c84a",
+    "ps2.kicad_sch": "38c7f32392f95b7ef4d4c5eb3530512b5535446bf61b647f1e5841464c3af17b"
+  }
+}

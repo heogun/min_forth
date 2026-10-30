@@ -87,4 +87,52 @@ PCB의 실제 pad/net·배선 연결을 대조해야 한다. 원본은 수정하
 3. I/O decode·음원·Attribute 회로의 논리/타이밍을 확정한다.
 4. 회로도에 구현하고 ERC/netlist 대조 후 PCB 배치·배선을 진행한다.
 
-현재 산출물에는 여전히 신규 통합 회로도, 배선 PCB, 제조 Gerber가 없다.
+## 수정 작업본 — 2026-10-30
+
+`cad/8-Bit CPU 32k.kicad_pro`가 경고를 해결한 **기준 CAD 작업본**이다.
+컬러·SN76489 통합 회로는 아직 추가하지 않았다.
+[출처·변경 내역](cad/PROVENANCE.md)을 함께 확인한다.
+
+```sh
+python3 hardware/redux-color-sound/check_kicad.py \
+  --source hardware/redux-color-sound/cad \
+  --out hardware/redux-color-sound/build/corrected --refill-zones
+```
+
+| 검사 | 수정 전 | 수정 후 |
+| --- | ---: | ---: |
+| ERC 활성 경고 | 59 | **0** |
+| DRC 활성 경고 | 4 | **0** |
+| 회로도–PCB parity | 93 | **0** |
+| DRC 제외 진단 | 3 | **0** |
+| 미연결 | 0 | **0** |
+
+- 저장된 zone 검사와 메모리에서 zone을 재채운 검사 모두 종료 코드 0.
+- 회로도 XML netlist의 모든 `(ref, pin)` 연결 그룹은 원본과 동일하다.
+- 동박 segment/via/arc/zone 및 패드 형상·위치는 원본과 동일하다.
+  비교에서 VGA 네트 이름 변경만 정규화한다.
+- 실제 사용 중인 심볼과 소켓/RN1 footprint를 로컬 라이브러리로 고정했다.
+  최신 라이브러리로 덮어쓰거나 경고를 제외해서 0건으로 만든 것이 아니다.
+- 로고를 board-only로 표시하고, PCB 필드를 회로도에 맞추고,
+  VGA 네트 이름 및 실크 크기·간격·글꼴 문제를 수정했다.
+- 원본의 DRC 제외 목록은 **모두 삭제**했다. 규칙 강등·추가 ignore는 없다.
+  기존 project-wide ignored 규칙은 유지했다. 모든 가능한 검사를 활성화했다는 뜻은 아니다.
+- 원본 파일의 SHA-256 변경 없음. 정적 검사/도구 단위 테스트 **14개 통과**.
+- 새 디렉터리에서 재생성한 CAD도 별도로 검사해 동일한 0건 결과를 확인했다.
+- 실크 PDF를 출력해 변경한 설명문·`READY.` 배치를 확인했다.
+
+재생성은 기존 작업을 덮어쓰지 않도록 **존재하지 않는 목적지**를 지정한다:
+
+```sh
+python3 hardware/redux-color-sound/prepare_cad.py \
+  --destination hardware/redux-color-sound/build/new-baseline
+```
+
+macOS KiCad에 포함된 Python/PCB API를 footprint 추출에 사용한다.
+다른 설치는 `--kicad-python`으로 지정한다. 생성기는 원본 프로젝트와 작업본이
+서로 포함되는 경로를 거부하고, 원본 파일·전기적 연결·동박 불변 조건을 검증한다.
+`prepare_cad.py`는 이 기준 작업본을 만드는 도구일 뿐 이후 통합 설계를 재생성하는 도구가 아니다.
+
+로그에 남는 `/usr/local/etc/fonts/`의 Fontconfig 메시지는 호스트 폰트 설정에서
+발생하는 별도 런타임 진단이다. 전역 설정을 임의 수정하지 않았으며, 수정 PCB는
+해당 TTF나 대체 글꼴에 의존하지 않는다. 제조 가능성·실기 동작 검증은 여전히 별도다.
