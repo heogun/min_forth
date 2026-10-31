@@ -38,6 +38,23 @@ python3 abort_regress.py -v
 - `--realtime`: 기본 최대 속도 실행 대신 초당 8,000,000 CPU 클록에 맞춰 호스트를 대기시킨다. 느린 호스트에서는 클록을 생략하지 않으므로 실시간보다 느릴 수 있다. OS 스케줄링 지연까지 보장하지는 않는다.
 - `--stats`: 입력 손실, VGA 프레임/VREG 덮어쓰기, 남은 FLASH busy 클록을 표시한다. `--no-output`은 UART 출력 수집만 끄며 송신 대기는 그대로 실행한다.
 
+### GUI 프론트엔드 (`gui/`)
+
+창 기반 프론트엔드는 같은 `minredux` 코어를 사용하며 VRAM의 400x240 뷰포트를
+직접 픽셀로 렌더링한다. 터미널 인코딩이나 CR/DEL 입력 문제를 거치지 않는다.
+
+```sh
+cd gui
+cargo run --release
+cargo run --release -- --rom-dir ../../minforth/build   # Forth 커널
+```
+
+Enter는 LF `0x0a`, Backspace/Delete는 `0x08`로 UART에 넣는다. `F5`는 CPU 리셋,
+창 닫기는 종료다. `--scale`, `--speed`, `--fg`, `--bg`, `--headless`,
+`--screenshot`, `--text`, `--uart-hex`를 지원한다. 자세한 내용은
+[`gui/README.md`](gui/README.md)를 참고한다. `minifb` 의존성은 `gui` crate에만
+들어가며 코어 에뮬레이터의 무의존성은 유지된다.
+
 ## 정확도 범위
 
 - CPU는 Redux 제어 ROM을 1클록씩 실행한다. 공개 opcode 255개 모두의 결과·플래그·RAM 부수효과·클록을 독립적인 명령 수준 기대값으로 검사하고, 내부 0xff 대기 상태도 별도로 검사한다. 배포 ROM의 `XR.B`/`XR.R` writeback 및 WIN ffff wakeup 결함은 명시적인 예외 검사로 기록하며 원본 동작을 보존한다. 전체 상태 공간의 전수 증명이나 실기 타이밍 검증을 의미하지 않는다.

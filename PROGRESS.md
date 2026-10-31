@@ -326,6 +326,14 @@
 
 ## 6. 프론트엔드
 
+- [x] `minredux/gui` — 실제 400x240 VRAM을 그리는 창 기반 흑백 프론트엔드 (2026-11-01)
+      - `minifb` 창에 VRAM `(96,12,400,240)` 크롭을 직접 렌더링, 정수 배율 지원
+      - 호스트 키를 MinOS UART 바이트로 변환: Enter `0x0a`, Backspace/Delete `0x08`
+      - 60fps마다 133,120 CPU 클록(=`--speed 1.0`, 실기 8MHz) 실행, F5 리셋
+      - `--scale`, `--speed`, `--fg`, `--bg`, `--uart-hex`, `--uart-after` 지원
+      - `--headless --frames N --screenshot FILE`로 BMP 저장, `--text`로 화면 덤프
+      - 단위 테스트 8개: 뷰포트 크롭/비트 순서, 정수 배율, BMP, 키 매핑
+      - 같은 클록의 headless BMP와 기존 `minredux --ascii` 픽셀 비교 일치
 - [x] `minredux term` — 대화형 터미널 프론트엔드
       - 50x30 텍스트 VRAM을 ANSI로 렌더링, 변경된 행만 다시 그림
       - 호스트 stdin을 raw 모드(`stty`)로 전환해 UART로 전달
