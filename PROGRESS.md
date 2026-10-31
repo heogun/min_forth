@@ -1,6 +1,6 @@
 # Minimal 64x4 Redux Forth — 프로젝트 진행 상황
 
-최종 업데이트: 2026-10-30
+최종 업데이트: 2026-11-01
 
 **현재 ROM 정책:** 수정 ROM은 `minimal64/Revision 1.4 Redux/FLASH Images/`에 직접 설치되어 있으며 이 위치를 빌드·에뮬레이터·테스트의 단일 기준으로 사용한다. 삭제된 원본 ROM이나 별도 `roms/` 번들은 필요 없다. 아래의 원본/수정본 분리·비교 기록은 과거 이력이다. 현재 검증은 수정 ROM만 실행하며 `python3 minredux/verify_rom.py`가 수정 SHA-256과 CSV 전체를 검사한다.
 
@@ -13,6 +13,26 @@
 - 권고 순서: 범위/위상 계약 → 비파괴 peek → 선택적 trace/최초 차이 비교 → 작은 독립 모델 → 재현된 차이만 최소 수정 → 동시 이벤트 확대. 실기/형식 검증은 별도 승인 경로.
 - 코드에서 확인한 사항: FLASH Busy `memory_read(&self)`의 DQ6 토글 부작용. 현재 trace가 추가 읽기로 실행을 바꾼다는 증거는 확인하지 않았으므로 기존 trace 버그나 전체 CPU 부정확성을 단정하지 않음.
 - 이번 작업은 타당성 검토만 수행하며 로드맵 구현·실기 측정은 시작하지 않음. 기존 수정-ROM 회귀 및 정적 검사는 통과.
+
+### 컬러·SN76489 에뮬레이터 (2026-11-01)
+
+- `minredux-cs/` 추가: 기존 `minredux/`의 CPU·마이크로코드·FLASH·UART·PS/2·VGA 모델을
+  기반으로 CS-DRAFT-1 통합안의 확장 I/O, Attribute SRAM/팔레트, SN76489를 디지털
+  모델로 구현. 흑백 기준 `minredux/`는 수정하지 않음.
+- 확장 I/O `0xFEE0..0xFEEF`: 제어/상태 레지스터, SN 데이터 래치, bit 3 alias,
+  Attribute 모드의 `0x4000..0x7FFF` RAM inhibit, VREG 쓰기 캡처 시점 plane 보존.
+- 컬러: 2KB Attribute SRAM, 세로 위상 +4 주소, ViewPort 셀 매핑, `I:R:G:B` 3단계 DAC,
+  표시 영역 판정과 흑백 bypass, 400x240 PPM 출력.
+- 음원: SN76489AN 3.579545MHz/16 내부 클록, 3톤+잡음, 2dB 감쇠, 15비트 LFSR,
+  32 입력 클록 READY, 제어 bit 3 mute. WAV 출력은 mono 16-bit PCM.
+- CLI: `--ansi`, `--ppm`, `--wav`, `--audio-rate`; 기존 `run`/`bench`/`term` 옵션 유지.
+- 검증: `cargo test --all-targets` **63 통과 + opt-in 1 제외**, examples **4 통과**,
+  Clippy `-D warnings`·`cargo fmt --check` 통과. release 재빌드 후 Forth **50/50**,
+  ABORT **13/13**, P2 **5/5**. 커널 이미지 `4988` bytes at `0x1000`.
+- 한계: 디지털 논리 모델이며 아날로그 DAC/앰프/필터, 저항 공차, 전파 지연,
+  setup/hold, 실기 최악 조건은 재현하지 않음. READY 32클록도 설계 참고값이다.
+  회로 초안 자체가 배선·타이밍·실기 검증 미완료이므로 이 에뮬레이터 통과를
+  하드웨어 검증으로 표시하지 않는다. 상세 내용은 `minredux-cs/README.md`.
 
 ### 기존 목표
 

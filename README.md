@@ -10,7 +10,8 @@ Minimal 64x4 (Revision 1.4 Redux) 홈 컴퓨터용 **16비트 Forth 커널**과,
 | `minforth/tools/` | C++ 어셈블러(`asm.cpp`), 이미지 빌더(`build.py`), 보조 스크립트 |
 | `minforth/test/` | 커널 검증용 `.fs` 프로그램 |
 | `minimal64/Revision 1.4 Redux/FLASH Images/` | ISA 결함 3건을 수정한 ROM이 기존 위치에 직접 설치됨. 실행·빌드·검증의 단일 기준 |
-| `minredux/` | 외부 crate 의존성 없는 Rust 에뮬레이터, ISA/화면 회귀 스크립트 |
+| `minredux/` | 외부 crate 의존성 없는 흑백 기준 Rust 에뮬레이터, ISA/화면 회귀 스크립트 |
+| `minredux-cs/` | 컬러 + SN76489 통합안(CS-DRAFT-1)용 Rust 에뮬레이터. `minredux/`를 기반으로 확장 |
 | `benchmarks/` | Min 인터프리터와 Forth의 동일 알고리즘 실행 비용 비교 하네스 |
 | `AGENTS.md` | 작업 공간 규칙과 커널 불변식 |
 | `PROGRESS.md`, `benchmark.md` | 구현 이력, 벤치마크 방법과 결과 |
@@ -42,11 +43,16 @@ python3 runline.py ': t 0 10 0 DO I + LOOP . ;' 't'
 
 Python 도우미는 실행 파일과 ROM을 자동으로 다시 빌드하지 않으므로, 어셈블리나 Rust 소스를 고친 뒤에는 위 빌드 단계를 먼저 실행한다.
 
+컬러·SN76489 통합안은 `cd minredux-cs`에서 같은 방식으로 빌드·회귀하며, 추가로
+`--ansi`, `--ppm`, `--wav` 출력을 지원한다. 자세한 내용은
+[`minredux-cs/README.md`](minredux-cs/README.md)를 참고한다.
+
 ## 문서
 
 - 실물 제작 부품 구매 목록과 주의사항: [`docs/HARDWARE_SHOPPING.md`](docs/HARDWARE_SHOPPING.md)
 - 커널 설계와 `ABORT"` 동작: [`minforth/README.md`](minforth/README.md)
-- 에뮬레이터 사용법과 정확도 범위: [`minredux/README.md`](minredux/README.md)
+- 흑백 기준 에뮬레이터 사용법과 정확도 범위: [`minredux/README.md`](minredux/README.md)
+- 컬러·SN76489 에뮬레이터와 한계: [`minredux-cs/README.md`](minredux-cs/README.md)
 - ISA 검증 내역: [`minredux/ISA_VALIDATION.md`](minredux/ISA_VALIDATION.md)
 - 벤치마크 하네스: [`benchmark.md`](benchmark.md)
 - Cycle-exact 제안과 타당성 검토: [`CYCLE_EXACT_ROADMAP.md`](CYCLE_EXACT_ROADMAP.md), [`CYCLE_EXACT_REVIEW.md`](CYCLE_EXACT_REVIEW.md) (구현 승인/실기 검증 완료를 뜻하지 않음)
