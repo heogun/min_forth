@@ -72,6 +72,9 @@ python3 hardware/redux-color-sound/check_kicad.py \
 `routing_checks.py`는 UUID별 원래 동박과 부품·패드 정보를 독립적으로 대조한다.
 클록 배선 변경이나 부품 이동을 놓치지 않도록 실패 조건을 단위 테스트한다.
 
+> **2026-11-24:** `integrated/`가 PLD 디코드로 다시 생성되었다(U64 교체, U66–U68 제거).
+> Run 2의 `before.json`/source hash는 이전 PCB 기준이라 import와 채택 검사가 거부한다. 재배선은 새 PCB로 해야 한다.
+
 ## Run 2 결과 (2026-11-01 실행, 2026-11-24 분석) — 채택 안 함
 
 `build/route-run2`: Freerouting JVM으로 10시간 10분, 80 pass를 실행했다.

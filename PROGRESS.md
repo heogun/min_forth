@@ -14,6 +14,17 @@
 - 코드에서 확인한 사항: FLASH Busy `memory_read(&self)`의 DQ6 토글 부작용. 현재 trace가 추가 읽기로 실행을 바꾼다는 증거는 확인하지 않았으므로 기존 trace 버그나 전체 CPU 부정확성을 단정하지 않음.
 - 이번 작업은 타당성 검토만 수행하며 로드맵 구현·실기 측정은 시작하지 않음. 기존 수정-ROM 회귀 및 정적 검사는 통과.
 
+### CS-DRAFT-1 타이밍 검토와 PLD 디코드 (2026-11-24)
+
+- `hardware/redux-color-sound/TIMING_REVIEW.md`: 데이터시트 최대값으로 조건 2–7을 계산했다.
+  원본 Redux도 최대값 기준으로는 8MHz를 닫지 못하므로, 원본 최장 경로 대비로 판정했다.
+- RAM `/CE` 6단 HC 디코드를 ATF22V10C(U64) 한 개로 바꿨다. U66–U68은 제거했고, IC는 26개에서 23개로 줄었다.
+  `/CE` 경로가 원본 최장보다 +12/+71/+101ns 길던 것이 −37.5ns(-7 등급)가 되었다.
+  식은 `extension_design.py`가 단일 원본이며, `integrated/extension-decode.pld`(GALasm)를 생성한다.
+- 검증: KiCad ERC/physical DRC/parity 0건, 미배선 360건, 하드웨어 테스트 31 통과(1 skip).
+  JEDEC 컴파일과 실기 측정은 하지 않았다.
+- 남은 일: Attribute 주소 adder 경로(조건 2·3), 배치 압축, 클록 분리. 그 뒤 재배선한다.
+
 ### 컬러·SN76489 Forth 단어 (2026-11-24)
 
 - 커널에 `COLOR AUDIO ATTR! ATTRFILL SN! TONE VOL NOISE SILENCE` 추가. 제어 shadow는

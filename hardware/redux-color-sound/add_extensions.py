@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 
 from cad_sexpr import parse, quoted, replace
 from check_kicad import HERE, PROJECT, find_cli
-from extension_design import SOURCES, design, net_name
+from extension_design import PLD_EQUATIONS, SOURCES, design, net_name, pld_source
 from prepare_cad import hierarchy, properties, export_netlist, fingerprint
 
 
@@ -80,6 +80,7 @@ def pin_definitions():
         'HC157': ('74xx', '74LS157'), 'AC244': ('74xx', '74LS244'),
         'POR': ('Power_Supervisor', 'MCP120-xxxDxTO'),
         '2N7000': ('Transistor_FET', '2N7000'),
+        'PAL22V10': ('Logic_Programmable', 'PAL22V10-xxP'),
     }
     result = {key: std_pins(*value) for key, value in sources.items()}
     result['R'] = {'1': ('1', 'passive'), '2': ('2', 'passive')}
@@ -412,9 +413,13 @@ def generate(source, destination):
     (destination / 'fp-lib-table').write_text(fp_table[:end]+'\n'.join(extra)+'\n'+fp_table[end:])
     manifest = {'status': 'SCHEMATIC DRAFT - PCB UNROUTED',
                 'parts': [asdict(p) for p in parts], 'gates': gates,
+                'pld': {'U64': {net_name(out): {'active_low': low, 'products': [
+                    [[net_name(n), level] for n, level in product] for product in products]}
+                    for out, (low, products) in PLD_EQUATIONS.items()}},
                 'symbol_pins': {name: {num: {'name': label, 'type': typ} for num, (label, typ)
                                           in physical.items()} for name, physical in pins.items()},
                 'source_sha256': source_before}
+    (destination / 'extension-decode.pld').write_text(pld_source())
     (destination / 'extension-manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     with (destination / 'extension-bom.csv').open('w', newline='') as output:
         writer = csv.writer(output, lineterminator='\n')
@@ -436,7 +441,9 @@ License: https://creativecommons.org/licenses/by-nc-sa/4.0/
 Legal code: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 Modified 2026-10-30: Attribute color, SN76489AN, decoding/control, RGB DAC, reset/mute,
-power parts, and PCB footprint/net synchronization. See `../CIRCUIT.md` for status.
+power parts, and PCB footprint/net synchronization. Modified 2026-11-24: single ATF22V10C
+address decode (U64, `extension-decode.pld`) replaces the HC gate chain
+(`../TIMING_REVIEW.md`). See `../CIRCUIT.md` for status.
 No external expansion-card CAD was copied wholesale.
 
 **NOT FOR FABRICATION.** This is an electrical/placement draft, not a validated 8MHz

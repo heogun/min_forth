@@ -10,7 +10,9 @@ License: https://creativecommons.org/licenses/by-nc-sa/4.0/
 Legal code: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode
 
 Modified 2026-10-30: Attribute color, SN76489AN, decoding/control, RGB DAC, reset/mute,
-power parts, and PCB footprint/net synchronization. See `../CIRCUIT.md` for status.
+power parts, and PCB footprint/net synchronization. Modified 2026-11-24: single ATF22V10C
+address decode (U64, `extension-decode.pld`) replaces the HC gate chain
+(`../TIMING_REVIEW.md`). See `../CIRCUIT.md` for status.
 No external expansion-card CAD was copied wholesale.
 
 **NOT FOR FABRICATION.** This is an electrical/placement draft, not a validated 8MHz

@@ -20,14 +20,27 @@ def nets(path):
             for net in root.findall('./nets/net') for n in net.findall('node')}
 
 
+def pld_value(spec, result):
+    value = any(all(bool(result[net]) == level for net, level in product)
+                for product in spec['products'])
+    return not value if spec['active_low'] else value
+
+
 def evaluate(manifest, values):
-    """Evaluate the actual declared gate graph and U66/U78 combinational pins."""
+    """Evaluate the declared gate graph, the U64 PLD equations and U78 adder pins."""
     result = dict(values, **{'+5V': True, 'GND': False})
     parts = {p['ref']: p['pins'] for p in manifest['parts']}
     pending = list(manifest['gates'])
+    pld_pending = {(ref, net): spec for ref, outputs in manifest.get('pld', {}).items()
+                   for net, spec in outputs.items()}
     changed = True
     while changed:
         changed = False
+        for key, spec in list(pld_pending.items()):
+            if all(net in result for product in spec['products'] for net, _ in product):
+                result[key[1]] = pld_value(spec, result)
+                del pld_pending[key]
+                changed = True
         for gate in list(pending):
             if not all(n in result for n in gate['inputs']):
                 continue
@@ -39,14 +52,6 @@ def evaluate(manifest, values):
             result[gate['output']] = value
             pending.remove(gate)
             changed = True
-        decoder = parts['U66']
-        if all(decoder[p] in result for p in ['1', '2', '3', '4', '5', '6']):
-            enabled = not result[decoder['4']] and not result[decoder['5']] and result[decoder['6']]
-            selection = sum(int(bool(result[decoder[str(i+1)]])) << i for i in range(3))
-            for code, pin in enumerate([15, 14, 13]):
-                if decoder[str(pin)] not in result:
-                    result[decoder[str(pin)]] = not (enabled and selection == code)
-                    changed = True
         adder = parts['U78']
         needed = [5, 3, 14, 12, 6, 2, 15, 11, 7]
         if all(adder[str(p)] in result for p in needed) and adder['9'] not in result:
@@ -106,17 +111,21 @@ class ExtensionTests(unittest.TestCase):
         self.assertLessEqual(int(match.group(1), 16), 0xFEE0)
 
     def test_decode_and_ram_inhibit_cover_all_cpu_addresses(self):
-        # This exercises physical pin declarations, not a parallel address-mask implementation.
+        # Exercises the manifest PLD equations wired to U64's physical pins.
         for address in range(65536):
             inputs = {f'A{i}': bool(address & (1 << i)) for i in range(16)}
-            inputs.update(CS_ATTR_MODE=False, CS_INH_EXT=False)
+            inputs.update(CS_ATTR_MODE=False, CS_INH_EXT=False, **{'~{RI}': False, '~{RO}': False})
             result = evaluate(self.manifest, inputs)
             selected = address & 0xFFF0 == 0xFEE0
-            self.assertEqual(bool(result['CS_IO_HIT']), selected, hex(address))
             self.assertEqual(bool(result['CS_RAM_INH']), selected, hex(address))
-            self.assertEqual(not result['CS_Y0_N'], selected and address & 7 == 0)
-            self.assertEqual(not result['CS_Y1_N'], selected and address & 7 == 1)
-            self.assertEqual(not result['CS_Y2_N'], selected and address & 7 == 2)
+            self.assertEqual(not result['CS_SND_EN_N'], selected and address & 7 == 0)
+            self.assertEqual(not result['CS_STATUS_OE_N'], selected and address & 7 == 1)
+            self.assertEqual(not result['CS_CTRL_SEL_N'], selected and address & 7 == 2)
+        inputs = {f'A{i}': bool(0xFEE0 & (1 << i)) for i in range(16)}
+        inputs.update(CS_ATTR_MODE=False, CS_INH_EXT=False, **{'~{RI}': True, '~{RO}': True})
+        result = evaluate(self.manifest, inputs)
+        self.assertTrue(result['CS_SND_EN_N'])  # data latch loads only while ~RI is low
+        self.assertTrue(result['CS_STATUS_OE_N'])  # status drives BUS only while ~RO is low
         for address in [0x0000, 0x3FFF, 0x4000, 0x430C, 0x7FFF, 0x8000, 0xFEE0, 0xFFFF]:
             for mode in (False, True):
                 for external in (False, True):
@@ -125,6 +134,50 @@ class ExtensionTests(unittest.TestCase):
                     result = evaluate(self.manifest, inputs)
                     self.assertEqual(bool(result['CS_RAM_INH']), external or (
                         address & 0xFFF0 == 0xFEE0) or (mode and 0x4000 <= address < 0x8000))
+
+    def test_ram_inhibit_is_a_single_pld_level_from_every_address_bit(self):
+        # TIMING_REVIEW.md: RAM /CE must not pass through a multi-gate HC chain again.
+        self.assertEqual(self.netmap[('U34', '22')], 'CS_RAM_INH')
+        drivers = [(ref, pin) for (ref, pin), net in self.netmap.items()
+                   if net == 'CS_RAM_INH' and ref != 'U34']
+        self.assertEqual(drivers, [('U64', '23')])
+        self.assertEqual(self.parts['U64']['symbol'], 'PAL22V10')
+        for gate in self.manifest['gates']:
+            self.assertNotEqual(gate['output'], 'CS_RAM_INH')
+        pld_inputs = {net for product in self.manifest['pld']['U64']['CS_RAM_INH']['products']
+                      for net, _ in product}
+        self.assertEqual(pld_inputs, {f'A{i}' for i in range(4, 16)} |
+                         {'CS_INH_EXT', 'CS_ATTR_MODE'})
+        pins = self.parts['U64']['pins']
+        for product in (p for spec in self.manifest['pld']['U64'].values()
+                        for p in spec['products']):
+            for net, _ in product:
+                self.assertIn(net, pins.values(), net)  # every literal is a real U64 pin
+
+    def test_galasm_source_matches_manifest_equations(self):
+        text = (PROJECT / 'extension-decode.pld').read_text()
+        lines = text.split('DESCRIPTION')[0].splitlines()
+        self.assertEqual(lines[0], 'GAL22V10')
+        pins = (lines[3] + ' ' + lines[4]).split()
+        self.assertEqual(len(pins), 24)
+        self.assertEqual((pins[11], pins[23]), ('GND', 'VCC'))
+        by_name = {name: str(i+1) for i, name in enumerate(pins)}
+        u64 = self.parts['U64']['pins']
+        body = ' '.join(lines[5:]).replace(' + ', ' | ')
+        equations = {}
+        for statement in re.findall(r'(/?\w+)\s*=\s*([^=]+?)(?=\s+/?\w+(?:\.E)?\s*=|$)', body):
+            target, expression = statement
+            if target.endswith('.E'):
+                continue
+            equations[target] = [[(u64[by_name[lit.lstrip('/')]], not lit.startswith('/'))
+                                  for lit in product.replace('*', ' ').split()]
+                                 for product in expression.split('|')]
+        for net, spec in self.manifest['pld']['U64'].items():
+            name = next(n for n, pin in by_name.items() if u64.get(pin) == net)
+            target = ('/' if spec['active_low'] else '') + name
+            self.assertIn(target, equations, net)
+            expected = [[(n, level) for n, level in product] for product in spec['products']]
+            self.assertEqual(equations[target], expected, net)
 
     def test_attribute_row_phase_and_active_window_for_entire_raster(self):
         for y in range(260):

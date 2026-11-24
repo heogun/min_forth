@@ -3,22 +3,35 @@
   "parts": [
     {
       "ref": "U64",
-      "symbol": "HC30",
-      "value": "74HC30",
-      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "symbol": "PAL22V10",
+      "value": "ATF22V10C (CS_DECODE)",
+      "footprint": "Package_DIP:DIP-24_W7.62mm_Socket",
       "sheet": "ExtensionIO",
       "pins": {
-        "1": "A15",
-        "2": "A14",
-        "3": "A13",
-        "4": "A12",
-        "5": "A11",
-        "6": "A10",
-        "11": "A9",
-        "12": "CS_A8_N",
-        "8": "CS_FE_N",
-        "7": "GND",
-        "14": "+5V"
+        "1": "A4",
+        "2": "A5",
+        "3": "A6",
+        "4": "A7",
+        "5": "A8",
+        "6": "A9",
+        "7": "A10",
+        "8": "A11",
+        "9": "A12",
+        "10": "A13",
+        "11": "A14",
+        "13": "A15",
+        "14": "A0",
+        "15": "A1",
+        "16": "A2",
+        "17": "CS_ATTR_MODE",
+        "18": "CS_INH_EXT",
+        "19": "~{RI}",
+        "20": "CS_SND_EN_N",
+        "21": "CS_CTRL_SEL_N",
+        "22": "CS_STATUS_SEL_N",
+        "23": "CS_RAM_INH",
+        "12": "GND",
+        "24": "+5V"
       }
     },
     {
@@ -28,81 +41,15 @@
       "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
       "sheet": "ExtensionIO",
       "pins": {
-        "1": "A8",
-        "2": "CS_A8_N",
-        "3": "CS_FE_N",
-        "4": "CS_FE",
-        "5": "A4",
-        "6": "CS_A4_N",
         "9": "CS_SN_WRITE",
         "8": "CS_SN_WRITE_N",
         "11": "CS_AUDIO_EN",
         "10": "CS_AUDIO_MUTE",
         "13": "~{RESET}",
         "12": "CS_RESET",
-        "7": "GND",
-        "14": "+5V"
-      }
-    },
-    {
-      "ref": "U66",
-      "symbol": "HC138",
-      "value": "74HC138",
-      "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
-      "sheet": "ExtensionIO",
-      "pins": {
-        "1": "A0",
-        "2": "A1",
-        "3": "A2",
-        "4": "CS_FE_N",
-        "5": "A4",
-        "6": "CS_LO",
-        "15": "CS_Y0_N",
-        "14": "CS_Y1_N",
-        "13": "CS_Y2_N",
-        "8": "GND",
-        "16": "+5V"
-      }
-    },
-    {
-      "ref": "U67",
-      "symbol": "HC11",
-      "value": "74HC11",
-      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
-      "sheet": "ExtensionIO",
-      "pins": {
-        "1": "A7",
-        "2": "A6",
-        "13": "A5",
-        "12": "CS_LO",
-        "3": "CS_FE",
-        "4": "CS_LO",
-        "5": "CS_A4_N",
-        "6": "CS_IO_HIT",
-        "9": "GND",
-        "10": "GND",
-        "11": "GND",
-        "7": "GND",
-        "14": "+5V"
-      }
-    },
-    {
-      "ref": "U68",
-      "symbol": "HC11",
-      "value": "74HC11",
-      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
-      "sheet": "ExtensionIO",
-      "pins": {
-        "1": "CS_ATTR_MODE",
-        "2": "A14",
-        "13": "CS_A15_N",
-        "12": "CS_ATTR_CPU",
+        "1": "GND",
         "3": "GND",
-        "4": "GND",
         "5": "GND",
-        "9": "GND",
-        "10": "GND",
-        "11": "GND",
         "7": "GND",
         "14": "+5V"
       }
@@ -121,7 +68,7 @@
         "5": "CS_ATTR_MODE",
         "6": "CS_AUDIO_EN",
         "7": "CLK_MAR",
-        "9": "CS_Y2_N",
+        "9": "CS_CTRL_SEL_N",
         "10": "~{RI}",
         "11": "BUS3",
         "12": "BUS2",
@@ -168,18 +115,16 @@
       "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
       "sheet": "ExtensionIO",
       "pins": {
-        "1": "CS_INH_EXT",
-        "2": "CS_IO_HIT",
-        "3": "CS_INH_IO",
-        "4": "CS_INH_IO",
-        "5": "CS_ATTR_CPU",
-        "6": "CS_RAM_INH",
         "9": "CS_VGA_WE_RAW",
         "10": "CS_PENDING_ATTR",
         "8": "CS_BITMAP_WE_N",
         "12": "CS_VGA_WE_RAW",
         "13": "CS_PENDING_BITMAP",
         "11": "CS_ATTR_WE_N",
+        "1": "GND",
+        "2": "GND",
+        "4": "GND",
+        "5": "GND",
         "14": "+5V",
         "7": "GND"
       }
@@ -191,12 +136,11 @@
       "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
       "sheet": "ExtensionIO",
       "pins": {
-        "1": "CS_Y1_N",
+        "1": "CS_STATUS_SEL_N",
         "2": "~{RO}",
         "3": "CS_STATUS_OE_N",
-        "4": "CS_Y0_N",
-        "5": "~{RI}",
-        "6": "CS_SND_EN_N",
+        "4": "GND",
+        "5": "GND",
         "9": "GND",
         "10": "GND",
         "12": "GND",
@@ -354,12 +298,11 @@
         "1": "CS_ROW_CARRY",
         "2": "CS_VA13",
         "3": "CS_CA10",
-        "4": "A15",
-        "5": "+5V",
-        "6": "CS_A15_N",
         "9": "CS_ACTIVE_LATCH",
         "10": "+5V",
         "8": "CS_RGB_BLANK",
+        "4": "GND",
+        "5": "GND",
         "12": "GND",
         "13": "GND",
         "7": "GND",
@@ -783,39 +726,6 @@
       }
     },
     {
-      "ref": "C36",
-      "symbol": "C",
-      "value": "100n",
-      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
-      "sheet": "ExtensionPower",
-      "pins": {
-        "1": "+5V",
-        "2": "GND"
-      }
-    },
-    {
-      "ref": "C37",
-      "symbol": "C",
-      "value": "100n",
-      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
-      "sheet": "ExtensionPower",
-      "pins": {
-        "1": "+5V",
-        "2": "GND"
-      }
-    },
-    {
-      "ref": "C38",
-      "symbol": "C",
-      "value": "100n",
-      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
-      "sheet": "ExtensionPower",
-      "pins": {
-        "1": "+5V",
-        "2": "GND"
-      }
-    },
-    {
       "ref": "C39",
       "symbol": "C",
       "value": "100n",
@@ -1071,68 +981,6 @@
   ],
   "gates": [
     {
-      "op": "NAND",
-      "inputs": [
-        "A15",
-        "A14",
-        "A13",
-        "A12",
-        "A11",
-        "A10",
-        "A9",
-        "CS_A8_N"
-      ],
-      "output": "CS_FE_N",
-      "ref": "U64",
-      "input_pins": [
-        "1",
-        "2",
-        "3",
-        "4",
-        "5",
-        "6",
-        "11",
-        "12"
-      ],
-      "output_pin": "8"
-    },
-    {
-      "op": "NOT",
-      "inputs": [
-        "A8"
-      ],
-      "output": "CS_A8_N",
-      "ref": "U65",
-      "input_pins": [
-        "1"
-      ],
-      "output_pin": "2"
-    },
-    {
-      "op": "NOT",
-      "inputs": [
-        "CS_FE_N"
-      ],
-      "output": "CS_FE",
-      "ref": "U65",
-      "input_pins": [
-        "3"
-      ],
-      "output_pin": "4"
-    },
-    {
-      "op": "NOT",
-      "inputs": [
-        "A4"
-      ],
-      "output": "CS_A4_N",
-      "ref": "U65",
-      "input_pins": [
-        "5"
-      ],
-      "output_pin": "6"
-    },
-    {
       "op": "NOT",
       "inputs": [
         "CS_SN_WRITE"
@@ -1169,82 +1017,6 @@
       "output_pin": "12"
     },
     {
-      "op": "AND",
-      "inputs": [
-        "A7",
-        "A6",
-        "A5"
-      ],
-      "output": "CS_LO",
-      "ref": "U67",
-      "input_pins": [
-        "1",
-        "2",
-        "13"
-      ],
-      "output_pin": "12"
-    },
-    {
-      "op": "AND",
-      "inputs": [
-        "CS_FE",
-        "CS_LO",
-        "CS_A4_N"
-      ],
-      "output": "CS_IO_HIT",
-      "ref": "U67",
-      "input_pins": [
-        "3",
-        "4",
-        "5"
-      ],
-      "output_pin": "6"
-    },
-    {
-      "op": "AND",
-      "inputs": [
-        "CS_ATTR_MODE",
-        "A14",
-        "CS_A15_N"
-      ],
-      "output": "CS_ATTR_CPU",
-      "ref": "U68",
-      "input_pins": [
-        "1",
-        "2",
-        "13"
-      ],
-      "output_pin": "12"
-    },
-    {
-      "op": "OR",
-      "inputs": [
-        "CS_INH_EXT",
-        "CS_IO_HIT"
-      ],
-      "output": "CS_INH_IO",
-      "ref": "U71",
-      "input_pins": [
-        "1",
-        "2"
-      ],
-      "output_pin": "3"
-    },
-    {
-      "op": "OR",
-      "inputs": [
-        "CS_INH_IO",
-        "CS_ATTR_CPU"
-      ],
-      "output": "CS_RAM_INH",
-      "ref": "U71",
-      "input_pins": [
-        "4",
-        "5"
-      ],
-      "output_pin": "6"
-    },
-    {
       "op": "OR",
       "inputs": [
         "CS_VGA_WE_RAW",
@@ -1275,7 +1047,7 @@
     {
       "op": "OR",
       "inputs": [
-        "CS_Y1_N",
+        "CS_STATUS_SEL_N",
         "~{RO}"
       ],
       "output": "CS_STATUS_OE_N",
@@ -1285,20 +1057,6 @@
         "2"
       ],
       "output_pin": "3"
-    },
-    {
-      "op": "OR",
-      "inputs": [
-        "CS_Y0_N",
-        "~{RI}"
-      ],
-      "output": "CS_SND_EN_N",
-      "ref": "U72",
-      "input_pins": [
-        "4",
-        "5"
-      ],
-      "output_pin": "6"
     },
     {
       "op": "XOR",
@@ -1313,20 +1071,6 @@
         "2"
       ],
       "output_pin": "3"
-    },
-    {
-      "op": "XOR",
-      "inputs": [
-        "A15",
-        "+5V"
-      ],
-      "output": "CS_A15_N",
-      "ref": "U79",
-      "input_pins": [
-        "4",
-        "5"
-      ],
-      "output_pin": "6"
     },
     {
       "op": "XOR",
@@ -1455,6 +1199,290 @@
       "output_pin": "8"
     }
   ],
+  "pld": {
+    "U64": {
+      "CS_RAM_INH": {
+        "active_low": false,
+        "products": [
+          [
+            [
+              "CS_INH_EXT",
+              true
+            ]
+          ],
+          [
+            [
+              "A15",
+              true
+            ],
+            [
+              "A14",
+              true
+            ],
+            [
+              "A13",
+              true
+            ],
+            [
+              "A12",
+              true
+            ],
+            [
+              "A11",
+              true
+            ],
+            [
+              "A10",
+              true
+            ],
+            [
+              "A9",
+              true
+            ],
+            [
+              "A8",
+              false
+            ],
+            [
+              "A7",
+              true
+            ],
+            [
+              "A6",
+              true
+            ],
+            [
+              "A5",
+              true
+            ],
+            [
+              "A4",
+              false
+            ]
+          ],
+          [
+            [
+              "CS_ATTR_MODE",
+              true
+            ],
+            [
+              "A14",
+              true
+            ],
+            [
+              "A15",
+              false
+            ]
+          ]
+        ]
+      },
+      "CS_STATUS_SEL_N": {
+        "active_low": true,
+        "products": [
+          [
+            [
+              "A15",
+              true
+            ],
+            [
+              "A14",
+              true
+            ],
+            [
+              "A13",
+              true
+            ],
+            [
+              "A12",
+              true
+            ],
+            [
+              "A11",
+              true
+            ],
+            [
+              "A10",
+              true
+            ],
+            [
+              "A9",
+              true
+            ],
+            [
+              "A8",
+              false
+            ],
+            [
+              "A7",
+              true
+            ],
+            [
+              "A6",
+              true
+            ],
+            [
+              "A5",
+              true
+            ],
+            [
+              "A4",
+              false
+            ],
+            [
+              "A2",
+              false
+            ],
+            [
+              "A1",
+              false
+            ],
+            [
+              "A0",
+              true
+            ]
+          ]
+        ]
+      },
+      "CS_CTRL_SEL_N": {
+        "active_low": true,
+        "products": [
+          [
+            [
+              "A15",
+              true
+            ],
+            [
+              "A14",
+              true
+            ],
+            [
+              "A13",
+              true
+            ],
+            [
+              "A12",
+              true
+            ],
+            [
+              "A11",
+              true
+            ],
+            [
+              "A10",
+              true
+            ],
+            [
+              "A9",
+              true
+            ],
+            [
+              "A8",
+              false
+            ],
+            [
+              "A7",
+              true
+            ],
+            [
+              "A6",
+              true
+            ],
+            [
+              "A5",
+              true
+            ],
+            [
+              "A4",
+              false
+            ],
+            [
+              "A2",
+              false
+            ],
+            [
+              "A1",
+              true
+            ],
+            [
+              "A0",
+              false
+            ]
+          ]
+        ]
+      },
+      "CS_SND_EN_N": {
+        "active_low": true,
+        "products": [
+          [
+            [
+              "A15",
+              true
+            ],
+            [
+              "A14",
+              true
+            ],
+            [
+              "A13",
+              true
+            ],
+            [
+              "A12",
+              true
+            ],
+            [
+              "A11",
+              true
+            ],
+            [
+              "A10",
+              true
+            ],
+            [
+              "A9",
+              true
+            ],
+            [
+              "A8",
+              false
+            ],
+            [
+              "A7",
+              true
+            ],
+            [
+              "A6",
+              true
+            ],
+            [
+              "A5",
+              true
+            ],
+            [
+              "A4",
+              false
+            ],
+            [
+              "A2",
+              false
+            ],
+            [
+              "A1",
+              false
+            ],
+            [
+              "A0",
+              false
+            ],
+            [
+              "~{RI}",
+              false
+            ]
+          ]
+        ]
+      }
+    }
+  },
   "symbol_pins": {
     "HC30": {
       "1": {
@@ -2756,6 +2784,104 @@
       "3": {
         "name": "D",
         "type": "passive"
+      }
+    },
+    "PAL22V10": {
+      "1": {
+        "name": "I_{0}",
+        "type": "input"
+      },
+      "2": {
+        "name": "I_{1}",
+        "type": "input"
+      },
+      "3": {
+        "name": "I_{2}",
+        "type": "input"
+      },
+      "4": {
+        "name": "I_{3}",
+        "type": "input"
+      },
+      "5": {
+        "name": "I_{4}",
+        "type": "input"
+      },
+      "6": {
+        "name": "I_{5}",
+        "type": "input"
+      },
+      "7": {
+        "name": "I_{6}",
+        "type": "input"
+      },
+      "8": {
+        "name": "I_{7}",
+        "type": "input"
+      },
+      "9": {
+        "name": "I_{8}",
+        "type": "input"
+      },
+      "10": {
+        "name": "I_{9}",
+        "type": "input"
+      },
+      "11": {
+        "name": "I_{10}",
+        "type": "input"
+      },
+      "12": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "13": {
+        "name": "I_{11}",
+        "type": "input"
+      },
+      "14": {
+        "name": "I/O_{0}",
+        "type": "bidirectional"
+      },
+      "15": {
+        "name": "I/O_{1}",
+        "type": "bidirectional"
+      },
+      "16": {
+        "name": "I/O_{2}",
+        "type": "bidirectional"
+      },
+      "17": {
+        "name": "I/O_{3}",
+        "type": "bidirectional"
+      },
+      "18": {
+        "name": "I/O_{4}",
+        "type": "bidirectional"
+      },
+      "19": {
+        "name": "I/O_{5}",
+        "type": "bidirectional"
+      },
+      "20": {
+        "name": "I/O_{6}",
+        "type": "bidirectional"
+      },
+      "21": {
+        "name": "I/O_{7}",
+        "type": "bidirectional"
+      },
+      "22": {
+        "name": "I/O_{8}",
+        "type": "bidirectional"
+      },
+      "23": {
+        "name": "I/O_{9}",
+        "type": "bidirectional"
+      },
+      "24": {
+        "name": "V_{CC}",
+        "type": "power_in"
       }
     },
     "R": {

@@ -34,7 +34,7 @@ def design():
                      'HC173': 16, 'HC574': 20, 'HC32': 14, 'SN76489AN': 16,
                      'HCT244': 20, 'HC283': 16, 'HC86': 14, 'HC245': 20,
                      'HC377': 20, 'HCT377': 20, 'HC74': 14, 'HC08': 14, 'HC4002': 14,
-                     'HC157': 16, 'AC244': 20, 'SRAM': 28}[symbol]
+                     'HC157': 16, 'AC244': 20, 'SRAM': 28, 'PAL22V10': 24}[symbol]
             width = '15.24' if count == 28 else '7.62'
             footprint = f'Package_DIP:DIP-{count}_W{width}mm_Socket'
         p = Part(ref, symbol, value, footprint, sheet, {str(k): v for k, v in pins.items()})
@@ -54,27 +54,22 @@ def design():
     snd = 'PSG'
     attr = 'Attribute'
     palette = 'Palette'
-    nand = add('U64', 'HC30', '74HC30', {}, io)
-    logic(nand, 'NAND', list(zip([1, 2, 3, 4, 5, 6, 11, 12],
-          [f'CS_A{i}' for i in range(15, 8, -1)] + ['CS_A8_N'])), (8, 'CS_FE_N'))
+    # Single-level address decode (TIMING_REVIEW.md 2절, 8절 1번).  One ATF22V10C
+    # replaces the former HC04/HC30/HC138/HC11/HC32 chain so RAM /CE is one
+    # PLD delay from the address bus.  A3 stays undecoded (documented alias).
+    add('U64', 'PAL22V10', 'ATF22V10C (CS_DECODE)', {
+        **{pin: f'CS_A{bit}' for pin, bit in PLD_ADDRESS_PINS.items()},
+        **{pin: net for pin, (net, _) in PLD_IO_PINS.items()}}, io,
+        'Package_DIP:DIP-24_W7.62mm_Socket')
     inv = add('U65', 'HC04', '74HC04', {}, io)
     for a, y, source, target in [
-        (1, 2, 'CS_A8', 'CS_A8_N'), (3, 4, 'CS_FE_N', 'CS_FE'),
-        (5, 6, 'CS_A4', 'CS_A4_N'), (9, 8, 'CS_SN_WRITE', 'CS_SN_WRITE_N'),
+        (9, 8, 'CS_SN_WRITE', 'CS_SN_WRITE_N'),
         (11, 10, 'CS_AUDIO_EN', 'CS_AUDIO_MUTE'), (13, 12, 'CS_RESET_N', 'CS_RESET')]:
         logic(inv, 'NOT', [(a, source)], (y, target))
-    dec = add('U66', 'HC138', '74HC138', {
-        1: 'CS_A0', 2: 'CS_A1', 3: 'CS_A2', 4: 'CS_FE_N', 5: 'CS_A4',
-        6: 'CS_LO', 15: 'CS_Y0_N', 14: 'CS_Y1_N', 13: 'CS_Y2_N'}, io)
-    and1 = add('U67', 'HC11', '74HC11', {}, io)
-    logic(and1, 'AND', [(1, 'CS_A7'), (2, 'CS_A6'), (13, 'CS_A5')], (12, 'CS_LO'))
-    logic(and1, 'AND', [(3, 'CS_FE'), (4, 'CS_LO'), (5, 'CS_A4_N')], (6, 'CS_IO_HIT'))
-    and2 = add('U68', 'HC11', '74HC11', {}, io)
-    logic(and2, 'AND', [(1, 'CS_ATTR_MODE'), (2, 'CS_A14'), (13, 'CS_A15_N')], (12, 'CS_ATTR_CPU'))
     ctrl = add('U69', 'HC173', '74HC173', {
         1: 'GND', 2: 'GND', 3: 'CS_COLOR_EN', 4: 'CS_SN_WRITE',
         5: 'CS_ATTR_MODE', 6: 'CS_AUDIO_EN', 7: 'CS_CLK_MAR',
-        9: 'CS_Y2_N', 10: 'CS_RI_N', 11: 'CS_BUS3', 12: 'CS_BUS2',
+        9: 'CS_CTRL_SEL_N', 10: 'CS_RI_N', 11: 'CS_BUS3', 12: 'CS_BUS2',
         13: 'CS_BUS1', 14: 'CS_BUS0', 15: 'CS_RESET'}, io)
     d_pins = [3, 4, 7, 8, 13, 14, 17, 18]
     q_pins = [2, 5, 6, 9, 12, 15, 16, 19]
@@ -84,14 +79,11 @@ def design():
         **dict(zip(q_pins, [f'CS_SND{i}' for i in range(8)]))}, io)
     or1 = add('U71', 'HC32', '74HC32', {}, io)
     for inputs, output in [
-        ([(1, 'CS_INH_EXT'), (2, 'CS_IO_HIT')], (3, 'CS_INH_IO')),
-        ([(4, 'CS_INH_IO'), (5, 'CS_ATTR_CPU')], (6, 'CS_RAM_INH')),
         ([(9, 'CS_VGA_WE_RAW'), (10, 'CS_PENDING_ATTR')], (8, 'CS_BITMAP_WE_N')),
         ([(12, 'CS_VGA_WE_RAW'), (13, 'CS_PENDING_BITMAP')], (11, 'CS_ATTR_WE_N'))]:
         logic(or1, 'OR', inputs, output)
     or2 = add('U72', 'HC32', '74HC32', {}, io)
-    logic(or2, 'OR', [(1, 'CS_Y1_N'), (2, 'CS_RO_N')], (3, 'CS_STATUS_OE_N'))
-    logic(or2, 'OR', [(4, 'CS_Y0_N'), (5, 'CS_RI_N')], (6, 'CS_SND_EN_N'))
+    logic(or2, 'OR', [(1, 'CS_STATUS_SEL_N'), (2, 'CS_RO_N')], (3, 'CS_STATUS_OE_N'))
     add('U74', 'SN76489AN', 'SN76489AN', {
         # TI D0 is MSB; logical bus bit 0 goes to TI D7 (physical pin 10).
         3: 'CS_SND7', 2: 'CS_SND6', 1: 'CS_SND5', 15: 'CS_SND4',
@@ -121,7 +113,6 @@ def design():
         9: 'CS_ROW_CARRY'}, attr)
     xor = add('U79', 'HC86', '74HC86', {}, attr)
     logic(xor, 'XOR', [(1, 'CS_ROW_CARRY'), (2, 'CS_VA13')], (3, 'CS_CA10'))
-    logic(xor, 'XOR', [(4, 'CS_A15'), (5, '+5V')], (6, 'CS_A15_N'))
     logic(xor, 'XOR', [(9, 'CS_ACTIVE_LATCH'), (10, '+5V')], (8, 'CS_RGB_BLANK'))
     add('U80', 'HC245', '74HC245', {
         1: '+5V', 19: 'CS_VREG_OE_N',
@@ -202,6 +193,57 @@ def design():
         gate['inputs'] = [net_name(n) for n in gate['inputs']]
         gate['output'] = net_name(gate['output'])
     return parts, gates
+
+
+# ATF22V10C (U64) pin map and equations.  Products are lists of (net, level);
+# an output is active-low when its flag is True (pin low while the sum is true).
+PLD_ADDRESS_PINS = {1: 4, 2: 5, 3: 6, 4: 7, 5: 8, 6: 9, 7: 10, 8: 11, 9: 12, 10: 13,
+                    11: 14, 13: 15, 14: 0, 15: 1, 16: 2}
+PLD_IO_PINS = {17: ('CS_ATTR_MODE', 'in'), 18: ('CS_INH_EXT', 'in'), 19: ('CS_RI_N', 'in'),
+               20: ('CS_SND_EN_N', 'out'), 21: ('CS_CTRL_SEL_N', 'out'),
+               22: ('CS_STATUS_SEL_N', 'out'), 23: ('CS_RAM_INH', 'out')}
+_HIT = [(f'CS_A{i}', True) for i in range(15, 8, -1)] + [('CS_A8', False)] + \
+       [(f'CS_A{i}', True) for i in (7, 6, 5)] + [('CS_A4', False)]
+
+
+def _reg(a2, a1, a0):
+    return _HIT + [('CS_A2', a2), ('CS_A1', a1), ('CS_A0', a0)]
+
+
+PLD_EQUATIONS = {
+    # RAM /CE (active-high inhibit): expansion card, I/O window, attribute writes.
+    'CS_RAM_INH': (False, [[('CS_INH_EXT', True)], _HIT,
+                           [('CS_ATTR_MODE', True), ('CS_A14', True), ('CS_A15', False)]]),
+    'CS_STATUS_SEL_N': (True, [_reg(False, False, True)]),
+    'CS_CTRL_SEL_N': (True, [_reg(False, True, False)]),
+    'CS_SND_EN_N': (True, [_reg(False, False, False) + [('CS_RI_N', False)]]),
+}
+
+
+def pld_source():
+    """GALasm/galette source for U64; the CAD generator writes it next to the netlist."""
+    names = {pin: f'A{bit}' for pin, bit in PLD_ADDRESS_PINS.items()}
+    short = {'CS_ATTR_MODE': 'ATTRMD', 'CS_INH_EXT': 'INHEXT', 'CS_RI_N': 'RI',
+             'CS_SND_EN_N': 'SNDEN', 'CS_CTRL_SEL_N': 'CTLSEL', 'CS_STATUS_SEL_N': 'STSEL',
+             'CS_RAM_INH': 'RAMINH'}
+    names.update({pin: short[net] for pin, (net, _) in PLD_IO_PINS.items()})
+    names[12], names[24] = 'GND', 'VCC'
+    alias = {**{f'CS_A{i}': f'A{i}' for i in range(16)}, **short}
+    lines = ['GAL22V10', 'CSDECODE', '',
+             ' '.join(names[i] for i in range(1, 13)),
+             ' '.join(names[i] for i in range(13, 25)), '']
+    for net, (active_low, products) in PLD_EQUATIONS.items():
+        terms = [' * '.join(('' if level else '/') + alias[n] for n, level in product)
+                 for product in products]
+        target = ('/' if active_low else '') + alias[net]
+        lines.append(f'{target} = ' + '\n    + '.join(terms))
+        lines.append(f'{alias[net]}.E = VCC')
+        lines.append('')
+    lines += ['DESCRIPTION', '',
+              'CS-DRAFT-1 single-level decode (U64). Generated from extension_design.py;',
+              'edit the Python equations, not this file. RI is the active-low ~{RI} net.',
+              'NOT compiled or hardware-tested here; see TIMING_REVIEW.md.']
+    return '\n'.join(lines) + '\n'
 
 
 SOURCES = {

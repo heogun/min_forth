@@ -1,9 +1,6 @@
 Reference,Value,Footprint,Schematic sheet
-U64,74HC30,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
+U64,ATF22V10C (CS_DECODE),Package_DIP:DIP-24_W7.62mm_Socket,ExtensionIO
 U65,74HC04,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
-U66,74HC138,Package_DIP:DIP-16_W7.62mm_Socket,ExtensionIO
-U67,74HC11,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
-U68,74HC11,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
 U69,74HC173,Package_DIP:DIP-16_W7.62mm_Socket,ExtensionIO
 U70,74HC377,Package_DIP:DIP-20_W7.62mm_Socket,ExtensionIO
 U71,74HC32,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
@@ -40,9 +37,6 @@ J6,MONO LINE OUT / EXTERNAL AMP,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54m
 C62,220n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,PSG
 C34,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C35,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
-C36,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
-C37,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
-C38,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C39,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C40,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C41,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower

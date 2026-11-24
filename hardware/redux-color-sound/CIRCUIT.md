@@ -10,13 +10,13 @@ KiCad에서 `integrated/8-Bit CPU 32k.kicad_pro`를 연다.
 
 | 시트 | 내용 |
 | --- | --- |
-| ExtensionIO | `0xFEE0..0xFEEF` 디코더, 제어 레지스터, 음원 데이터 래치, RAM inhibit 및 쓰기 plane 선택 |
+| ExtensionIO | ATF22V10C 단일 단 디코더(`0xFEE0..0xFEEF`, RAM `/CE`), 제어 레지스터, 음원 데이터 래치, 쓰기 plane 선택 |
 | PSG | SN76489AN, 독립 3.579545MHz 발진기, HCT 상태 버퍼, power-on reset, 하드웨어 mute, 모노 line-out |
 | Attribute | 별도 AS6C62256-55PCN, 세로 주소 위상 +4, 데이터 버퍼, 색상 표시 래치, pending write plane 래치 |
 | Palette | 표시 영역 판정/유지, 전경·배경 선택, 흑백 bypass, AC244 RGBI 출력 버퍼, 저항 DAC |
 | ExtensionPower | IC별 100nF, 발진기 100nF, 10µF bulk capacitor |
 
-추가 부품은 **IC 26개를 포함해 67개**다. 단자·수동소자를 포함한 수량이며,
+추가 부품은 **IC 23개를 포함해 61개**다(2026-11-24 PLD 디코드 반영 후). 단자·수동소자를 포함한 수량이며,
 전체 보드 BOM이나 예비품 수량은 아니다. `integrated/extension-bom.csv`를 참고한다.
 구매 가능한 정확한 주문번호·속도 등급·제조사별 최대값은 제조 전에 확정해야 한다.
 온보드 스피커 앰프, SD, 조이스틱, TTS, 프로그래머는 추가하지 않았다.
@@ -34,9 +34,36 @@ KiCad에서 `integrated/8-Bit CPU 32k.kicad_pro`를 연다.
 - Attribute 쓰기 모드에서는 해당 CPU RAM 창을 inhibit해 기존 비트맵 RAM mirror를 보존한다.
 - U70은 별도 clock gate 대신 **enable이 있는 HC377**을 사용한다.
   기존 `CLK_MAR`를 직접 사용하며 주소 디코더 출력으로 클록을 만들지 않는다.
-- U79의 남는 XOR 게이트 두 개를 반전기로 재사용해 U73 패키지는 생략했다.
+- U79의 XOR 하나를 `RGB_BLANK` 반전기로 쓴다. PLD 도입 후 U79에는 XOR 두 개가 남는다.
 
-`U73`, `C43`은 의도적으로 비어 있는 참조번호다. 번호를 메우기 위해 부품을 추가하지 않았다.
+`U66`–`U68`, `U73`과 각 바이패스 `C36`–`C38`, `C43`은 의도적으로 비어 있는 참조번호다.
+U66–U68은 PLD 도입으로 제거되었다. 번호를 메우기 위해 부품을 추가하지 않았다.
+
+## 주소 디코드 PLD (U64, 2026-11-24)
+
+[TIMING_REVIEW.md](TIMING_REVIEW.md) 조건 4에 따라, 기존 HC04→HC30→HC04→HC11→HC32→HC32
+6단 체인(U64 HC30, U65 일부, U66 HC138, U67/U68 HC11, U71 일부, U79 일부, U72 일부)을
+**ATF22V10C 한 개**로 바꿨다. 이제 RAM `/CE`는 주소 버스에서 PLD 한 단을 거친다.
+
+| 출력 핀 | 넷 | 식 |
+| --- | --- | --- |
+| 23 | `CS_RAM_INH` → U34 `/CE` | `INH_EXT + HIT + ATTR_MODE·A14·/A15` |
+| 22 | `CS_STATUS_SEL_N` → U72 OR(`~RO`) → U75 OE | `/(HIT·/A2·/A1·A0)` |
+| 21 | `CS_CTRL_SEL_N` → U69 E1 (E2 = `~RI`) | `/(HIT·/A2·A1·/A0)` |
+| 20 | `CS_SND_EN_N` → U70 E | `/(HIT·/A2·/A1·/A0·/~RI)` |
+
+`HIT = A15..A9 · /A8 · A7·A6·A5 · /A4`이며 A3은 디코드하지 않는다. 이는 기존에 문서화한 alias와 같다.
+입력은 A0–A2, A4–A15, `ATTR_MODE`, `INH_EXT`, `~RI`로 18개, 출력은 4개다. 22개 신호 핀을 모두 쓴다.
+`~RO`는 PLD 밖 U72에 남겼다. 상태 OE는 RAM `/CE` 경로가 아니다.
+
+- **식의 단일 원본:** `extension_design.py`의 `PLD_EQUATIONS`.
+  생성기가 `integrated/extension-decode.pld`(GALasm/galette 형식, GAL mode 5892 fuse)를 쓰고,
+  테스트가 이 파일과 manifest, U64 핀 연결을 대조한다.
+- **아직 컴파일하지 않았다.** JEDEC 생성(galette 등)과 프로그래머 기록은 별도 단계다.
+  Power-down(PD) fuse를 켠 JEDEC를 쓰면 안 된다. PD를 켜면 pin 4(A7)가 PD 핀이 된다.
+- **부품:** DIP 24핀 300mil. 데이터시트 주문표의 PDIP는 `-7PC`(7.5ns, 0–70°C),
+  `-10PC/-10PI`, `-15PC/-15PI`다. 유통사는 무연 `-7PX`/`-10PU`도 표기한다. 구매 전에 확인한다.
+- **전원:** ICC 85mA typ, 130mA max(-7/-10). 기존 HC 게이트보다 훨씬 크므로 전류 예산(조건 8)에 넣는다.
 
 ## 메모리맵과 제어
 
@@ -123,14 +150,14 @@ J6은 **외부 앰프용 모노 line-out**(1=신호, 2=GND)이다. 스피커나 
 
 - KiCad 10.0.7 ERC: **0건**.
 - PCB physical DRC 및 schematic parity: **0건**.
-- **미배선 연결 386건**: DRC 전체 결과는 실패(종료 코드 5)다. 제외하지 않았다.
-- 디지털/정적 검사 **24개 통과**. 모든 CPU 주소, 전체 논리 raster의 색상 주소·blanking,
+- **미배선 연결 360건**(PLD 반영 후, 이전 386건): DRC 전체 결과는 실패(종료 코드 5)다. 제외하지 않았다.
+- 디지털/정적 검사 **31개 통과**(배선 채택 검사 1개 skip). 모든 CPU 주소, 전체 논리 raster의 색상 주소·blanking,
   음원 bit 순서, 두 SRAM 쓰기 plane 상호 배제, 실제 netlist의 핀 연결을 검사했다.
 - 원래 회로의 연결 그룹은 의도한 인터페이스 7개 pad를 제외하면 같다.
 - 기존 네트 4개의 분리가 필요해 관련 track/via **26개**를 제거했다.
   대상은 INH, VGA WE, 기존 RGB 공통선, 기존 pixel–R6 선뿐이다.
   CPU 클록/ALU/명령 경로의 기존 배선을 지운 것이 아니다.
-- 새 부품 67개의 footprint와 실제 pad/net를 PCB에 반영했다.
+- 새 부품 61개의 footprint와 실제 pad/net를 PCB에 반영했다.
   현재 넓힌 외형·shelf 배치는 **임시 검토 배치**이지 최종 보드 크기나 구매 규격이 아니다.
 
 ## 아직 통과하지 않은 조건
@@ -140,7 +167,7 @@ J6은 **외부 앰프용 모노 line-out**(1=신호, 2=GND)이다. 스피커나 
 > **구조적 회귀**로 판정했다. 5는 배치를 압축한 뒤 다시 계산해야 하고, 6·7은 통과다.
 > 회로 수정 전에는 재배선하지 않는다.
 
-1. 새 회로의 실제 배선 386개 연결, ground plane 확장, compact 재배치 및 제조 DRC.
+1. 새 회로의 실제 배선 360개 연결, ground plane 확장, compact 재배치 및 제조 DRC.
 2. SRAM 주소 settle/접근/출력 enable와 16MHz capture의 setup/hold 최대값.
 3. VREG 캡처와 plane FF의 전환, WE 펄스 폭·non-overlap/글리치 검증.
 4. 새 INH 디코더가 CPU RAM 접근의 기존 시간 여유 안에 도착하는지 확인.

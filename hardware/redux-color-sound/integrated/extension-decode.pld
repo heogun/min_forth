@@ -1,0 +1,25 @@
+GAL22V10
+CSDECODE
+
+A4 A5 A6 A7 A8 A9 A10 A11 A12 A13 A14 GND
+A15 A0 A1 A2 ATTRMD INHEXT RI SNDEN CTLSEL STSEL RAMINH VCC
+
+RAMINH = INHEXT
+    + A15 * A14 * A13 * A12 * A11 * A10 * A9 * /A8 * A7 * A6 * A5 * /A4
+    + ATTRMD * A14 * /A15
+RAMINH.E = VCC
+
+/STSEL = A15 * A14 * A13 * A12 * A11 * A10 * A9 * /A8 * A7 * A6 * A5 * /A4 * /A2 * /A1 * A0
+STSEL.E = VCC
+
+/CTLSEL = A15 * A14 * A13 * A12 * A11 * A10 * A9 * /A8 * A7 * A6 * A5 * /A4 * /A2 * A1 * /A0
+CTLSEL.E = VCC
+
+/SNDEN = A15 * A14 * A13 * A12 * A11 * A10 * A9 * /A8 * A7 * A6 * A5 * /A4 * /A2 * /A1 * /A0 * /RI
+SNDEN.E = VCC
+
+DESCRIPTION
+
+CS-DRAFT-1 single-level decode (U64). Generated from extension_design.py;
+edit the Python equations, not this file. RI is the active-low ~{RI} net.
+NOT compiled or hardware-tested here; see TIMING_REVIEW.md.
