@@ -270,19 +270,19 @@
       "footprint": "Package_DIP:DIP-16_W7.62mm_Socket",
       "sheet": "Attribute",
       "pins": {
-        "7": "CS_VA8",
-        "5": "CS_VA9",
-        "3": "CS_VA10",
-        "14": "CS_VA11",
-        "12": "CS_VA12",
+        "7": "CS_V4",
+        "5": "CS_V8",
+        "3": "CS_V16",
+        "14": "CS_V32",
+        "12": "CS_V64",
         "6": "GND",
         "2": "GND",
         "15": "GND",
         "11": "GND",
-        "4": "CS_CA6",
-        "1": "CS_CA7",
-        "13": "CS_CA8",
-        "10": "CS_CA9",
+        "4": "CS_SCA6",
+        "1": "CS_SCA7",
+        "13": "CS_SCA8",
+        "10": "CS_SCA9",
         "9": "CS_ROW_CARRY",
         "8": "GND",
         "16": "+5V"
@@ -296,8 +296,8 @@
       "sheet": "Attribute",
       "pins": {
         "1": "CS_ROW_CARRY",
-        "2": "CS_VA13",
-        "3": "CS_CA10",
+        "2": "CS_V128",
+        "3": "CS_SCA10",
         "9": "CS_ACTIVE_LATCH",
         "10": "+5V",
         "8": "CS_RGB_BLANK",
@@ -307,6 +307,32 @@
         "13": "GND",
         "7": "GND",
         "14": "+5V"
+      }
+    },
+    {
+      "ref": "U66",
+      "symbol": "HC574",
+      "value": "74HC574",
+      "footprint": "Package_DIP:DIP-20_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "~{VREG_OE}",
+        "11": "CS_VREG_CP",
+        "2": "A9",
+        "3": "A10",
+        "4": "A11",
+        "5": "A12",
+        "6": "A13",
+        "19": "CS_CA6",
+        "18": "CS_CA7",
+        "17": "CS_CA8",
+        "16": "CS_CA9",
+        "15": "CS_CA10",
+        "7": "GND",
+        "8": "GND",
+        "9": "GND",
+        "20": "+5V",
+        "10": "GND"
       }
     },
     {
@@ -418,8 +444,8 @@
       "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
       "sheet": "Palette",
       "pins": {
-        "1": "CS_VA3",
-        "2": "CS_VA2",
+        "1": "CS_H8",
+        "2": "CS_H4",
         "3": "CS_H12",
         "4": "GND",
         "5": "GND",
@@ -438,13 +464,13 @@
       "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
       "sheet": "Palette",
       "pins": {
-        "2": "CS_CA7",
-        "3": "CS_CA8",
-        "4": "CS_CA9",
-        "5": "CS_CA10",
+        "2": "CS_SCA7",
+        "3": "CS_SCA8",
+        "4": "CS_SCA9",
+        "5": "CS_SCA10",
         "1": "CS_VBAD",
-        "9": "CS_VA5",
-        "10": "CS_VA4",
+        "9": "CS_H32",
+        "10": "CS_H16",
         "11": "CS_H12",
         "12": "GND",
         "13": "CS_HLOW",
@@ -480,11 +506,11 @@
       "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
       "sheet": "Palette",
       "pins": {
-        "1": "CS_VA5",
-        "2": "CS_VA4",
-        "3": "CS_VA3",
-        "4": "CS_VA2",
-        "5": "CS_VA1",
+        "1": "CS_H32",
+        "2": "CS_H16",
+        "3": "CS_H8",
+        "4": "CS_H4",
+        "5": "CS_H2",
         "6": "+5V",
         "11": "+5V",
         "12": "+5V",
@@ -623,6 +649,61 @@
       "pins": {
         "1": "CS_DAC_BI",
         "2": "CS_VGA_B"
+      }
+    },
+    {
+      "ref": "R37",
+      "symbol": "R",
+      "value": "470",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_SCA6",
+        "2": "CS_CA6"
+      }
+    },
+    {
+      "ref": "R38",
+      "symbol": "R",
+      "value": "470",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_SCA7",
+        "2": "CS_CA7"
+      }
+    },
+    {
+      "ref": "R39",
+      "symbol": "R",
+      "value": "470",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_SCA8",
+        "2": "CS_CA8"
+      }
+    },
+    {
+      "ref": "R40",
+      "symbol": "R",
+      "value": "470",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_SCA9",
+        "2": "CS_CA9"
+      }
+    },
+    {
+      "ref": "R41",
+      "symbol": "R",
+      "value": "470",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_SCA10",
+        "2": "CS_CA10"
       }
     },
     {
@@ -826,6 +907,17 @@
     },
     {
       "ref": "C49",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C36",
       "symbol": "C",
       "value": "100n",
       "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
@@ -1062,9 +1154,9 @@
       "op": "XOR",
       "inputs": [
         "CS_ROW_CARRY",
-        "CS_VA13"
+        "CS_V128"
       ],
-      "output": "CS_CA10",
+      "output": "CS_SCA10",
       "ref": "U79",
       "input_pins": [
         "1",
@@ -1089,8 +1181,8 @@
     {
       "op": "AND",
       "inputs": [
-        "CS_VA3",
-        "CS_VA2"
+        "CS_H8",
+        "CS_H4"
       ],
       "output": "CS_H12",
       "ref": "U84",
@@ -1103,10 +1195,10 @@
     {
       "op": "NOR",
       "inputs": [
-        "CS_CA7",
-        "CS_CA8",
-        "CS_CA9",
-        "CS_CA10"
+        "CS_SCA7",
+        "CS_SCA8",
+        "CS_SCA9",
+        "CS_SCA10"
       ],
       "output": "CS_VBAD",
       "ref": "U85",
@@ -1121,8 +1213,8 @@
     {
       "op": "NOR",
       "inputs": [
-        "CS_VA5",
-        "CS_VA4",
+        "CS_H32",
+        "CS_H16",
         "CS_H12",
         "GND"
       ],
@@ -1175,11 +1267,11 @@
     {
       "op": "NAND",
       "inputs": [
-        "CS_VA5",
-        "CS_VA4",
-        "CS_VA3",
-        "CS_VA2",
-        "CS_VA1",
+        "CS_H32",
+        "CS_H16",
+        "CS_H8",
+        "CS_H4",
+        "CS_H2",
         "+5V",
         "+5V",
         "+5V"

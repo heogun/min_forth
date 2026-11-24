@@ -1806,7 +1806,9 @@ nfx_put:
         RTS
 
 ; ( attr col row -- )  attr = background<<4 | foreground, each I:R:G:B.
-; Cell (col,row) is written through bitmap address 0x430c + row*512 + col.
+; Cell (col,row) is written through bitmap address 0x440c + row*512 + col:
+; the cell's line 4, because the CPU write path latches A13..A9 as the row
+; with no +4 phase adder (hardware TIMING_REVIEW.md 11).
 ; Out-of-range cells are ignored so no write escapes the 0x4000 window.
 wATTRSTORE:
         LZP zSP,0x30 SDZ zTMP           ; row
@@ -1817,7 +1819,7 @@ wATTRSTORE:
         SIZ 2,zSP
         LDZ zTMP
         CPI 30 BCS nfa_skip
-        LL1 ADI 0x43 SDZ zPTR+1
+        LL1 ADI 0x44 SDZ zPTR+1
         LDZ zTMP2
         CPI 50 BCS nfa_skip
         ADI 0x0c SDZ zPTR
@@ -1832,7 +1834,7 @@ wATTRFILL:
         LZP zSP,0x30 SDZ zT0
         SIZ 2,zSP
         LDZ zXCTL ORI 0x04 SDB 0xfee2
-        MIV 0x430c,zPTR
+        MIV 0x440c,zPTR
         MIZ 30,zT1
 nfaf_row:
         MIZ 50,zT2

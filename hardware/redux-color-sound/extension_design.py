@@ -106,13 +106,22 @@ def design():
         1: 'GND', 2: 'GND', 23: 'GND', 26: 'GND', 20: 'GND',
         22: 'CS_VGA_GET_N', 27: 'CS_ATTR_WE_N',
         **dict(zip([11, 12, 13, 15, 16, 17, 18, 19], [f'CS_ATTR_D{i}' for i in range(8)]))}, attr)
+    # Attribute row address (TIMING_REVIEW.md 11절).  The +4 phase adder works on
+    # the scan counter outputs *before* the 470R VA isolation resistors, which are
+    # stable for a whole fetch period, and reaches U77 through its own 470R network
+    # (R37-R41).  CPU writes bypass the adder: U66 latches A9..A13 with the same
+    # clock/OE as VREG U41, so software writes a cell's lower four lines.
     add('U78', 'HC283', '74HC283', {
-        7: 'CS_VA8', **dict(zip([5, 3, 14, 12], [f'CS_VA{i}' for i in range(9, 13)])),
+        7: 'CS_V4', **dict(zip([5, 3, 14, 12], ['CS_V8', 'CS_V16', 'CS_V32', 'CS_V64'])),
         6: 'GND', 2: 'GND', 15: 'GND', 11: 'GND',
-        **dict(zip([4, 1, 13, 10], [f'CS_CA{i}' for i in range(6, 10)])),
+        **dict(zip([4, 1, 13, 10], [f'CS_SCA{i}' for i in range(6, 10)])),
         9: 'CS_ROW_CARRY'}, attr)
     xor = add('U79', 'HC86', '74HC86', {}, attr)
-    logic(xor, 'XOR', [(1, 'CS_ROW_CARRY'), (2, 'CS_VA13')], (3, 'CS_CA10'))
+    logic(xor, 'XOR', [(1, 'CS_ROW_CARRY'), (2, 'CS_V128')], (3, 'CS_SCA10'))
+    add('U66', 'HC574', '74HC574', {
+        1: 'CS_VREG_OE_N', 11: 'CS_VREG_CP',
+        **dict(zip([2, 3, 4, 5, 6], [f'CS_A{i}' for i in range(9, 14)])),
+        **dict(zip([19, 18, 17, 16, 15], [f'CS_CA{i}' for i in range(6, 11)]))}, attr)
     logic(xor, 'XOR', [(9, 'CS_ACTIVE_LATCH'), (10, '+5V')], (8, 'CS_RGB_BLANK'))
     add('U80', 'HC245', '74HC245', {
         1: '+5V', 19: 'CS_VREG_OE_N',
@@ -131,10 +140,10 @@ def design():
         7: '16MHz', 9: 'CS_VGA_GET_N', 10: 'GND', 11: 'GND', 12: 'GND',
         13: 'CS_COLOR_EN', 14: 'CS_ACTIVE', 15: 'CS_RESET'}, palette)
     h_and = add('U84', 'HC08', '74HC08', {}, palette)
-    logic(h_and, 'AND', [(1, 'CS_VA3'), (2, 'CS_VA2')], (3, 'CS_H12'))
+    logic(h_and, 'AND', [(1, 'CS_H8'), (2, 'CS_H4')], (3, 'CS_H12'))
     nor1 = add('U85', 'HC4002', '74HC4002', {}, palette)
-    logic(nor1, 'NOR', list(zip([2, 3, 4, 5], [f'CS_CA{i}' for i in range(7, 11)])), (1, 'CS_VBAD'))
-    logic(nor1, 'NOR', [(9, 'CS_VA5'), (10, 'CS_VA4'), (11, 'CS_H12'), (12, 'GND')], (13, 'CS_HLOW'))
+    logic(nor1, 'NOR', list(zip([2, 3, 4, 5], [f'CS_SCA{i}' for i in range(7, 11)])), (1, 'CS_VBAD'))
+    logic(nor1, 'NOR', [(9, 'CS_H32'), (10, 'CS_H16'), (11, 'CS_H12'), (12, 'GND')], (13, 'CS_HLOW'))
     nor2 = add('U86', 'HC4002', '74HC4002', {}, palette)
     logic(nor2, 'NOR', [(2, 'CS_HHIGH_OK'), (3, 'CS_HHIGH_OK'),
                        (4, 'CS_HHIGH_OK'), (5, 'CS_HHIGH_OK')], (1, 'CS_HHIGH_BAD'))
@@ -142,7 +151,7 @@ def design():
                        (11, 'CS_HHIGH_BAD'), (12, 'CS_V256')], (13, 'CS_ACTIVE'))
     h_nand = add('U87', 'HC30', '74HC30', {}, palette)
     logic(h_nand, 'NAND', list(zip([1, 2, 3, 4, 5, 6, 11, 12],
-          [f'CS_VA{i}' for i in range(5, 0, -1)] + ['+5V'] * 3)), (8, 'CS_HHIGH_OK'))
+          ['CS_H32', 'CS_H16', 'CS_H8', 'CS_H4', 'CS_H2'] + ['+5V'] * 3)), (8, 'CS_HHIGH_OK'))
     mux_in0 = [2, 5, 11, 14]
     mux_in1 = [3, 6, 10, 13]
     mux_out = [4, 7, 9, 12]
@@ -169,6 +178,8 @@ def design():
         ('R30', '1.5k', 'CS_DAC_RI', 'CS_VGA_R'), ('R31', '1.5k', 'CS_DAC_GI', 'CS_VGA_G'),
         ('R32', '1.5k', 'CS_DAC_BI', 'CS_VGA_B')]:
         resistor(ref, value, a, b, palette)
+    for i in range(5):  # scan-side attribute row onto the shared CS_CA bus
+        resistor(f'R{37+i}', '470', f'CS_SCA{6+i}', f'CS_CA{6+i}', attr)
     resistor('R33', '4.7k', '+5V', 'CS_SN_READY', snd)
     resistor('R34', '1k', 'CS_AUDIO_AC', 'CS_LINE_OUT', snd)
     resistor('R35', '10k', 'CS_LINE_OUT', 'GND', snd)
@@ -250,6 +261,9 @@ SOURCES = {
     **{f'CS_A{i}': ('RAM.kicad_sch', f'U{27 if i < 4 else 29 if i < 8 else 30 if i < 12 else 32}',
                     str([14, 13, 12, 11][i % 4])) for i in range(16)},
     **{f'CS_BUS{i}': ('VGA.kicad_sch', 'U38', str([5, 9, 4, 8, 3, 7, 2, 6][i])) for i in range(8)},
+    # Scan counter outputs before the 470R VA isolation resistors.
+    **{f'CS_H{1 << i}': ('VGA.kicad_sch', 'U37', str(i)) for i in range(1, 6)},
+    **{f'CS_V{1 << i}': ('VGA.kicad_sch', 'U39', str(i-1)) for i in range(2, 8)},
     **{f'CS_VA{i}': ('VGA.kicad_sch', 'U40' if i < 8 else 'U41',
                      str([19, 18, 17, 16, 15, 14, 13, 12][i % 8])) for i in range(14)},
     **{f'CS_VDATA{i}': ('VGA.kicad_sch', 'U38', str([16, 12, 17, 13, 18, 14, 19, 15][i])) for i in range(8)},

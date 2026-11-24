@@ -288,7 +288,9 @@ def modify_core(destination):
         if filename == 'VGA.kicad_sch':
             renames = {**{f'B{i}': f'CS_VDATA{i}' for i in range(8)},
                        **{f'V_A{i}': f'CS_VA{i}' for i in range(14)},
-                       'VREG_CP': 'CS_VREG_CP', 'V256': 'CS_V256', '~{VGA_WE}': 'CS_VGA_WE_RAW'}
+                       'VREG_CP': 'CS_VREG_CP', 'V256': 'CS_V256', '~{VGA_WE}': 'CS_VGA_WE_RAW',
+                       **{f'H{1 << i}': f'CS_H{1 << i}' for i in range(1, 6)},
+                       **{f'V{1 << i}': f'CS_V{1 << i}' for i in range(2, 8)}}
         elif filename == 'RAM.kicad_sch':
             renames = {'INH': 'CS_INH_EXT'}
         deleted = {(a, b) for a, b, _ in edits}
@@ -367,12 +369,12 @@ def generate(source, destination):
                                        else 35 + math.ceil(len(large)/3)*80 + (i // 5)*28)
             x, y = round(x/1.27)*1.27, round(y/1.27)*1.27
             # Sound has many passives: put them on a separate sub-sheet.
-            if y > (390 if sheet == 'Palette' else 270):
+            if y > (390 if sheet in ('Palette', 'Attribute') else 270):
                 raise ValueError(f'Sheet {sheet} overflow: {part.ref} at y={y}')
             additions += instance(part, x, y, definitions[part.symbol][1],
                                   definitions[part.symbol][2], root_uuid, pins)
         text = f'''(kicad_sch (version 20250114) (generator "eeschema")
-          (uuid {q(uid('document:'+sheet))}) (paper {q('A2' if sheet == 'Palette' else 'A3')})
+          (uuid {q(uid('document:'+sheet))}) (paper {q('A2' if sheet in ('Palette', 'Attribute') else 'A3')})
           (title_block (title {q(sheet+' - Color/SN76489 integration DRAFT')})
              (date "2026-10-30") (rev "CS-DRAFT-1")
              (comment 1 "NOT FOR FABRICATION: PCB routing/timing validation pending")

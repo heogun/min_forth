@@ -516,13 +516,13 @@ fn attribute_mode_inhibits_cpu_window_and_writes_attribute_plane() {
     let mut m = flash_machine();
     m.bank = 0xff;
     m.memory_write(0xfee2, super::extension::CONTROL_ATTR);
-    m.memory_write(0x430c, 0x1e);
-    assert_eq!(m.peek_ram(0x430c), 0);
-    assert_eq!(m.memory_read(0x430c), 0xff);
+    m.memory_write(0x440c, 0x1e);
+    assert_eq!(m.peek_ram(0x440c), 0);
+    assert_eq!(m.memory_read(0x440c), 0xff);
     tick_inputs(&mut m, 2);
     let index = video::attribute_index(12, 12);
     assert_eq!(m.video.attributes()[index], 0x1e);
-    assert_eq!(m.video.vram()[0x30c], 0);
+    assert_eq!(m.video.vram()[0x40c], 0);
 }
 
 #[test]
@@ -530,7 +530,7 @@ fn colour_frame_uses_attribute_nibbles_and_monochrome_bypass() {
     let mut m = flash_machine();
     m.bank = 0xff;
     m.memory_write(0xfee2, super::extension::CONTROL_ATTR);
-    m.memory_write(0x430c, 0x0f); // cell (0,0): white foreground, black background
+    m.memory_write(0x440c, 0x0f); // cell (0,0) lower half: white fg, black bg
     tick_inputs(&mut m, 2);
     m.memory_write(0xfee2, super::extension::CONTROL_COLOR);
     m.memory_write(0x430c, 0x01); // one lit pixel in the bitmap plane

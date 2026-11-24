@@ -16,7 +16,7 @@ KiCad에서 `integrated/8-Bit CPU 32k.kicad_pro`를 연다.
 | Palette | 표시 영역 판정/유지, 전경·배경 선택, 흑백 bypass, AC244 RGBI 출력 버퍼, 저항 DAC |
 | ExtensionPower | IC별 100nF, 발진기 100nF, 10µF bulk capacitor |
 
-추가 부품은 **IC 23개를 포함해 61개**다(2026-11-24 PLD 디코드 반영 후). 단자·수동소자를 포함한 수량이며,
+추가 부품은 **IC 24개를 포함해 68개**다(2026-11-24 PLD 디코드와 Attribute 주소 경로 수정 반영 후). 단자·수동소자를 포함한 수량이며,
 전체 보드 BOM이나 예비품 수량은 아니다. `integrated/extension-bom.csv`를 참고한다.
 구매 가능한 정확한 주문번호·속도 등급·제조사별 최대값은 제조 전에 확정해야 한다.
 온보드 스피커 앰프, SD, 조이스틱, TTS, 프로그래머는 추가하지 않았다.
@@ -26,7 +26,12 @@ KiCad에서 `integrated/8-Bit CPU 32k.kicad_pro`를 연다.
 초기 문서의 간접 Attribute 주소/데이터 포트 대신 **기존 영상 VREG를 공유**한다.
 별도 CPU 주소 래치·주소 MUX·쓰기 대기열을 중복 추가하지 않는다.
 
-- U40/U41 영상 주소를 Attribute SRAM 주소에도 사용한다.
+- Attribute SRAM 열 주소(A0–A5)는 VA0–VA5를 그대로 쓴다. 행 주소(A6–A10)는 별도 `CS_CA` 버스로 받는다.
+  - 표시 쪽: U78 adder와 U79 XOR가 470Ω 저항 앞의 스캔 카운터 출력(`CS_V4..V128`)에서 +4 위상 행을 계산한다.
+    결과는 R37–R41(470Ω)을 거쳐 `CS_CA`로 간다. 기존 VA 버스의 저항 분리 방식과 같다.
+  - CPU 쓰기 쪽: U66 HC574가 A9..A13을 U41과 같은 클록(VREG_CP)·OE로 래치해 `CS_CA`를 직접 구동한다.
+  - Palette 표시 영역 판정도 저항 앞의 카운터 출력(`CS_H2..H32`, `CS_SCA7..10`)을 쓴다.
+    그래서 확장 회로는 VA6–VA13에 부하를 주지 않고, VA0–VA5에는 U77 입력 하나만 더한다.
 - U38의 보류된 영상 데이터를 U80으로 Attribute 데이터 버스에 전달한다.
 - U82는 VREG가 쓰기를 캡처하는 시점의 plane을 저장한다. 제어 bit를 나중에
   바꾸더라도 이미 캡처한 쓰기의 목적 plane은 바뀌지 않는다.
@@ -36,8 +41,8 @@ KiCad에서 `integrated/8-Bit CPU 32k.kicad_pro`를 연다.
   기존 `CLK_MAR`를 직접 사용하며 주소 디코더 출력으로 클록을 만들지 않는다.
 - U79의 XOR 하나를 `RGB_BLANK` 반전기로 쓴다. PLD 도입 후 U79에는 XOR 두 개가 남는다.
 
-`U66`–`U68`, `U73`과 각 바이패스 `C36`–`C38`, `C43`은 의도적으로 비어 있는 참조번호다.
-U66–U68은 PLD 도입으로 제거되었다. 번호를 메우기 위해 부품을 추가하지 않았다.
+`U67`, `U68`, `U73`과 각 바이패스 `C37`, `C38`, `C43`은 의도적으로 비어 있는 참조번호다.
+U67·U68은 PLD 도입으로 제거되었고, U66은 Attribute 행 래치(HC574)로 다시 쓴다. 번호를 메우기 위해 부품을 추가하지 않았다.
 
 ## 주소 디코드 PLD (U64, 2026-11-24)
 
@@ -95,7 +100,7 @@ Forth dictionary/프로그램은 이 16바이트 영역을 RAM으로 사용하�
 ### Attribute 갱신
 
 1. 제어 bit 2를 설정한다.
-2. `0x4000..0x7fff`에 색상 바이트를 쓴다. 해당 VREG 주소에서 한 8×8 영역을 선택한다.
+2. `0x4000..0x7fff`에 색상 바이트를 쓴다. 행은 주소 A13..A9(= `y >> 3`)로 정해진다.
 3. 마지막 보류 쓰기의 commit 시간을 확보한 뒤 bit 2를 해제한다.
 4. Attribute 초기화가 끝난 뒤에만 bit 0을 설정한다.
 
@@ -103,11 +108,13 @@ Forth dictionary/프로그램은 이 16바이트 영역을 RAM으로 사용하�
 
 ```text
 ViewPort cell: column=0..49, row=0..29
-쓰기 주소 = 0x430c + row*512 + column
+쓰기 주소 = 0x440c + row*512 + column      (cell의 아래 네 줄 중 첫 줄)
 Attribute SRAM index = (row+2)*64 + column+12
 ```
 
-같은 cell의 8개 비트맵 줄은 동일 Attribute 주소를 가리킨다. 프로그램은 색상을
+**쓰기 경로에는 +4 위상 adder가 없다**(2026-11-24, [TIMING_REVIEW.md](TIMING_REVIEW.md) 11절).
+cell의 아래 네 줄(y = 16+8·row..19+8·row)만 그 cell을 가리킨다. 위 네 줄에 쓰면 한 행 위의 Attribute가 바뀐다.
+표시(스캐너) 쪽은 그대로 +4 위상을 적용하므로, cell의 8줄 모두 같은 색으로 보인다. 프로그램은 색상을
 cell당 한 번만 기록하면 된다. 32KB SRAM 중 2KB만 사용하고 나머지 주소 입력은 GND다.
 
 Attribute 모드가 켜진 동안 CPU의 `0x4000..0x7fff` **읽기도 inhibit**된다.
@@ -150,14 +157,14 @@ J6은 **외부 앰프용 모노 line-out**(1=신호, 2=GND)이다. 스피커나 
 
 - KiCad 10.0.7 ERC: **0건**.
 - PCB physical DRC 및 schematic parity: **0건**.
-- **미배선 연결 360건**(PLD 반영 후, 이전 386건): DRC 전체 결과는 실패(종료 코드 5)다. 제외하지 않았다.
-- 디지털/정적 검사 **31개 통과**(배선 채택 검사 1개 skip). 모든 CPU 주소, 전체 논리 raster의 색상 주소·blanking,
+- **미배선 연결 384건**(Attribute 경로 수정 후): DRC 전체 결과는 실패(종료 코드 5)다. 제외하지 않았다.
+- 디지털/정적 검사 **33개 통과**(배선 채택 검사 1개 skip). 모든 CPU 주소, 전체 논리 raster의 색상 주소·blanking,
   음원 bit 순서, 두 SRAM 쓰기 plane 상호 배제, 실제 netlist의 핀 연결을 검사했다.
 - 원래 회로의 연결 그룹은 의도한 인터페이스 7개 pad를 제외하면 같다.
 - 기존 네트 4개의 분리가 필요해 관련 track/via **26개**를 제거했다.
   대상은 INH, VGA WE, 기존 RGB 공통선, 기존 pixel–R6 선뿐이다.
   CPU 클록/ALU/명령 경로의 기존 배선을 지운 것이 아니다.
-- 새 부품 61개의 footprint와 실제 pad/net를 PCB에 반영했다.
+- 새 부품 68개의 footprint와 실제 pad/net를 PCB에 반영했다.
   현재 넓힌 외형·shelf 배치는 **임시 검토 배치**이지 최종 보드 크기나 구매 규격이 아니다.
 
 ## 아직 통과하지 않은 조건
@@ -167,7 +174,7 @@ J6은 **외부 앰프용 모노 line-out**(1=신호, 2=GND)이다. 스피커나 
 > **구조적 회귀**로 판정했다. 5는 배치를 압축한 뒤 다시 계산해야 하고, 6·7은 통과다.
 > 회로 수정 전에는 재배선하지 않는다.
 
-1. 새 회로의 실제 배선 360개 연결, ground plane 확장, compact 재배치 및 제조 DRC.
+1. 새 회로의 실제 배선 384개 연결, ground plane 확장, compact 재배치 및 제조 DRC.
 2. SRAM 주소 settle/접근/출력 enable와 16MHz capture의 setup/hold 최대값.
 3. VREG 캡처와 plane FF의 전환, WE 펄스 폭·non-overlap/글리치 검증.
 4. 새 INH 디코더가 CPU RAM 접근의 기존 시간 여유 안에 도착하는지 확인.

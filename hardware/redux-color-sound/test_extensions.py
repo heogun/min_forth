@@ -180,16 +180,49 @@ class ExtensionTests(unittest.TestCase):
             self.assertEqual(equations[target], expected, net)
 
     def test_attribute_row_phase_and_active_window_for_entire_raster(self):
+        # Scan side works on the counter outputs before the 470R VA resistors.
         for y in range(260):
             for column in range(64):
-                address = ((y & 255) << 6) | column
-                inputs = {f'CS_VA{i}': bool(address & (1 << i)) for i in range(14)}
+                inputs = {f'CS_H{1 << i}': bool(column & (1 << i)) for i in range(1, 6)}
+                inputs.update({f'CS_V{1 << k}': bool(y & (1 << k)) for k in range(2, 8)})
                 inputs['CS_V256'] = y >= 256
                 result = evaluate(self.manifest, inputs)
-                row = sum(int(result[f'CS_CA{i}']) << (i-6) for i in range(6, 11))
+                row = sum(int(result[f'CS_SCA{i}']) << (i-6) for i in range(6, 11))
                 self.assertEqual(row, ((y+4) & 255) >> 3, (y, column))
                 self.assertEqual(bool(result['CS_ACTIVE']), 12 <= column < 62 and 12 <= y < 252,
                                  (y, column))
+
+    def test_attribute_address_paths_avoid_the_va_bus_adder(self):
+        # TIMING_REVIEW.md 11절: no adder between the VA bus and U77, and the
+        # extension no longer loads VA6..VA13.
+        u77, u66 = self.parts['U77']['pins'], self.parts['U66']['pins']
+        rows = {f'CS_CA{i}' for i in range(6, 11)}
+        self.assertEqual({n for n in u77.values() if n.startswith('CS_CA')}, rows)
+        self.assertFalse({n for n in u77.values() if n.startswith('CS_SCA')})  # only via R37-R41
+        self.assertEqual(self.netmap[('U66', '1')], self.netmap[('U41', '1')])   # same OE
+        self.assertEqual(self.netmap[('U66', '11')], self.netmap[('U41', '11')])  # same clock
+        for bit, (d, q) in enumerate(zip([2, 3, 4, 5, 6], [19, 18, 17, 16, 15])):
+            self.assertEqual(u66[str(d)], f'A{9+bit}')
+            self.assertEqual(u66[str(q)], f'CS_CA{6+bit}')
+        for i in range(5):
+            r = self.parts[f'R{37+i}']['pins']
+            self.assertEqual((r['1'], r['2'], self.parts[f'R{37+i}']['value']),
+                             (f'CS_SCA{6+i}', f'CS_CA{6+i}', '470'))
+        extension = {p['ref'] for p in self.manifest['parts']}
+        for i in range(6, 14):
+            loads = {ref for (ref, _), net in self.netmap.items() if net == f'CS_VA{i}'}
+            self.assertFalse(loads & extension, (i, loads & extension))
+
+    def test_cpu_attribute_write_targets_the_cell_lower_half(self):
+        # Write side has no adder: row = A13..A9 = y >> 3, so cell (col,row) is written
+        # through 0x440c + row*512 + col (cell lines 4..7), matching minforth ATTR!.
+        for row in range(30):
+            for col in range(50):
+                address = 0x440C + row*512 + col
+                y = ((address - 0x4000) >> 6) & 255
+                self.assertEqual((address >> 9) & 31, ((y + 4) & 255) >> 3)
+                self.assertTrue(12 + 8*row <= y < 20 + 8*row)
+                self.assertEqual((address - 0x4000) & 63, col + 12)
 
     def test_exactly_one_ram_write_plane_can_be_active(self):
         for raw in (False, True):

@@ -11,6 +11,12 @@
 //! the attribute byte at the same fetch as the bitmap byte, and U83 latches the
 //! active-window and colour-enable state.  The palette output is therefore
 //! derived from a coherent per-fetch snapshot, not from live late values.
+//!
+//! Attribute row addressing has two sources (hardware TIMING_REVIEW.md 11절):
+//! the scanner's +4 phase adder works on the counter outputs ahead of the VA
+//! isolation resistors, while CPU writes reach the attribute SRAM through U66,
+//! which latches A13..A9 directly with no adder.  A write therefore selects row
+//! `y >> 3`; software targets a cell's lower four lines (`0x440c + row*512 + col`).
 
 pub const SCAN_LINES: usize = 520;
 pub const FRAME_CPU_CYCLES: u64 = 64 * SCAN_LINES as u64 * 4;
@@ -122,9 +128,10 @@ pub fn attribute_index(y: usize, column: usize) -> usize {
     row * 64 + (va as usize & 63)
 }
 
+/// CPU write path: U66 latches A13..A9 as the attribute row, no phase adder.
 fn attribute_index_for_vreg(offset: u16) -> usize {
-    let offset = offset & 0x3fff;
-    attribute_index((offset >> 6) as usize, (offset & 63) as usize)
+    let offset = offset as usize & 0x3fff;
+    ((offset >> 9) & 31) * 64 + (offset & 63)
 }
 
 /// U84/U85/U86/U87 active-window decoder.
@@ -386,16 +393,40 @@ mod tests {
     #[test]
     fn attribute_write_plane_is_captured_per_write() {
         let mut v = Video::default();
-        v.capture_write(0x430c, 0x1e, true);
+        v.capture_write(0x440c, 0x1e, true);
         v.tick();
         v.tick();
         assert_eq!(v.attributes()[attribute_index(12, 12)], 0x1e);
-        assert_eq!(v.vram()[0x30c], 0);
+        assert_eq!(v.vram()[0x40c], 0);
         v.capture_write(0x430c, 0x2d, false);
         v.tick();
         v.tick();
         assert_eq!(v.vram()[0x30c], 0x2d);
         assert_eq!(v.attributes()[attribute_index(12, 12)], 0x1e);
+    }
+
+    #[test]
+    fn cpu_attribute_writes_use_a13_a9_without_the_scan_phase_adder() {
+        // Every cell's lower four lines select the same row the scanner shows;
+        // its upper four lines select the row above (no adder on the CPU path).
+        for row in 0..30usize {
+            for col in 0..50usize {
+                let mut v = Video::default();
+                let lower = 0x4000 + (16 + 8 * row) * 64 + 12 + col;
+                v.capture_write(lower as u16, 0x5a, true);
+                v.tick();
+                v.tick();
+                assert_eq!(
+                    v.attributes()[attribute_index(12 + 8 * row, 12 + col)],
+                    0x5a
+                );
+                let upper = 0x4000 + (12 + 8 * row) * 64 + 12 + col;
+                assert_eq!(
+                    attribute_index_for_vreg(upper as u16),
+                    (row + 1) * 64 + 12 + col
+                );
+            }
+        }
     }
 
     #[test]

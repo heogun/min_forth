@@ -71,7 +71,9 @@ strobe 중 데이터 래치를 바꾸는 것은 `protocol_errors`로 센다. `--
 
 - 2KB Attribute SRAM을 별도로 모델링한다. 한 바이트는
   `background[7:4] | foreground[3:0]`이고 각 니블은 `I:R:G:B`다.
-- 주소는 세로 위상 +4를 반영한 `((y + 4) & 255) >> 3` 행과 `x >> 3` 열이다.
+- 표시 주소는 세로 위상 +4를 반영한 `((y + 4) & 255) >> 3` 행과 `x >> 3` 열이다.
+- CPU 쓰기는 adder 없이 A13..A9(`y >> 3`)를 행으로 쓴다(하드웨어 U66, `TIMING_REVIEW.md` 11절).
+  따라서 cell `(column,row)`의 색은 `0x440c + row*512 + column`(cell의 아래 네 줄)에 쓴다.
   ViewPort 글자 `(column, row)`는 `(row + 2) * 64 + column + 12`에 대응한다.
 - 채널 값은 `(2 * C + I) / 3` 스케일의 3단계(0, 1/3, 2/3, 1)다.
 - Attribute 모드에서는 CPU의 `0x4000..0x7FFF` RAM 창이 inhibit된다. 쓰기는 기존

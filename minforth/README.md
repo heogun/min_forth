@@ -61,6 +61,8 @@ For the CS-DRAFT-1 board (`hardware/redux-color-sound/`, emulated by
 | `SILENCE` | `( -- )` | attenuation 15 on all four channels |
 
 `attr` is `background<<4 | foreground`, each nibble `I:R:G:B`.
+`ATTR!` writes through `0x440c + row*512 + col` (the cell's line 4): the board's
+CPU write path takes the attribute row straight from A13..A9 with no +4 adder.
 
 ```forth
 HEX 1E ATTRFILL 4F 0 0 ATTR! DECIMAL 1 COLOR

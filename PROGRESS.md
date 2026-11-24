@@ -23,7 +23,12 @@
   식은 `extension_design.py`가 단일 원본이며, `integrated/extension-decode.pld`(GALasm)를 생성한다.
 - 검증: KiCad ERC/physical DRC/parity 0건, 미배선 360건, 하드웨어 테스트 31 통과(1 skip).
   JEDEC 컴파일과 실기 측정은 하지 않았다.
-- 남은 일: Attribute 주소 adder 경로(조건 2·3), 배치 압축, 클록 분리. 그 뒤 재배선한다.
+- Attribute 주소 경로 수정(같은 날): 표시 쪽 +4 adder를 470Ω 앞의 카운터 출력으로 옮기고(R37–R41로 `CS_CA` 구동),
+  CPU 쓰기 쪽은 U66 HC574가 A9..A13을 U41과 같은 CP/OE로 래치하게 했다. 표시 창 판정도 카운터 출력을 쓴다.
+  VA6–13의 확장 부하가 사라졌다. CPU 쓰기 계약은 `0x440c + row*512 + col`로 바뀌었고,
+  커널 `ATTR!`/`ATTRFILL`과 `minredux-cs` 모델을 함께 바꿨다. 확장 부품은 68개(IC 24개),
+  하드웨어 테스트 33 통과, 미배선 384건. Rust 65+4, ext 7/7, Forth 50/50·ABORT·P2를 두 에뮬레이터에서 통과했다.
+- 남은 일: 배치 압축, 클록 분리, WE 경로 OR 단의 hold 측정. 그 뒤 재배선한다.
 
 ### 컬러·SN76489 Forth 단어 (2026-11-24)
 
