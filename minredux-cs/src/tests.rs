@@ -572,8 +572,10 @@ fn sn_strobe_and_audio_capture_produce_samples_only_after_unmute() {
     for data in [0x80u8, 0x01, 0x90] {
         m.memory_write(0xfee0, data);
         m.memory_write(0xfee2, super::extension::CONTROL_SN_WRITE);
+        tick_inputs(&mut m, 200); // READY recovers while still asserted
         m.memory_write(0xfee2, 0);
     }
+    assert_eq!(m.extension.protocol_errors, 0);
     tick_inputs(&mut m, 8_000);
     assert!(m.audio.samples.iter().all(|&s| s == 0)); // still muted
 

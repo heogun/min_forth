@@ -14,6 +14,25 @@
 - 코드에서 확인한 사항: FLASH Busy `memory_read(&self)`의 DQ6 토글 부작용. 현재 trace가 추가 읽기로 실행을 바꾼다는 증거는 확인하지 않았으므로 기존 trace 버그나 전체 CPU 부정확성을 단정하지 않음.
 - 이번 작업은 타당성 검토만 수행하며 로드맵 구현·실기 측정은 시작하지 않음. 기존 수정-ROM 회귀 및 정적 검사는 통과.
 
+### 컬러·SN76489 Forth 단어 (2026-11-24)
+
+- 커널에 `COLOR AUDIO ATTR! ATTRFILL SN! TONE VOL NOISE SILENCE` 추가. 제어 shadow는
+  `zXCTL`(ZP `0x9e`)에 둔다. strobe와 Attribute 모드 비트는 단어 안에서만 켜고 반환 전에 끈다.
+  `ATTR!`는 범위 밖 셀을 무시하고, READY 폴링은 최대 256회로 제한한다. 사전 lookup이
+  느려지지 않도록 primitive 테이블의 가장 오래된 쪽에 배치했다. 커널 **5,401 bytes**(`0x1000..0x2518`).
+- **에뮬레이터 수정:** 기존 `minredux-cs`는 strobe 동안 READY를 low로 고정하고
+  deassert 때 래치했다. `CIRCUIT.md`대로 "assert 중 READY high 확인" 드라이버를 쓰면
+  무한 대기하는 불일치였다. assert 시 래치하고, READY는 strobe와 무관하게 32 입력 클록 뒤
+  복귀하도록 바꿨다. 조기 해제와 strobe 중 데이터 변경은 `protocol_errors`로 센다.
+- 이 카운터가 실제 커널 버그를 잡았다. `ANI`는 Z 플래그를 바꾸지 않으므로 READY 폴링에
+  `CPI 0`이 필요했다. 수정 전에는 13개 SN 쓰기가 모두 조기 해제였다.
+- 검증: `minredux-cs` Rust **64 통과 + opt-in 1**, examples 4, fmt/Clippy 통과.
+  `ext_regress.py` **7/7**(440Hz 톤을 WAV에서 1% 이내로 측정, PPM 팔레트 포함).
+  Forth **50/50**, ABORT **13/13**, P2 **5/5**를 `minredux`·`minredux-cs` 모두에서 통과.
+  벤치마크 12종 실행 클록은 P2 기준과 **0.000%** 차이.
+- 한계: 디지털 모델 기준 검증이다. 실제 SN76489 READY assert 지연과 최대 쓰기 시간,
+  Attribute 쓰기 commit 여유는 실기로 확인해야 한다. 텍스트 스크롤 시 Attribute는 함께 이동하지 않는다.
+
 ### 컬러·SN76489 에뮬레이터 (2026-11-01)
 
 - `minredux-cs/` 추가: 기존 `minredux/`의 CPU·마이크로코드·FLASH·UART·PS/2·VGA 모델을

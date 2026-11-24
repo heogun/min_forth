@@ -207,8 +207,11 @@ CPU 제어 쓰기 → 리셋 가능한 제어 레지스터 → ~WE
   KiCad에서는 `cad/8-Bit CPU 32k.kicad_pro`를 연다.
 - 완료: 실제 통합 회로도 5개 sheet, PCB 부품·pad/net 반영, 추가 BOM 초안,
   디지털/정적 테스트 24개. [현재 상태](CIRCUIT.md)를 참고한다.
+- 에뮬레이터 기준 완료: Forth 커널 단어(`COLOR`, `AUDIO`, `ATTR!`, `ATTRFILL`, `SN!`,
+  `TONE`, `VOL`, `NOISE`, `SILENCE`). [`../../minforth/README.md`](../../minforth/README.md)를 참고한다.
+  `CIRCUIT.md`의 SN 쓰기 순서를 따르며, 실제 칩 타이밍으로는 검증하지 않았다.
 - 미완료: 추가 회로 배선, 최종 배치, 제조사 최대값 기반 타이밍 검증,
-  새 장치의 펌웨어 지원 및 실기 검증. 에뮬레이터 디지털 모델은
+  MinOS 수준 지원 및 실기 검증. 에뮬레이터 디지털 모델은
   [`../../minredux-cs/`](../../minredux-cs/)에 추가했으며, 이는 회로·실기 검증을
   대체하지 않는다.
 - KiCad 10.0.7 설치 후 원본 CAD의 ERC/DRC/회로도 parity 기준 검사를 실행했다.

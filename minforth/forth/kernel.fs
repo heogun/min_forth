@@ -22,6 +22,7 @@ wBoot:
         CLZ zSTATE
         CLZ zLVD
         CLZ zLEAVE
+        CLZ zXCTL                ; matches the control latch after RESET
         MIV 0x8000,zHERE
         CLV zLATEST
         JPS nf_build
@@ -1773,6 +1774,145 @@ wHEREV:
         RTS
 
 ; ---------------------------------------------------------------------------
+; Primitive: colour + SN76489 extension (CS-DRAFT-1 board, 0xFEE0..0xFEEF)
+;
+; 0xFEE0 SN data latch (W), 0xFEE1 status (R, bit 0 = SN READY), 0xFEE2
+; control (W).  Control is write-only, so zXCTL shadows its persistent bits
+; (0 colour enable, 3 audio unmute).  Bit 1 (SN CE/WE strobe) and bit 2
+; (attribute plane) are set only inside these primitives and are cleared
+; before they return: MinOS printing reads the 0x4000 bitmap mirror, which
+; attribute mode inhibits.  On a board without the extension the window is
+; plain RAM; the READY poll is bounded so SN words cannot hang there.
+; ---------------------------------------------------------------------------
+wCOLOR:                         ; ( flag -- )  colour output on/off
+        MIZ 0x01,zT0
+        JPA nfx_flag
+wAUDIO:                         ; ( flag -- )  unmute/mute; SILENCE first
+        MIZ 0x08,zT0
+nfx_flag:
+        LZP zSP,0x31 SDZ zT1
+        LZP zSP,0x30 ORZ zT1 SDZ zT1
+        SIZ 2,zSP
+        LDZ zT1
+        CPI 0
+        BEQ nfx_clear
+        LDZ zXCTL ORZ zT0
+        JPA nfx_put
+nfx_clear:
+        LDZ zXCTL ORZ zT0 XRZ zT0
+nfx_put:
+        SDZ zXCTL
+        SDB 0xfee2
+        RTS
+
+; ( attr col row -- )  attr = background<<4 | foreground, each I:R:G:B.
+; Cell (col,row) is written through bitmap address 0x430c + row*512 + col.
+; Out-of-range cells are ignored so no write escapes the 0x4000 window.
+wATTRSTORE:
+        LZP zSP,0x30 SDZ zTMP           ; row
+        SIZ 2,zSP
+        LZP zSP,0x30 SDZ zTMP2          ; column
+        SIZ 2,zSP
+        LZP zSP,0x30 SDZ zT0            ; attribute byte
+        SIZ 2,zSP
+        LDZ zTMP
+        CPI 30 BCS nfa_skip
+        LL1 ADI 0x43 SDZ zPTR+1
+        LDZ zTMP2
+        CPI 50 BCS nfa_skip
+        ADI 0x0c SDZ zPTR
+        LDZ zXCTL ORI 0x04 SDB 0xfee2   ; select attribute plane
+        LDZ zT0 SDT zPTR
+        LDZ zXCTL SDB 0xfee2            ; plane was captured with the write
+nfa_skip:
+        RTS
+
+; ( attr -- )  set all 50x30 viewport cells.
+wATTRFILL:
+        LZP zSP,0x30 SDZ zT0
+        SIZ 2,zSP
+        LDZ zXCTL ORI 0x04 SDB 0xfee2
+        MIV 0x430c,zPTR
+        MIZ 30,zT1
+nfaf_row:
+        MIZ 50,zT2
+nfaf_col:
+        LDZ zT0 SDT zPTR
+        INZ zPTR                        ; 0x0c+49 never carries
+        DEZ zT2
+        BNE nfaf_col
+        MIZ 0x0c,zPTR
+        AIZ 2,zPTR+1
+        DEZ zT1
+        BNE nfaf_row
+        LDZ zXCTL SDB 0xfee2
+        RTS
+
+; ( byte -- )  one SN76489 transfer: hold data, assert CE/WE, wait for
+; READY high while asserted, release (CIRCUIT.md driver order).
+wSNSTORE:
+        LZP zSP,0x30 SDZ zT0
+        SIZ 2,zSP
+        LDZ zT0
+nf_sn:                          ; A = byte (call with JAS); clobbers zT0, zT3
+        SDZ zT0
+        JPS nfs_wait                    ; previous transfer complete
+        LDZ zT0 SDB 0xfee0
+        LDZ zXCTL ORI 0x02 SDB 0xfee2
+        JPS nfs_wait                    ; >=11 clocks before the first poll
+        LDZ zXCTL SDB 0xfee2
+        RTS
+nfs_wait:                       ; poll READY, at most 256 times
+        CLZ zT3
+nfsw_loop:
+        LDB 0xfee1 ANI 0x01
+        CPI 0                           ; logic ops leave the flags alone
+        BNE nfsw_done
+        DEZ zT3
+        BNE nfsw_loop
+nfsw_done:
+        RTS
+
+; ( period ch -- )  tone channel 0..2, 10-bit period: f = 3579545/(32*N).
+wTONE:
+        LZP zSP,0x30 ANI 0x03 LL5 SDZ zTMP
+        SIZ 2,zSP
+        LZP zSP,0x30 ANI 0x0f ORI 0x80 ORZ zTMP
+        JAS nf_sn
+        LZP zSP,0x31 ANI 0x03 LL4 SDZ zTMP
+        LZP zSP,0x30 LR4 ORZ zTMP SDZ zTMP
+        SIZ 2,zSP
+        LDZ zTMP
+        JAS nf_sn
+        RTS
+
+; ( atten ch -- )  channel 0..3 (3 = noise), attenuation 0 loud .. 15 off.
+wVOL:
+        LZP zSP,0x30 ANI 0x03 LL5 SDZ zTMP
+        SIZ 2,zSP
+        LZP zSP,0x30 ANI 0x0f ORI 0x90 ORZ zTMP SDZ zTMP
+        SIZ 2,zSP
+        LDZ zTMP
+        JAS nf_sn
+        RTS
+
+; ( mode -- )  noise control: bit 2 white, bits 0..1 rate (3 = tone 2).
+wNOISE:
+        LZP zSP,0x30 ANI 0x07 ORI 0xe0 SDZ zTMP
+        SIZ 2,zSP
+        LDZ zTMP
+        JAS nf_sn
+        RTS
+
+; ( -- )  maximum attenuation on all four channels.
+wSILENCE:
+        LDI 0x9f JAS nf_sn
+        LDI 0xbf JAS nf_sn
+        LDI 0xdf JAS nf_sn
+        LDI 0xff JAS nf_sn
+        RTS
+
+; ---------------------------------------------------------------------------
 ; Frame-sensitive tail-call exclusions (four xts, counted by wSEMI).
 ; ---------------------------------------------------------------------------
 taildeny:
@@ -1813,6 +1953,17 @@ inltab:
 ; Strings and tables
 ; ---------------------------------------------------------------------------
 primtab:
+        ; Extension words first: FIND scans newest-first, so the rarely used
+        ; device words sit at the far end and do not slow common lookups.
+        0x05,<wCOLOR,>wCOLOR,"COLOR"
+        0x05,<wAUDIO,>wAUDIO,"AUDIO"
+        0x05,<wATTRSTORE,>wATTRSTORE,"ATTR!"
+        0x08,<wATTRFILL,>wATTRFILL,"ATTRFILL"
+        0x03,<wSNSTORE,>wSNSTORE,"SN!"
+        0x04,<wTONE,>wTONE,"TONE"
+        0x03,<wVOL,>wVOL,"VOL"
+        0x05,<wNOISE,>wNOISE,"NOISE"
+        0x07,<wSILENCE,>wSILENCE,"SILENCE"
         0x03,<wDUP,>wDUP,"DUP"
         0x04,<wDROP,>wDROP,"DROP"
         0x04,<wSWAP,>wSWAP,"SWAP"

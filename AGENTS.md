@@ -44,4 +44,5 @@ python3 runfs.py ../minforth/test/speed.fs --cycles 40000000 --no-output --until
 - `JPS` clobbers A; use `JAS` when passing A to helpers such as `nf_cbyte`. `nf_cbyte` also clobbers `zPTR`; preserve live pointers elsewhere.
 - Keep the tokenizer cursor in private `zIVEC`: MinOS printing helpers clobber `_ReadPtr`.
 - The active loop's index/limit are cached in `zCIDX`/`zCLIM`; inner `DO` must flush the outer index to its frame for `J`, and `nf_lpop` must restore the outer cache.
+- Colour/SN words (`zXCTL` shadow at ZP `0x9e`) must leave extension control bits 1 (SN strobe) and 2 (attribute plane) cleared on return; attribute mode inhibits CPU reads of the `0x4000` bitmap mirror that MinOS printing uses. Verify with `minredux-cs/ext_regress.py`.
 - `nfDefHere`/`nfDefLatest` reserve `0x26c0..0x26c3` for pre-colon rollback checkpoints; keep kernel code below this range. `ABORT"` abandons all return frames, clears stack/loop/compiler depths, rolls back any active colon definition, and resumes at `wRepl` without resetting BASE or completed dictionary entries.

@@ -42,6 +42,56 @@ The compiler checkpoint reserves RAM `26c0..26c3` (`nfDefHere`,
 `ABORT"` uses `JPS wABORTQRT / length-byte / message`, like the existing `."`
 layout; its false path repairs the caller return address across page boundaries.
 
+## Colour + SN76489 extension words
+
+For the CS-DRAFT-1 board (`hardware/redux-color-sound/`, emulated by
+`minredux-cs/`). Registers live at `0xFEE0..0xFEEF`; see
+`hardware/redux-color-sound/CIRCUIT.md`.
+
+| Word | Stack | Effect |
+| --- | --- | --- |
+| `COLOR` | `( flag -- )` | colour output on/off (control bit 0) |
+| `AUDIO` | `( flag -- )` | unmute/mute line-out (bit 3); send `SILENCE` first |
+| `ATTR!` | `( attr col row -- )` | colour of one 8x8 cell, col 0..49, row 0..29 |
+| `ATTRFILL` | `( attr -- )` | colour of all 50x30 cells |
+| `SN!` | `( byte -- )` | one raw SN76489 command byte |
+| `TONE` | `( period ch -- )` | tone ch 0..2, 10-bit period, f = 3579545/(32*N) |
+| `VOL` | `( atten ch -- )` | ch 0..3 (3 = noise), 0 loudest .. 15 off |
+| `NOISE` | `( mode -- )` | noise control, bit 2 white, bits 0..1 rate |
+| `SILENCE` | `( -- )` | attenuation 15 on all four channels |
+
+`attr` is `background<<4 | foreground`, each nibble `I:R:G:B`.
+
+```forth
+HEX 1E ATTRFILL 4F 0 0 ATTR! DECIMAL 1 COLOR
+SILENCE 254 0 TONE 0 0 VOL 1 AUDIO     \ about 440 Hz on channel 0
+```
+
+- Flags are whole cells: any nonzero 16-bit value enables.
+- Control is write-only. `zXCTL` (ZP `0x9e`) shadows bits 0 and 3 and is
+  cleared at boot to match the RESET state; the words never read hardware back.
+- Bits 1 (SN strobe) and 2 (attribute plane) are set only inside a word and
+  are cleared before it returns, because attribute mode inhibits CPU reads of
+  the `0x4000` bitmap mirror that MinOS printing relies on.
+- `ATTR!` ignores rows >= 30 or columns >= 50 (low byte only), so no write
+  can leave the bitmap window and hit the dictionary. Attributes do not scroll
+  with text: MinOS scrolling moves only bitmap bytes.
+- SN transfers follow the circuit's order: wait for READY, hold data, assert
+  CE/WE, wait for READY high **while asserted**, release. Each READY wait
+  gives up after 256 polls, so these words cannot hang on a board without the
+  extension. There, the window is plain RAM and the writes are harmless,
+  but nothing is played.
+- The kernel does not touch the extension at boot. Run `SILENCE` before
+  `1 AUDIO`, because the SN76489 has no reset input.
+- These words sit at the oldest end of the primitive table, so the common
+  newest-first `FIND` lookups do not scan them first.
+
+From `minredux-cs/` after rebuilding the kernel and release binary:
+`python3 ext_regress.py -v` (7 end-to-end cases: attribute cells and range
+guard, fill, control shadow, SN registers, a 440 Hz tone measured from the WAV,
+and the PPM palette, each also requiring zero SN protocol errors and zero VREG
+overwrites).
+
 ## Build and test isolated images
 
 From the workspace root:

@@ -156,12 +156,14 @@ zLastCall:                            ; address of the most recent compiled JPS
 zTailOK:                              ; 1 only while that JPS is the last emitted code
 #org 0x009d
 zEndTarget:                           ; 1 when HERE is a patched forward-branch target
+#org 0x009e
+zXCTL:                                ; shadow of write-only extension control (bits 0, 3)
 #org 0x26c0
 nfDefHere:                            ; pre-colon dictionary checkpoint (not ZP)
 #org 0x26c2
 nfDefLatest:                          ; restore on abort during compilation
 #emit
-; Forth ZP state uses 0x00..0x7f and 0x96..0x9d. MinOS helpers use
+; Forth ZP state uses 0x00..0x7f and 0x96..0x9e. MinOS helpers use
 ; 0x80..0x95 and 0xc0..0xff; do not allocate Forth state in those ranges.
 
 ; ---------------------------------------------------------------------------

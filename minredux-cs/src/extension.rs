@@ -12,6 +12,13 @@
 //! Control bits: 0 colour enable, 1 SN write assert (CE/WE low), 2 attribute
 //! write mode, 3 audio unmute.  Reset clears the control register; the PSG has
 //! no reset pin and keeps its state.
+//!
+//! SN write protocol (CIRCUIT.md): hold the data latch, assert bit 1, wait
+//! for READY to return high *while still asserted*, then deassert.  The chip
+//! samples the held data when CE/WE go low; READY recovers after 32 input
+//! clocks regardless of the strobe.  Deasserting before READY or changing the
+//! data latch mid-strobe would corrupt a real transfer, so both are counted in
+//! `protocol_errors` instead of being silently accepted.
 
 use crate::psg::Psg;
 
@@ -28,6 +35,8 @@ pub struct Extension {
     sn_data: u8,
     strobe: bool,
     pub psg: Psg,
+    /// Driver bugs a real SN76489 would not tolerate (see module docs).
+    pub protocol_errors: u64,
 }
 
 impl Default for Extension {
@@ -43,6 +52,7 @@ impl Extension {
             sn_data: 0,
             strobe: false,
             psg: Psg::default(),
+            protocol_errors: 0,
         }
     }
 
@@ -80,7 +90,7 @@ impl Extension {
 
     #[inline(always)]
     pub fn sn_ready(&self) -> bool {
-        !self.strobe && self.psg.ready()
+        self.psg.ready()
     }
 
     pub fn control(&self) -> u8 {
@@ -111,7 +121,12 @@ impl Extension {
     /// CPU write inside the extension window.  No write reaches system RAM.
     pub fn write(&mut self, addr: u16, value: u8) {
         match addr & 0x07 {
-            0 => self.sn_data = value,
+            0 => {
+                if self.strobe && value != self.sn_data {
+                    self.protocol_errors += 1;
+                }
+                self.sn_data = value;
+            }
             2 => self.write_control(value),
             _ => {}
         }
@@ -124,10 +139,13 @@ impl Extension {
         let asserted = self.control & CONTROL_SN_WRITE != 0;
         if !was_asserted && asserted {
             self.strobe = true;
+            // CE/WE low: the chip samples the held data and drops READY.
+            self.psg.write(self.sn_data);
         } else if was_asserted && !asserted {
             self.strobe = false;
-            // SN76489 latches its data on the rising edge of /WE.
-            self.psg.write(self.sn_data);
+            if !self.psg.ready() {
+                self.protocol_errors += 1; // strobe released mid-transfer
+            }
         }
     }
 
@@ -163,18 +181,29 @@ mod tests {
     }
 
     #[test]
-    fn sn_write_needs_assert_then_deassert_and_holds_ready_low() {
+    fn sn_ready_recovers_while_strobe_is_still_asserted() {
         let mut e = Extension::new();
         e.write(0xfee0, 0x9f);
         e.write(0xfee2, CONTROL_SN_WRITE);
         assert_eq!(e.read(0xfee1) & 1, 0); // asserted: busy
-        assert!(!e.sn_ready());
-        e.write(0xfee2, 0);
-        assert_eq!(e.read(0xfee1) & 1, 0); // recovery window
         for _ in 0..200 {
             e.step();
         }
+        // CIRCUIT.md: READY must go high before the driver deasserts.
         assert_eq!(e.read(0xfee1) & 1, 1);
+        e.write(0xfee2, 0);
+        assert_eq!(e.read(0xfee1) & 1, 1);
+        assert_eq!(e.protocol_errors, 0);
+    }
+
+    #[test]
+    fn early_release_and_mid_strobe_data_change_are_protocol_errors() {
+        let mut e = Extension::new();
+        e.write(0xfee0, 0x9f);
+        e.write(0xfee2, CONTROL_SN_WRITE);
+        e.write(0xfee0, 0xbf); // data changed while CE/WE low
+        e.write(0xfee2, 0); // released before READY
+        assert_eq!(e.protocol_errors, 2);
     }
 
     #[test]

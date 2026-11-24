@@ -45,6 +45,8 @@ OPTIONS:
     --dump            print final CPU registers
     --dump-mem A:L    hex dump RAM at address A (hex) for L bytes
     --dump-ram FILE   write the full 64 KiB RAM image to FILE
+    --dump-ext FILE   write extension state (control, SN registers, attribute
+                      SRAM, protocol errors) as JSON to FILE
     --text            print the decoded 50x30 text screen
     --ansi            print the text screen with attribute colours
     --ppm FILE        write the visible 400x240 colour frame as PPM
@@ -95,6 +97,7 @@ struct Options {
     profile: bool,
     dump_mem: Vec<(u16, usize)>,
     dump_ram: Option<PathBuf>,
+    dump_ext: Option<PathBuf>,
     crop: Option<(usize, usize, usize, usize)>,
     text: bool,
     ansi: bool,
@@ -131,6 +134,7 @@ impl Default for Options {
             profile: false,
             dump_mem: Vec::new(),
             dump_ram: None,
+            dump_ext: None,
             crop: None,
             text: false,
             ansi: false,
@@ -267,6 +271,9 @@ fn parse_args() -> Result<Options, String> {
             }
             "--text" => o.text = true,
             "--ansi" => o.ansi = true,
+            "--dump-ext" => {
+                o.dump_ext = Some(PathBuf::from(args.next().ok_or("--dump-ext needs a path")?))
+            }
             "--ppm" => o.ppm = Some(PathBuf::from(args.next().ok_or("--ppm needs a path")?)),
             "--wav" => o.wav = Some(PathBuf::from(args.next().ok_or("--wav needs a path")?)),
             "--audio-rate" => {
@@ -706,6 +713,28 @@ fn main() {
         }
     }
 
+    if let Some(path) = &opts.dump_ext {
+        let regs = m.extension.psg.registers();
+        let attrs: String = m
+            .video
+            .attributes()
+            .iter()
+            .map(|b| format!("{b:02x}"))
+            .collect();
+        let json = format!(
+            "{{\"control\":{},\"protocol_errors\":{},\"sn_registers\":{:?},\"vreg_overwrites\":{},\"attributes\":\"{}\"}}\n",
+            m.extension.control(),
+            m.extension.protocol_errors,
+            regs,
+            m.video.overwritten_writes,
+            attrs
+        );
+        match std::fs::write(path, json) {
+            Ok(()) => eprintln!("wrote extension state to {}", path.display()),
+            Err(e) => eprintln!("failed to write {}: {e}", path.display()),
+        }
+    }
+
     if opts.uart_log {
         for (c, k, b) in &m.io_events {
             eprintln!("io {c:>12} {k} {b:02x}");
@@ -754,11 +783,12 @@ fn main() {
             m.input_mode, m.uart_dropped, m.ps2_dropped
         );
         eprintln!(
-            "video_frames={} vreg_overwrites={} flash_busy_cycles={} audio_samples={}",
+            "video_frames={} vreg_overwrites={} flash_busy_cycles={} audio_samples={} sn_protocol_errors={}",
             m.video.frames,
             m.video.overwritten_writes,
             m.flash_busy_cycles(),
-            m.audio.samples.len()
+            m.audio.samples.len(),
+            m.extension.protocol_errors
         );
         let secs = elapsed.as_secs_f64();
         let mhz = (m.cycles - start_cycles) as f64 / secs / 1e6;

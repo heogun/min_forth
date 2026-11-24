@@ -21,6 +21,7 @@ cargo test --all-targets
 cargo build --release
 python3 regress.py
 python3 abort_regress.py -v
+python3 ext_regress.py -v      # kernel colour/sound words, see ../minforth/README.md
 ```
 
 `cargo test`는 CPU ISA·주변장치·확장 장치 검사이고, `regress.py`는
@@ -57,8 +58,14 @@ python3 abort_regress.py -v
 니블은 0이다. CPU RESET은 제어 레지스터만 지운다. SN76489에는 시스템 reset 핀이
 없으므로 PSG 내부 상태는 유지된다.
 
-SN 데이터는 제어 bit 1을 assert한 뒤 deassert하는 상승 에지에서 래치된다. READY는
-strobe가 assert된 동안과 쓰기 후 32 입력 클록 동안 low다.
+SN 데이터는 제어 bit 1을 assert하는 시점(CE/WE low)에 칩으로 들어가고, READY는 그때부터
+32 입력 클록 동안 low였다가 **strobe가 계속 assert된 상태에서도** high로 돌아온다.
+`CIRCUIT.md`의 드라이버 순서(데이터 유지 → assert → READY high 확인 → deassert)를
+그대로 따를 수 있도록 한 것이다. 이전 모델은 strobe 동안 READY를 low로 고정하고
+deassert 때 래치했기 때문에, 회로 문서대로 작성한 드라이버가 무한 대기했다.
+실제 칩이 받아들이지 않을 두 가지 드라이버 오류, 즉 READY 전에 strobe를 해제하는 것과
+strobe 중 데이터 래치를 바꾸는 것은 `protocol_errors`로 센다. `--stats`의
+`sn_protocol_errors`와 `--dump-ext`로 확인한다.
 
 ### Attribute SRAM과 컬러 팔레트
 
@@ -111,6 +118,7 @@ strobe가 assert된 동안과 쓰기 후 32 입력 클록 동안 low다.
 | `--ppm FILE` | 표시 영역 400x240을 binary PPM(`P6`)으로 저장 |
 | `--wav FILE` | SN76489 출력을 mono 16-bit WAV로 저장 |
 | `--audio-rate N` | WAV 샘플레이트(기본 48000, 0 불가) |
+| `--dump-ext FILE` | 제어 레지스터, SN 레지스터 8개, Attribute SRAM 2KB, SN protocol error, VREG overwrite를 JSON으로 저장 |
 
 `--stats`에는 `video_frames`, `vreg_overwrites`, `flash_busy_cycles`와 함께
 `audio_samples`가 표시된다. `--ansi`는 터미널 ANSI 색 지원이 필요하고, `--text`는
@@ -144,3 +152,4 @@ strobe가 assert된 동안과 쓰기 후 32 입력 클록 동안 low다.
 | `src/audio.rs` | CPU 클록 오디오 캡처, 리샘플링, WAV |
 | `src/isa_tests/` | 상속한 전체 ISA 검증 행렬 |
 | `regress.py`, `runline.py`, `runfs.py` | Forth 커널 회귀·단일 입력·파일 실행 도우미 |
+| `ext_regress.py` | 커널 컬러·음원 단어의 end-to-end 회귀(`--dump-ext`/PPM/WAV 검사) |

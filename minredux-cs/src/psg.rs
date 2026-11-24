@@ -102,13 +102,18 @@ impl Psg {
         }
     }
 
+    /// Raw tone/volume/noise registers (tone 0, vol 0, ..., noise, vol 3).
+    pub fn registers(&self) -> [u16; 8] {
+        self.registers
+    }
+
     /// True when the chip has finished the 32-clock write recovery window.
     pub fn ready(&self) -> bool {
         self.ready_timer == 0
     }
 
-    /// Latch a byte on the rising edge of /WE (after the board deasserts the
-    /// shared CE/WE strobe).  Every write restarts the READY timer.
+    /// Sample a byte when the board asserts the shared CE/WE strobe.  Every
+    /// write restarts the READY timer.
     pub fn write(&mut self, data: u8) {
         let mut r = self.last_register;
         if data & 0x80 != 0 {
