@@ -26,6 +26,7 @@ KICAD = Path('/Applications/KiCad/KiCad.app/Contents')
 SYMBOLS = KICAD / 'SharedSupport/symbols'
 NAMESPACE = uuid.UUID('53761c37-1a9a-4cf2-a1c3-b80a4ab9c191')
 SHEETS = ['ExtensionIO', 'PSG', 'Attribute', 'Palette', 'ExtensionPower']
+LARGE_SHEETS = ('ExtensionIO', 'Attribute', 'Palette')  # A2 paper
 
 
 def uid(name):
@@ -77,6 +78,7 @@ def pin_definitions():
         'HC377': ('74xx', '74LS377'), 'HC74': ('74xx', '74HC74'),
         'HCT377': ('74xx', '74LS377'),
         'HC08': ('74xx', '74HC08'), 'HC4002': ('74xx', '74HC4002'),
+        'HC02': ('74xx', '74HC02'), 'AC08': ('74xx', '74HC08'),
         'HC157': ('74xx', '74LS157'), 'AC244': ('74xx', '74LS244'),
         'POR': ('Power_Supervisor', 'MCP120-xxxDxTO'),
         '2N7000': ('Transistor_FET', '2N7000'),
@@ -369,12 +371,12 @@ def generate(source, destination):
                                        else 35 + math.ceil(len(large)/3)*80 + (i // 5)*28)
             x, y = round(x/1.27)*1.27, round(y/1.27)*1.27
             # Sound has many passives: put them on a separate sub-sheet.
-            if y > (390 if sheet in ('Palette', 'Attribute') else 270):
+            if y > (390 if sheet in LARGE_SHEETS else 270):
                 raise ValueError(f'Sheet {sheet} overflow: {part.ref} at y={y}')
             additions += instance(part, x, y, definitions[part.symbol][1],
                                   definitions[part.symbol][2], root_uuid, pins)
         text = f'''(kicad_sch (version 20250114) (generator "eeschema")
-          (uuid {q(uid('document:'+sheet))}) (paper {q('A2' if sheet in ('Palette', 'Attribute') else 'A3')})
+          (uuid {q(uid('document:'+sheet))}) (paper {q('A2' if sheet in LARGE_SHEETS else 'A3')})
           (title_block (title {q(sheet+' - Color/SN76489 integration DRAFT')})
              (date "2026-10-30") (rev "CS-DRAFT-1")
              (comment 1 "NOT FOR FABRICATION: PCB routing/timing validation pending")

@@ -55,6 +55,46 @@
       }
     },
     {
+      "ref": "U67",
+      "symbol": "HC02",
+      "value": "74HC02",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "2": "CS_CLK_RC",
+        "3": "GND",
+        "1": "CS_EXT_CLK_MAR_DRV",
+        "5": "GND",
+        "6": "GND",
+        "8": "GND",
+        "9": "GND",
+        "11": "GND",
+        "12": "GND",
+        "7": "GND",
+        "14": "+5V"
+      }
+    },
+    {
+      "ref": "U68",
+      "symbol": "AC08",
+      "value": "74AC08",
+      "footprint": "Package_DIP:DIP-14_W7.62mm_Socket",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "16MHz",
+        "2": "16MHz",
+        "3": "CS_16MHZ_DRV",
+        "4": "GND",
+        "5": "GND",
+        "9": "GND",
+        "10": "GND",
+        "12": "GND",
+        "13": "GND",
+        "14": "+5V",
+        "7": "GND"
+      }
+    },
+    {
       "ref": "U69",
       "symbol": "HC173",
       "value": "74HC173",
@@ -67,7 +107,7 @@
         "4": "CS_SN_WRITE",
         "5": "CS_ATTR_MODE",
         "6": "CS_AUDIO_EN",
-        "7": "CLK_MAR",
+        "7": "CS_EXT_CLK_MAR",
         "9": "CS_CTRL_SEL_N",
         "10": "~{RI}",
         "11": "BUS3",
@@ -87,7 +127,7 @@
       "sheet": "ExtensionIO",
       "pins": {
         "1": "CS_SND_EN_N",
-        "11": "CLK_MAR",
+        "11": "CS_EXT_CLK_MAR",
         "3": "BUS0",
         "4": "BUS1",
         "7": "BUS2",
@@ -372,7 +412,7 @@
       "sheet": "Attribute",
       "pins": {
         "1": "~{VGA_GET}",
-        "11": "16MHz",
+        "11": "CS_EXT_16MHZ",
         "3": "CS_ATTR_D0",
         "4": "CS_ATTR_D1",
         "7": "CS_ATTR_D2",
@@ -425,7 +465,7 @@
         "2": "GND",
         "3": "CS_ACTIVE_LATCH",
         "4": "CS_COLOR_LATCH",
-        "7": "16MHz",
+        "7": "CS_EXT_16MHZ",
         "9": "~{VGA_GET}",
         "10": "GND",
         "11": "GND",
@@ -652,6 +692,28 @@
       }
     },
     {
+      "ref": "R42",
+      "symbol": "R",
+      "value": "33",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "Attribute",
+      "pins": {
+        "1": "CS_16MHZ_DRV",
+        "2": "CS_EXT_16MHZ"
+      }
+    },
+    {
+      "ref": "R43",
+      "symbol": "R",
+      "value": "0 (SKEW TRIM)",
+      "footprint": "Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal",
+      "sheet": "ExtensionIO",
+      "pins": {
+        "1": "CS_EXT_CLK_MAR_DRV",
+        "2": "CS_EXT_CLK_MAR"
+      }
+    },
+    {
       "ref": "R37",
       "symbol": "R",
       "value": "470",
@@ -797,6 +859,28 @@
     },
     {
       "ref": "C35",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C37",
+      "symbol": "C",
+      "value": "100n",
+      "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
+      "sheet": "ExtensionPower",
+      "pins": {
+        "1": "+5V",
+        "2": "GND"
+      }
+    },
+    {
+      "ref": "C38",
       "symbol": "C",
       "value": "100n",
       "footprint": "Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm",
@@ -1107,6 +1191,34 @@
         "13"
       ],
       "output_pin": "12"
+    },
+    {
+      "op": "NOR",
+      "inputs": [
+        "CS_CLK_RC",
+        "GND"
+      ],
+      "output": "CS_EXT_CLK_MAR_DRV",
+      "ref": "U67",
+      "input_pins": [
+        "2",
+        "3"
+      ],
+      "output_pin": "1"
+    },
+    {
+      "op": "AND",
+      "inputs": [
+        "16MHz",
+        "16MHz"
+      ],
+      "output": "CS_16MHZ_DRV",
+      "ref": "U68",
+      "input_pins": [
+        "1",
+        "2"
+      ],
+      "output_pin": "3"
     },
     {
       "op": "OR",
@@ -2700,6 +2812,122 @@
       "6": {
         "name": "~",
         "type": "no_connect"
+      }
+    },
+    "HC02": {
+      "1": {
+        "name": "",
+        "type": "output"
+      },
+      "2": {
+        "name": "",
+        "type": "input"
+      },
+      "3": {
+        "name": "",
+        "type": "input"
+      },
+      "4": {
+        "name": "",
+        "type": "output"
+      },
+      "5": {
+        "name": "",
+        "type": "input"
+      },
+      "6": {
+        "name": "",
+        "type": "input"
+      },
+      "8": {
+        "name": "",
+        "type": "input"
+      },
+      "9": {
+        "name": "",
+        "type": "input"
+      },
+      "10": {
+        "name": "",
+        "type": "output"
+      },
+      "11": {
+        "name": "",
+        "type": "input"
+      },
+      "12": {
+        "name": "",
+        "type": "input"
+      },
+      "13": {
+        "name": "",
+        "type": "output"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      }
+    },
+    "AC08": {
+      "1": {
+        "name": "~",
+        "type": "input"
+      },
+      "2": {
+        "name": "~",
+        "type": "input"
+      },
+      "3": {
+        "name": "~",
+        "type": "output"
+      },
+      "4": {
+        "name": "~",
+        "type": "input"
+      },
+      "5": {
+        "name": "~",
+        "type": "input"
+      },
+      "6": {
+        "name": "~",
+        "type": "output"
+      },
+      "9": {
+        "name": "~",
+        "type": "input"
+      },
+      "10": {
+        "name": "~",
+        "type": "input"
+      },
+      "8": {
+        "name": "~",
+        "type": "output"
+      },
+      "12": {
+        "name": "~",
+        "type": "input"
+      },
+      "13": {
+        "name": "~",
+        "type": "input"
+      },
+      "11": {
+        "name": "~",
+        "type": "output"
+      },
+      "14": {
+        "name": "VCC",
+        "type": "power_in"
+      },
+      "7": {
+        "name": "GND",
+        "type": "power_in"
       }
     },
     "HC157": {

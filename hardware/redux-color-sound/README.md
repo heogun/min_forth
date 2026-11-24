@@ -206,7 +206,7 @@ CPU 제어 쓰기 → 리셋 가능한 제어 레지스터 → ~WE
   기존 DRC 제외 항목 제거, 원본 회로 연결·동박 형상 보존 검사.
   KiCad에서는 `cad/8-Bit CPU 32k.kicad_pro`를 연다.
 - 완료: 실제 통합 회로도 5개 sheet, PCB 부품·pad/net 반영, 추가 BOM 초안,
-  디지털/정적 테스트 33개. 주소 디코드는 ATF22V10C 한 개(U64)로 바꿨다. Attribute 행 주소는 VA 버스 앞에서 계산한다(U66, R37–R41). [현재 상태](CIRCUIT.md)를 참고한다.
+  디지털/정적 테스트 33개. 주소 디코드는 ATF22V10C 한 개(U64)로 바꿨다. Attribute 행 주소는 VA 버스 앞에서 계산한다(U66, R37–R41). 클록은 U67/U68로 분리했다. [현재 상태](CIRCUIT.md)를 참고한다.
 - 에뮬레이터 기준 완료: Forth 커널 단어(`COLOR`, `AUDIO`, `ATTR!`, `ATTRFILL`, `SN!`,
   `TONE`, `VOL`, `NOISE`, `SILENCE`). [`../../minforth/README.md`](../../minforth/README.md)를 참고한다.
   `CIRCUIT.md`의 SN 쓰기 순서를 따르며, 실제 칩 타이밍으로는 검증하지 않았다.

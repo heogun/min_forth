@@ -44,9 +44,11 @@ EDGE_GAP, H_GAP, V_GAP, BORDER = 3.0, 4.0, 6.0, 3.0
 ROW_PENALTY = 60.0   # mm of x displacement traded for one row farther from the core
 # Placement order: TIMING_REVIEW.md critical paths first (VA/CA bus, 16MHz capture,
 # RAM /CE, WE path, CLK_MAR latches), then the palette/status logic, then sound.
-PRIORITY = [('U77', 'U66', 'U78', 'U79', 'U81', 'U83', 'U64', 'U71'),
+PRIORITY = [('U68', 'U67'), ('U77', 'U66', 'U78', 'U79', 'U81', 'U83', 'U64', 'U71'),
             ('U69', 'U70', 'U80', 'U82', 'U88', 'U89', 'U90', 'U84', 'U85', 'U86', 'U87'),
             ('U72', 'U75', 'U65'), ('U74', 'X2')]
+# Clock drivers: anchored at their core source instead of their net average.
+PINNED = {'U68': 'X1', 'U67': 'U6'}
 POWER = {'+5V', 'GND'}
 
 
@@ -89,6 +91,9 @@ def place_compact(pcbnew, board, footprints, manifest, pin_nets, new_refs,
     for ref in sorted(new_refs - set(anchors)):
         anchors[ref] = (BAND_LEFT+BAND_RIGHT)/2
     weight = {ref: sum(1 for n in nets_of.get(ref, ()) if n in core_x) for ref in new_refs}
+    for ref, core in PINNED.items():  # clock drivers sit next to their core source
+        if ref in new_refs and core in footprints:
+            anchors[ref] = pcbnew.ToMM(footprints[core].GetPosition().x)
 
     def decoupler(ref):
         return f'C{34+int(ref[1:])-64}'

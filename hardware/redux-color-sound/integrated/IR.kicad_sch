@@ -14712,5 +14712,7 @@
 		)
 	)
 
-
+(global_label "CS_CLK_RC" (shape bidirectional) (at 199.39 83.82 0)
+       (effects (font (size 0.8 0.8)) (justify left))
+       (uuid "bea564c3-b189-5dae-bceb-60907b489bc1"))
 )

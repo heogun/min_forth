@@ -245,7 +245,7 @@ class ExtensionTests(unittest.TestCase):
                 transmitted |= ((value >> logical) & 1) << (7-ti_bit)
             self.assertEqual(transmitted, value)
         self.assertEqual(self.parts['U70']['symbol'], 'HC377')
-        self.assertEqual(latch['11'], 'CLK_MAR')  # Plain clock, not an address-gated clock.
+        self.assertEqual(latch['11'], 'CS_EXT_CLK_MAR')  # CLK_MAR copy, not address-gated.
         for i, pin in enumerate([3, 4, 7, 8, 13, 14, 17, 18]):
             self.assertEqual(latch[str(pin)], f'BUS{i}')
         self.assertEqual(snd['5'], snd['6'])
@@ -263,6 +263,32 @@ class ExtensionTests(unittest.TestCase):
         self.assertEqual(len(colors), 16)
         worst = 5.25*(1/(750*0.99)+1/(1500*0.99))/(1/75+1/(750*0.99)+1/(1500*0.99))
         self.assertLessEqual(worst, 0.7)
+
+    def test_clock_buffering_keeps_core_clock_nets_unloaded(self):
+        # TIMING_REVIEW.md 13절: extension latches have their own clock drivers.
+        members = {}
+        for (ref, pin), net in self.netmap.items():
+            members.setdefault(net, set()).add((ref, pin))
+        extension = {p['ref'] for p in self.manifest['parts']}
+        # CLK_MAR keeps exactly its original loads.
+        self.assertFalse({r for r, _ in members['CLK_MAR']} & extension)
+        # X1 16MHz gains only U68's input gate.
+        self.assertEqual({r for r, _ in members['16MHz']} & extension, {'U68'})
+        gates = {(g['ref'], g['output']): g for g in self.manifest['gates']}
+        self.assertEqual(gates[('U68', 'CS_16MHZ_DRV')]['inputs'], ['16MHz', '16MHz'])
+        self.assertEqual(self.parts['U68']['symbol'], 'AC08')
+        self.assertEqual({r for r, _ in members['CS_EXT_16MHZ']}, {'R42', 'U81', 'U83'})
+        self.assertEqual(self.netmap[('U81', '11')], 'CS_EXT_16MHZ')
+        self.assertEqual(self.netmap[('U83', '7')], 'CS_EXT_16MHZ')
+        # U67 copies U6's CLK_MAR gate: NOR of the same C33 RC node, then R43 trim.
+        self.assertEqual(self.netmap[('U6', '2')], 'CS_CLK_RC')
+        self.assertEqual(self.netmap[('C33', '1')], 'CS_CLK_RC')
+        self.assertEqual(gates[('U67', 'CS_EXT_CLK_MAR_DRV')]['inputs'], ['CS_CLK_RC', 'GND'])
+        self.assertEqual(self.parts['U67']['symbol'], 'HC02')
+        self.assertEqual({r for r, _ in members['CS_EXT_CLK_MAR']}, {'R43', 'U69', 'U70'})
+        r42, r43 = self.parts['R42']['pins'], self.parts['R43']['pins']
+        self.assertEqual((r42['1'], r42['2']), ('CS_16MHZ_DRV', 'CS_EXT_16MHZ'))
+        self.assertEqual((r43['1'], r43['2']), ('CS_EXT_CLK_MAR_DRV', 'CS_EXT_CLK_MAR'))
 
     def test_compact_band_layout_and_j4_notch(self):
         # TIMING_REVIEW.md 12절: extension parts live in a band above the original

@@ -34,7 +34,8 @@ def design():
                      'HC173': 16, 'HC574': 20, 'HC32': 14, 'SN76489AN': 16,
                      'HCT244': 20, 'HC283': 16, 'HC86': 14, 'HC245': 20,
                      'HC377': 20, 'HCT377': 20, 'HC74': 14, 'HC08': 14, 'HC4002': 14,
-                     'HC157': 16, 'AC244': 20, 'SRAM': 28, 'PAL22V10': 24}[symbol]
+                     'HC157': 16, 'AC244': 20, 'SRAM': 28, 'PAL22V10': 24,
+                     'HC02': 14, 'AC08': 14}[symbol]
             width = '15.24' if count == 28 else '7.62'
             footprint = f'Package_DIP:DIP-{count}_W{width}mm_Socket'
         p = Part(ref, symbol, value, footprint, sheet, {str(k): v for k, v in pins.items()})
@@ -66,15 +67,23 @@ def design():
         (9, 8, 'CS_SN_WRITE', 'CS_SN_WRITE_N'),
         (11, 10, 'CS_AUDIO_EN', 'CS_AUDIO_MUTE'), (13, 12, 'CS_RESET_N', 'CS_RESET')]:
         logic(inv, 'NOT', [(a, source)], (y, target))
+    # Clock distribution (TIMING_REVIEW.md 13절).  U67 copies U6's CLK_MAR gate:
+    # NOR of the same C33 RC node, so the extension latches get their own driver
+    # with the CPU's own phase instead of loading CLK_MAR or adding a buffer delay.
+    clk = add('U67', 'HC02', '74HC02', {}, io)
+    logic(clk, 'NOR', [(2, 'CS_CLK_RC'), (3, 'GND')], (1, 'CS_EXT_CLK_MAR_DRV'))
+    # U68 buffers 16MHz next to X1 for U81/U83 (AC: 1.5-8.5ns), series-terminated.
+    buf = add('U68', 'AC08', '74AC08', {}, attr)
+    logic(buf, 'AND', [(1, '16MHz'), (2, '16MHz')], (3, 'CS_16MHZ_DRV'))
     ctrl = add('U69', 'HC173', '74HC173', {
         1: 'GND', 2: 'GND', 3: 'CS_COLOR_EN', 4: 'CS_SN_WRITE',
-        5: 'CS_ATTR_MODE', 6: 'CS_AUDIO_EN', 7: 'CS_CLK_MAR',
+        5: 'CS_ATTR_MODE', 6: 'CS_AUDIO_EN', 7: 'CS_EXT_CLK_MAR',
         9: 'CS_CTRL_SEL_N', 10: 'CS_RI_N', 11: 'CS_BUS3', 12: 'CS_BUS2',
         13: 'CS_BUS1', 14: 'CS_BUS0', 15: 'CS_RESET'}, io)
     d_pins = [3, 4, 7, 8, 13, 14, 17, 18]
     q_pins = [2, 5, 6, 9, 12, 15, 16, 19]
     add('U70', 'HC377', '74HC377', {
-        1: 'CS_SND_EN_N', 11: 'CS_CLK_MAR',
+        1: 'CS_SND_EN_N', 11: 'CS_EXT_CLK_MAR',
         **dict(zip(d_pins, [f'CS_BUS{i}' for i in range(8)])),
         **dict(zip(q_pins, [f'CS_SND{i}' for i in range(8)]))}, io)
     or1 = add('U71', 'HC32', '74HC32', {}, io)
@@ -128,7 +137,7 @@ def design():
         **dict(zip(range(2, 10), [f'CS_VDATA{i}' for i in range(8)])),
         **dict(zip(range(18, 10, -1), [f'CS_ATTR_D{i}' for i in range(8)]))}, attr)
     add('U81', 'HCT377', '74HCT377', {
-        1: 'CS_VGA_GET_N', 11: '16MHz',
+        1: 'CS_VGA_GET_N', 11: 'CS_EXT_16MHZ',
         **dict(zip([3, 4, 7, 8, 13, 14, 17, 18], [f'CS_ATTR_D{i}' for i in range(8)])),
         **dict(zip([2, 5, 6, 9, 12, 15, 16, 19], [f'CS_ATTR_Q{i}' for i in range(8)]))}, attr)
     add('U82', 'HC74', '74HC74', {
@@ -137,7 +146,7 @@ def design():
         10: '+5V', 11: 'GND', 12: 'GND', 13: 'CS_RESET_N'}, attr)
     add('U83', 'HC173', '74HC173', {
         1: 'GND', 2: 'GND', 3: 'CS_ACTIVE_LATCH', 4: 'CS_COLOR_LATCH',
-        7: '16MHz', 9: 'CS_VGA_GET_N', 10: 'GND', 11: 'GND', 12: 'GND',
+        7: 'CS_EXT_16MHZ', 9: 'CS_VGA_GET_N', 10: 'GND', 11: 'GND', 12: 'GND',
         13: 'CS_COLOR_EN', 14: 'CS_ACTIVE', 15: 'CS_RESET'}, palette)
     h_and = add('U84', 'HC08', '74HC08', {}, palette)
     logic(h_and, 'AND', [(1, 'CS_H8'), (2, 'CS_H4')], (3, 'CS_H12'))
@@ -178,6 +187,10 @@ def design():
         ('R30', '1.5k', 'CS_DAC_RI', 'CS_VGA_R'), ('R31', '1.5k', 'CS_DAC_GI', 'CS_VGA_G'),
         ('R32', '1.5k', 'CS_DAC_BI', 'CS_VGA_B')]:
         resistor(ref, value, a, b, palette)
+    resistor('R42', '33', 'CS_16MHZ_DRV', 'CS_EXT_16MHZ', attr)  # series termination
+    # Skew trim: U67 drives far less load than U6's CLK_MAR gate, so it leads by an
+    # estimated 1.5-9ns.  0R by default; choose a value after measuring the skew.
+    resistor('R43', '0 (SKEW TRIM)', 'CS_EXT_CLK_MAR_DRV', 'CS_EXT_CLK_MAR', io)
     for i in range(5):  # scan-side attribute row onto the shared CS_CA bus
         resistor(f'R{37+i}', '470', f'CS_SCA{6+i}', f'CS_CA{6+i}', attr)
     resistor('R33', '4.7k', '+5V', 'CS_SN_READY', snd)
@@ -272,6 +285,7 @@ SOURCES = {
     'CS_VREG_OE_N': ('VGA.kicad_sch', 'U38', '1'),
     'CS_V256': ('VGA.kicad_sch', 'U39', '7'),
     'CS_CLK_MAR': ('RAM.kicad_sch', 'J3', '6'),
+    'CS_CLK_RC': ('IR.kicad_sch', 'U6', '2'),  # C33 node feeding the CLK_MAR/CLK_REG NORs
     'CS_RI_N': ('RAM.kicad_sch', 'J3', '32'),
     'CS_RO_N': ('RAM.kicad_sch', 'J3', '31'),
     'CS_RESET_N': ('RAM.kicad_sch', 'J3', '5'),

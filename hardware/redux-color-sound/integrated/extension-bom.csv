@@ -1,6 +1,8 @@
 Reference,Value,Footprint,Schematic sheet
 U64,ATF22V10C (CS_DECODE),Package_DIP:DIP-24_W7.62mm_Socket,ExtensionIO
 U65,74HC04,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
+U67,74HC02,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
+U68,74AC08,Package_DIP:DIP-14_W7.62mm_Socket,Attribute
 U69,74HC173,Package_DIP:DIP-16_W7.62mm_Socket,ExtensionIO
 U70,74HC377,Package_DIP:DIP-20_W7.62mm_Socket,ExtensionIO
 U71,74HC32,Package_DIP:DIP-14_W7.62mm_Socket,ExtensionIO
@@ -29,6 +31,8 @@ R29,750,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Palette
 R30,1.5k,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Palette
 R31,1.5k,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Palette
 R32,1.5k,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Palette
+R42,33,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Attribute
+R43,0 (SKEW TRIM),Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,ExtensionIO
 R37,470,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Attribute
 R38,470,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Attribute
 R39,470,Resistor_THT:R_Axial_DIN0207_L6.3mm_D2.5mm_P7.62mm_Horizontal,Attribute
@@ -43,6 +47,8 @@ J6,MONO LINE OUT / EXTERNAL AMP,Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54m
 C62,220n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,PSG
 C34,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C35,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
+C37,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
+C38,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C39,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C40,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
 C41,100n,Capacitor_THT:C_Disc_D5.0mm_W2.5mm_P2.50mm,ExtensionPower
