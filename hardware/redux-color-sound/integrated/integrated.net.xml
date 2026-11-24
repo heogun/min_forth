@@ -2,7 +2,7 @@
 <export version="E">
   <design>
     <source>${KIPRJMOD}/8-Bit CPU 32k.kicad_sch</source>
-    <date>2026-11-24T18:29:28</date>
+    <date>2026-11-25T02:33:41</date>
     <tool>Eeschema 10.0.7</tool>
     <sheet number="1" name="/" tstamps="/">
       <title_block>

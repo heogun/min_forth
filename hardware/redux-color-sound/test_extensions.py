@@ -264,6 +264,21 @@ class ExtensionTests(unittest.TestCase):
         worst = 5.25*(1/(750*0.99)+1/(1500*0.99))/(1/75+1/(750*0.99)+1/(1500*0.99))
         self.assertLessEqual(worst, 0.7)
 
+    def test_compact_band_layout_and_j4_notch(self):
+        # TIMING_REVIEW.md 12절: extension parts live in a band above the original
+        # top edge; the VGA connector J4 (x 29..61) keeps a notch for its plug.
+        report = json.loads((PROJECT / 'placement-report.json').read_text())
+        outline = report['outline_mm']
+        self.assertEqual(outline[0], [29.2, 50.8])
+        notch_x, top = outline[1][0], outline[2][1]
+        self.assertGreaterEqual(notch_x, 62.0)
+        self.assertLess(top, 50.8)
+        for ref, (x, y, _) in report['placements'].items():
+            self.assertLess(y, 50.8, ref)
+            self.assertGreater(y, top, ref)
+            self.assertGreater(x, notch_x, ref)
+            self.assertLess(x, 260.98, ref)
+
     def test_pcb_draft_removes_only_intentionally_split_copper(self):
         report = json.loads((PROJECT / 'placement-report.json').read_text())
         self.assertEqual(report['new_footprints'], len(self.manifest['parts']))

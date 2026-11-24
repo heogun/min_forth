@@ -52,16 +52,22 @@ def prepare(pcbnew, source, work):
     before['source_sha256'] = digest(original)
     before['source'] = str(original)
     (work / 'before.json').write_text(json.dumps(before, indent=2)+'\n')
+    # The GND pour follows the whole (possibly non-rectangular) board outline.
+    outline = pcbnew.SHAPE_POLY_SET()
+    if not board.GetBoardPolygonOutlines(outline, False) or outline.OutlineCount() != 1:
+        raise ValueError('Board outline must be one closed polygon')
     expanded = 0
     for zone in board.Zones():
         if zone.GetNetname() != 'GND' or zone.Outline().OutlineCount() != 1:
             continue
+        # Rebuild the zone's own polygon in place; handing KiCad a temporary
+        # SHAPE_POLY_SET via SetOutline() crashes the 10.0 Python bindings.
+        points = [(p.x, p.y) for p in outline.COutline(0).CPoints()]
         polygon = zone.Outline()
-        points = list(polygon.COutline(0).CPoints())
-        old_right = max(p.x for p in points)
-        for i, point in enumerate(points):
-            if point.x == old_right:
-                polygon.SetVertex(i, pcbnew.VECTOR2I(pcbnew.FromMM(448), point.y))
+        polygon.RemoveAllContours()
+        polygon.NewOutline()
+        for x, y in points:
+            polygon.Append(x, y)
         expanded += 1
     assert expanded == 1, 'Expected exactly one existing multilayer GND zone'
     board.BuildConnectivity()
@@ -75,7 +81,7 @@ def prepare(pcbnew, source, work):
         raise RuntimeError('DSN export failed')
     text = (work / 'route.dsn').read_text()
     assert '(type fix)' in text, 'No locked copper exported'
-    print(f'Exported {len(before["copper"])} locked copper items; GND zone extends to x=448mm.')
+    print(f'Exported {len(before["copper"])} locked copper items; GND zone follows the board outline.')
     print(f'Input for local router: {work / "route.dsn"}')
 
 
@@ -161,7 +167,7 @@ def adopt(source, work):
               'freerouting_version': '2.5.0 JVM', 'protection': protected,
               'checks': {'erc': 0, 'physical_drc': 0, 'schematic_parity': 0,
                          'unconnected_items': 0, 'excluded_findings': 0},
-              'ground_zone_right_mm': 448,
+              'ground_zone': 'board outline',
               'remaining_validation': ['worst-case timing', 'clock waveform/fanout',
                   'power/current/thermal budget', 'real hardware tests']}
     (source / 'routing-report.json').write_text(json.dumps(report, indent=2)+'\n')
