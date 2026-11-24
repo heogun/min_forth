@@ -135,6 +135,11 @@ J6은 **외부 앰프용 모노 line-out**(1=신호, 2=GND)이다. 스피커나 
 
 ## 아직 통과하지 않은 조건
 
+> 2026-11-24 데이터시트 계산 결과는 [TIMING_REVIEW.md](TIMING_REVIEW.md)에 있다.
+> 조건 4(RAM `/CE` 6단 디코드)와 2·3(Attribute 주소 adder, VA 버스 용량)은 원본 최장 경로보다 긴
+> **구조적 회귀**로 판정했다. 5는 배치를 압축한 뒤 다시 계산해야 하고, 6·7은 통과다.
+> 회로 수정 전에는 재배선하지 않는다.
+
 1. 새 회로의 실제 배선 386개 연결, ground plane 확장, compact 재배치 및 제조 DRC.
 2. SRAM 주소 settle/접근/출력 enable와 16MHz capture의 setup/hold 최대값.
 3. VREG 캡처와 plane FF의 전환, WE 펄스 폭·non-overlap/글리치 검증.
