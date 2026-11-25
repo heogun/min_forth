@@ -59,6 +59,7 @@ cargo run --release -- --rom-dir ../../minforth/build   # Forth 커널
 
 ## 문서
 
+- Minimal 64x4 원작자(slu4) 매뉴얼 사본: [`docs/manual.txt`](docs/manual.txt)
 - 실물 제작 부품 구매 목록과 주의사항: [`docs/HARDWARE_SHOPPING.md`](docs/HARDWARE_SHOPPING.md)
 - 커널 설계와 `ABORT"` 동작: [`minforth/README.md`](minforth/README.md)
 - 흑백 기준 에뮬레이터 사용법과 정확도 범위: [`minredux/README.md`](minredux/README.md)
